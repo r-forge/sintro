@@ -1,0 +1,207 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>What is R?</TITLE>
+<META NAME="description" CONTENT="What is R?">
+<META NAME="keywords" CONTENT="Rintro">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="Rintro.css">
+
+<LINK REL="next" HREF="node4.html">
+<LINK REL="previous" HREF="node2.html">
+<LINK REL="up" HREF="node2.html">
+<LINK REL="next" HREF="node4.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html427"
+  HREF="node4.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="../icons/next.png"></A> 
+<A NAME="tex2html421"
+  HREF="node2.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="../icons/up.png"></A> 
+<A NAME="tex2html415"
+  HREF="node2.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="../icons/prev.png"></A> 
+<A NAME="tex2html423"
+  HREF="../sintroTOC.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="../icons/contents.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html428"
+  HREF="node4.html">Contents and Outline of</A>
+<B> Up:</B> <A NAME="tex2html422"
+  HREF="node2.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html416"
+  HREF="node2.html">Introduction</A>
+ &nbsp; <B>  <A NAME="tex2html424"
+  HREF="../sintroTOC.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00210000000000000000">
+What is R?</A>
+</H1><FONT COLOR="#ff00ff"><I></I></FONT>
+<P>
+<FONT COLOR="#ff00ff"><I><FONT COLOR="#000000"><A NAME="s:01"></A></FONT></I></FONT>
+<P>
+<FONT COLOR="#ff00ff"><I><FONT COLOR="#000000">R is a programming language, and the name of a software system which implements this language.
+The R programming language has been developed for statistics and stochastic simulation. By now, it has 
+become a standard in these fields. To be precise, we should use specific terms: the language is called S, its
+implementation and the environment are called R. The original authors of S are John M. Chambers, R. A. Becker and 
+A. R. Wilks, AT &amp; T Bell Laboratories, Statistics Research Department. The language and its development are documented in a series of books, commonly called by their cover as white, blue and green book. 
+</FONT></I></FONT>
+<P>
+<FONT COLOR="#ff00ff"><I><FONT COLOR="#000000">For a long time the AT &amp; T implementation of S has been the reference for the S language. Today, S 
+is available in a commercial version called  S-Plus 
+<TT><A NAME="tex2html7"
+  HREF="&lt;http://www.insightful.com/&gt;">&lt;http://www.insightful.com/&gt;</A></TT> (based on the AT &amp; T implementation) 
+and as a free software version R , or "Gnu S" <TT><A NAME="tex2html9"
+  HREF="&lt;http://www.r-project.org/&gt;">&lt;http://www.r-project.org/&gt;</A></TT>.
+</FONT></I></FONT>
+<DIV ALIGN="CENTER"><FONT COLOR="#ff00ff"><I><FONT COLOR="#000000"><img alt="R logo" src="../icons/RLogo.png"> 
+</FONT></I></FONT></DIV><FONT COLOR="#ff00ff"><I></I></FONT>
+<P>
+<FONT COLOR="#ff00ff"><I><FONT COLOR="#000000">In the meantime, R  has become the reference implementation.
+Essential precisations and - if necessary - even modifications of the language are
+defined by R. For simplicity, here and in the sequel we use "R language" as a
+common term even where the precise term should be: the S language using the R implementation.
+</FONT></I></FONT>
+<P>
+<FONT COLOR="#ff00ff"><I><FONT COLOR="#000000">R is an interpreted programming language. Instructions in R are executed immediately.
+Besides the original elements of S,  R has several extensions. Some of these are introduced
+in response to recent developments in statistics, some are introduced to open experimental
+facilities. On the other side, advancements of the S language are taken into account.
+</FONT></I></FONT>
+<P>
+<FONT COLOR="#ff00ff"><I><FONT COLOR="#000000"> The recent (2008) version of  R is 2.x. This version is largely compatible with
+the previous version R 1.x. The essential changes are internal to the system. For
+initial use, there is no significant difference from  R  1.x. For the advanced user,
+there are three essential innovations:
+</FONT></I></FONT>
+<UL>
+<LI><B>Graphics:</B> The basic graphics system in R implements a model
+inspired by pen and paper drawing. A graphics port (paper) is opened, and lines,
+points or symbols are drawn in this port. In R  2.x there is a second additional graphics
+system, oriented at a viewport/object model. Graphical objects in various positions and
+orientations are mapped in a visual space.
+</LI>
+<LI><B>Packages:</B> The original R had a linear command history and a uniform work
+space.  R  2.x introduced an improved support for "packages" which may have
+encapsulated information. To support this, language concepts such as "name spaces" and various tools
+have been introduced.
+</LI>
+<LI><B>Internationalisation:</B> Originally, R was based on the English language, and
+ASCII was the general encoding used. With R  2.x extensive support for other
+languages and encodings has been introduced. With this, it has become possible to
+provide localised versions.
+</LI>
+</UL><FONT COLOR="#ff00ff"><I></I></FONT>
+<P>
+<FONT COLOR="#ff00ff"><I><FONT COLOR="#000000">Two aspects of R  are active areas of recent developments: interactive access, and
+integration in a networked environment. These and other aspects are part of
+Omegahat - an attempt to develop a next generation system based on the experiences from R .
+This more experimental project is accessible at <TT><A NAME="tex2html10"
+  HREF="&lt;http://www.omegahat.org/&gt;">&lt;http://www.omegahat.org/&gt;</A></TT>.
+R  does already provide simple possibilities to call functions implemented in other languages
+like C or FORTRAN. Omegahat extends these possibilities and allows direct access 
+to Java, Perl.  A Java based graphical interface for R is JGR, accessible at 
+<TT><A NAME="tex2html11"
+  HREF="&lt;http://stats.math.uni-augsburg.de/software/&gt;">&lt;http://stats.math.uni-augsburg.de/software/&gt;</A></TT>. A collection of interactive
+displays for R is in iplots, available at the same site.
+</FONT></I></FONT>
+<P>
+<FONT COLOR="#ff00ff"><I><FONT COLOR="#000000">Recent developments related to R are in  <TT><A NAME="tex2html12"
+  HREF="&lt;http://r-forge.r-project.org/&gt;">&lt;http://r-forge.r-project.org/&gt;</A></TT>.
+Many helpful extensions are in 
+<TT><A NAME="tex2html13"
+  HREF="&lt;http://www.bioconductor.org/&gt;">&lt;http://www.bioconductor.org/&gt;</A></TT>, a site which is targeted at biocomputing.
+</FONT></I></FONT>
+<P>
+<FONT COLOR="#ff00ff"><I><FONT COLOR="#000000"><A NAME="s:02"></A></FONT></I></FONT>
+<P>
+<FONT COLOR="#ff00ff"><I><FONT COLOR="#000000">R  has been developed for practical work in statistics. Usability often has been given 
+priority over abstract design principles. As a consequence, it is not easy
+to give a systematic introduction to  R. A winding path is chosen here instead: case studies and
+examples, followed by systematic surveys. Practical work should make use
+of the rich online material which comes with  R. Starting points are the
+ "frequently asked questions" (FAQ) 
+<TT><A NAME="tex2html14"
+  HREF="&lt;http://www.cran.r-project.org/faqs.html&gt;">&lt;http://www.cran.r-project.org/faqs.html&gt;</A></TT>. "An Introduction to R" 
+ is the "official" introduction. This documentation and 
+other manuals can be downloaded from  <TT><A NAME="tex2html15"
+  HREF="&lt;http://www.cran.r-project.org/manuals.html&gt;">&lt;http://www.cran.r-project.org/manuals.html&gt;</A></TT>.
+</FONT></I></FONT>
+<P>
+<FONT COLOR="#ff00ff"><I><FONT COLOR="#000000">R comes with an extensive online help system providing function descriptions and examples.
+Once you have become familiar with R, the online help and manuals will become first source of information.
+For off-line reference, we include some examples of information provided by the help system, with kind permission of
+The R Foundation for Statistical Computing.
+</FONT></I></FONT>
+<P>
+<FONT COLOR="#ff00ff"><I><FONT COLOR="#000000">Many R functions are included in the basic system. Other functions must be loaded from libraries.
+Some of these libraries are distributed with the R system. If additional
+packages are needed,  <TT><A NAME="tex2html16"
+  HREF="&lt;http://www.cran.r-project.org/&gt;">&lt;http://www.cran.r-project.org/&gt;</A></TT> is a first source for downloads, 
+and <TT><A NAME="tex2html17"
+  HREF="&lt;http://r-forge.r-project.org/&gt;">&lt;http://r-forge.r-project.org/&gt;</A></TT> for current projects.
+</FONT></I></FONT>
+<P>
+<FONT COLOR="#ff00ff"><I><FONT COLOR="#000000">The commercial S-Plus is available in various versions. S-Plus 
+ and S-Plus 2000 use S version 3 and are largely compatible with  R.
+S-Plus 5 is an implementation of S version 4 with some changes which need attention. 
+These programming details of S-Plus  are not discussed here. Information about S-Plus is at <TT><A NAME="tex2html18"
+  HREF="&lt;http://www.insightful.com/&gt;">&lt;http://www.insightful.com/&gt;</A></TT>.
+</FONT></I></FONT>
+<P>
+<FONT COLOR="#ff00ff"><I></I></FONT><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html427"
+  HREF="node4.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="../icons/next.png"></A> 
+<A NAME="tex2html421"
+  HREF="node2.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="../icons/up.png"></A> 
+<A NAME="tex2html415"
+  HREF="node2.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="../icons/prev.png"></A> 
+<A NAME="tex2html423"
+  HREF="../sintroTOC.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="../icons/contents.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html428"
+  HREF="node4.html">Contents and Outline of</A>
+<B> Up:</B> <A NAME="tex2html422"
+  HREF="node2.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html416"
+  HREF="node2.html">Introduction</A>
+ &nbsp; <B>  <A NAME="tex2html424"
+  HREF="../sintroTOC.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+<ADDRESS>
+gs
+2008-08-23
+</ADDRESS>
+</BODY>
+</HTML>
