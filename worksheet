@@ -1,0 +1,41 @@
+# a commom worksheet for sitroe
+cd ~/projects/rforge/ # sintro ## a directory containing sintro
+cd "/Users/gs/projects/rforge/sintro/"
+
+# R cmds for ad hoc construction
+# setwd("/Users/gs/projects/rforge/sintro/")
+# install.packages("/Users/gs/projects/rforge/sintro/sintro.1-1.tar.gz", repos=NULL, type="source")
+
+# install package
+
+cd /Users/gs/projects/rforge/sintro
+R CMD CHECK pkg
+R CMD BUILD --compact-vignettes pkg
+
+# install package
+R CMD INSTALL sintro
+# generate a pdf help file
+rm sintro.pdf; R CMD Rd2dvi -o sintro.pdf --pdf --title="sintro" pkg
+
+##
+setwd("/Volumes/Untitled/sintro1")cd 
+
+source("R/sintro.R")
+source("R/plot.sintro.R")
+ll <- ls()
+package.skeleton(name="sintro", ll)
+
+rm sintro.pdf; R CMD Rd2dvi --pdf --output=sintro.pdf --title="sintro" /Users/gs/projects/rforge/sintro/pkg/man; open sintro.pdf
+
+setwd("/Users/gs/projects/rforge/sintro/pkg/inst/doc")
+enc <- options(width = 56);  Sweave("sintroR.Rnw",output="sintroR.tex", keep.source=TRUE, debug = TRUE, eps = FALSE); options(enc)
+tools::compactPDF("/Users/gs/projects/rforge/sintro/pkg/inst/doc/sintroR.pdf") # \textperthousand
+####
+# /Library/Frameworks/R.framework/Versions/2.14/Resources/bin/qpdf
+ detach("package:sintro", unload=TRUE)
+  install.packages("sintro",repos="http://r-forge.r-project.org",type="source")
+ remove.packages("sintro")
+install.packages("/Users/gs/projects/rforge/sintro/sintro_0.1-1.tar.gz",repos=NULL,type="source")
+# install.packages("/Users/gs/projects/rforge/sintro/sintro_0.1-1.tar.gz",repos=NULL,type="source",INSTALL_opts="--byte-compile")
+
+library(sintro)
