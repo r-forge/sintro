@@ -1,0 +1,6 @@
+export(
+    plot.lm
+    )
+
+S3method(plot, lm)
+
