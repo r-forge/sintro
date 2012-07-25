@@ -1,8 +1,8 @@
 Package: sintro
 Type: Package
 Title: sintro: Introduction to R
-Version: 0.1-1
-Date: 2012-01-21
+Version: 0.1-2
+Date: 2012-07-25
 Author: G. Sawitzki
 Maintainer: G. Sawitzki <gs@statlab.uni-heidelberg.de>
 Description: Sample code and supplement to G. Sawitzki: Computational Statistics/Introduction to R.

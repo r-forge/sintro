@@ -1,5 +1,7 @@
 export(
-    plot.lm
+    plot.lm,
+    text.id,
+    summaryRprof
     )
 
 S3method(plot, lm)
