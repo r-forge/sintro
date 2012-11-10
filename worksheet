@@ -15,10 +15,10 @@ R CMD BUILD --compact-vignettes pkg
 # install package
 R CMD INSTALL sintro
 # generate a pdf help file
-rm sintro.pdf; R CMD Rd2dvi -o sintro.pdf --pdf --title="sintro" pkg
-
+#rm sintro.pdf; R CMD Rd2dvi -o sintro.pdf --pdf --title="sintro" pkg
+rm sintro.pdf; R CMD Rd2pdf -o sintro.pdf --title="sintro" pkg
 ##
-setwd("/Volumes/Untitled/sintro1")cd 
+setwd("/Volumes/Untitled/sintro1")
 
 source("R/sintro.R")
 source("R/plot.sintro.R")

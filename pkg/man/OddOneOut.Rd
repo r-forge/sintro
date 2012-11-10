@@ -61,11 +61,13 @@ A matrix with columns \code{"oddrow", "oddcol", "selrow", "selcol"}  with the lo
 sample, and the location of the user response.
 }
 \references{
-G\"unther Sawitzki:    Computational Statistics: An Introduction to R. 
-        Chapman & Hall/CRC Press, Boca Raton (FL), 2009. 
-        ISBN: 978-1-4200-8678-2. }
+Sawitzki, G.: Computational Statistics/Introduction to R.
+	Chapman & Hall/CRC Press, Boca Raton (FL), 2009.
+        ISBN: 978-1-4200-8678-2.
+	 \url{http://sintro.r-forge.r-project.org/}
+}
 \author{
-G. Sawitzki
+G. Sawitzki \email{gs@statlab.uni-heidelberg.de}
 }
 %\note{
 %%%  ~~further notes~~
