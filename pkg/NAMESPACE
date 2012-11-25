@@ -1,7 +1,8 @@
 export(
     plot.lm,
     text.id,
-    summaryRprof
+    summaryRprof,
+    OddOneOut
     )
 
 S3method(plot, lm)

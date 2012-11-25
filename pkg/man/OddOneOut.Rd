@@ -10,7 +10,8 @@ OddOneOut
 Gives a series of plot matrices and waits for the user to select the figure in the matrix that is off.
 }
 \usage{
-OddOneOut(goodplot = rnormplot, badplot = runifplot, n = 100, runs = 10, nrows = 4, ncols = 4, training = TRUE, ...)
+OddOneOut(goodplot = rnormplot, badplot = runifplot, 
+n = 100, runs = 10, nrows = 4, ncols = 4, training = TRUE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
