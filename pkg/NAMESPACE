@@ -1,6 +1,6 @@
 export(
     plot.lm,
-    text.id,
+    text_id,
     summaryRprof,
     OddOneOut
     )
