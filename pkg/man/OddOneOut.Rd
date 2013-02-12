@@ -10,7 +10,8 @@ OddOneOut
 Gives a series of plot matrices and waits for the user to select the figure in the matrix that is off.
 }
 \usage{
-OddOneOut(goodplot = rnormplot, badplot = runifplot, 
+OddOneOut(goodplot = function(n, ...){plot(rnorm(n))}, 
+badplot = function(n, ...){plot(runif(n))}, 
 n = 100, runs = 10, nrows = 4, ncols = 4, training = TRUE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -82,15 +83,15 @@ G. Sawitzki \email{gs@statlab.uni-heidelberg.de}
 \examples{
 \dontrun{
 
-rnormplot <- function(n, ...){plot(rnorm(n))}
-runifplot <- function(n, ...){plot(runif(n))}
+%rnormplot <- function(n, ...){plot(rnorm(n))}
+%runifplot <- function(n, ...){plot(runif(n))}
 
 OddOneOut(runs=5, ncols=3)
 OddOneOut(runs=5, ncols=3, training=FALSE)
 
 }
 ## The function is currently defined as
-function (goodplot = rnormplot, badplot = runifplot, n = 100, 
+function (goodplot = function(n, ...){plot(rnorm(n))}, badplot = function(n, ...){plot(runif(n))}, n = 100, 
     runs = 10, nrows = 4, ncols = 4, training = TRUE, ...) 
 {
 cat("One plot is out. Please click on the odd panel in the plot. Abort with <esc>.\n")

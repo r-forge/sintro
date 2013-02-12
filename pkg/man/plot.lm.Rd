@@ -13,7 +13,7 @@
      caption = list("Residuals vs Fitted", "Normal Q-Q",
        "Scale-Location", "Cook's distance",
        "Residuals vs Leverage",
-       expression("Cook's dist vs Leverage  " * h[ii] / (1 - h[ii]))
+       expression("Cook's dist vs Leverage  " * h[ii] / (1 - h[ii])),
        "Stud. Residuals vs Rk Fitted"),
      panel = if(add.smooth) panel.smooth else points,
      sub.caption = NULL, main = "",
