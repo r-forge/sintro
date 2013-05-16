@@ -1,0 +1,9 @@
+export(
+    plot.lm,
+    text_id,
+    summaryRprof,
+    OddOneOut
+    )
+
+S3method(plot, lm)
+

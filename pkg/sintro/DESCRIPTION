@@ -1,0 +1,10 @@
+Package: sintro
+Type: Package
+Title: sintro: Introduction to R
+Version: 0.1-3
+Date: 2013-02-12
+Author: G. Sawitzki
+Maintainer: G. Sawitzki <gs@statlab.uni-heidelberg.de>
+Description: Sample code and supplement to G. Sawitzki: Computational Statistics/Introduction to R.
+License: LGPL
+ByteCompile: true
