@@ -1,0 +1,235 @@
+\documentclass[a4paper]{book}
+\usepackage[times,inconsolata,hyper]{Rd}
+\usepackage{makeidx}
+\usepackage[utf8,latin1]{inputenc}
+% \usepackage{graphicx} % @USE GRAPHICX@
+\makeindex{}
+\begin{document}
+\chapter*{}
+\begin{center}
+{\textbf{\huge sprof}}
+\par\bigskip{\large \today}
+\end{center}
+\begin{description}
+\raggedright{}
+\item[Type]\AsIs{Package}
+\item[Title]\AsIs{Profiling, timing and optimization utilitites}
+\item[Version]\AsIs{0.0-1}
+\item[Date]\AsIs{2013-05-26}
+\item[Author]\AsIs{G. Sawitzki}
+\item[Maintainer]\AsIs{G. Sawitzki }\email{gsawitzki@r-forge.r-project.org}\AsIs{}
+\item[Description]\AsIs{Support utilitites}
+\item[License]\AsIs{GPL-3}
+\end{description}
+\Rdcontents{\R{} topics documented:}
+\inputencoding{utf8}
+\HeaderA{sprof-package}{sprof: R profiling}{sprof.Rdash.package}
+\aliasA{sprof}{sprof-package}{sprof}
+\keyword{utilities}{sprof-package}
+%
+\begin{Description}\relax
+Profiling, timing and optimization utilitites
+\end{Description}
+%
+\begin{Details}\relax
+
+\Tabular{ll}{
+Package: & sprof\\{}
+Type: & Package\\{}
+Version: & 0.0-1\\{}
+Date: & 2013-05-26\\{}
+License: & GPL-2\\{}
+}
+\code{readProf} reads a profile file and returns a composite structure.
+\end{Details}
+%
+\begin{Author}\relax
+G<c3><bc>nther Sawitzki <gsawitzki@r-forge.r-project.org>
+\end{Author}
+%
+\begin{SeeAlso}\relax
+\code{\LinkA{proftools}{proftools}}.
+
+\code{\LinkA{profr}{profr}}.
+
+\code{\LinkA{profr}{profr}}.
+
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{readProf}{Read \code{\LinkA{Rprof}{Rprof}} Output files and Stack Logs}{readProf}
+%
+\begin{Description}\relax
+Read a log of stack entries, such as the output of the \code{\LinkA{Rprof}{Rprof}} function, and generate a more accessible representation.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+readProf(filename = "Rprof.out", chunksize = 5000,
+	interval = 0.02, head=c("auto"))
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{filename}] Name of a file produced by \code{Rprof()}.
+\item[\code{chunksize}] Number of lines to read at a time.
+\item[\code{interval}] real: time interval between samples, in s.
+\item[\code{head}] \code{c("auto", "none", "Rprofmem")} to interpret control information as provided by \code{Rprof} or \code{Rprofmem}. See details.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This function reads a log file of stacks, one stack snapshot per line, stack entries separated by space.
+
+As profiling output file could be very large, it
+is read in blocks of \code{chunksize} lines.  Increasing \code{chunksize}
+will make the function run faster if sufficient memory is available.
+
+The input format is controlled by the \code{head} argument. Format \code{"auto"} tries to detect control lines as interspersed by \code{Rprof}. These lines are not included in the output.
+
+\code{"none"} igores all control information and includes these lines as strange stacks.  
+
+\code{"Rprofmem"} isolates headers as provided by  \code{Rprofmem}. \code{new page} entries are encoded as \code{malloc} requests with length 0.
+\end{Details}
+%
+\begin{Value}
+A list with components
+\begin{ldescription}
+\item[\code{firstline}] A verbatim copy of the first line of the input file. 
+Typically this contains timing or formatting information.
+\item[\code{nodes}] A vector of node names. 
+This may include stray entries from interperspersed lines.
+\item[\code{stacks}] A vector of unique stacks found in input, stored as verbatim copies.
+\item[\code{stacksrenc}] A list of unique stacks in top down order (top first), 
+encoded as vectors or references to \code{stacks}.
+\item[\code{data}] A vector encoding the data file as referenes to  \code{stacks}.
+\item[\code{timesRLE}] Vector of sampling intervals, in miliseconds. Run-length encoded.
+\item[\code{freq}] A frequency table summarizing \code{data}.
+
+\end{ldescription}
+\end{Value}
+%
+\begin{Author}\relax
+Günther Sawitzki <gsawitzki@r-forge.r-project.org>, based on the code of \code{\LinkA{summaryRprof}{summaryRprof}}
+\end{Author}
+%
+\begin{References}\relax
+  \url{http://sintro.r-forge.r-project.org/} 
+\end{References}
+%
+\begin{SeeAlso}\relax
+\code{\LinkA{summaryRprof}{summaryRprof}}
+
+\code{\LinkA{summaryRprof}{summaryRprof}}
+
+\code{\{\LinkA{readRprofileData}{readRprofileData}\} and  \code{\{flatProfile\}} in \code{library(proftools)}.
+
+
+\code{\{parse\_rprof\}} in \code{library(profr)}.
+
+
+  The chapter on ``Tidying and profiling R code'' in
+  ``Writing \R{} Extensions'' (see the \file{doc/manual} subdirectory
+  of the \R{} source tree).
+
+  
+
+  
+\code{\LinkA{Rprof}{Rprof}} is a sampling profiler.
+
+  \code{\LinkA{tracemem}{tracemem}} traces copying of an object via the C function
+  \code{duplicate}.
+
+  \code{\LinkA{Rprofmem}{Rprofmem}} is a non-sampling memory-use profiler.
+
+  \url{http://developer.r-project.org/memory-profiling.html}
+}
+
+## Not run: 
+\#\# Rprof() is not available on all platforms
+profinterval <- 0.001
+simruns <- 100
+
+n <- 10000
+x <- runif(n)
+y0 <- 2+ 3 * x
+
+sinknull <- textConnection(NULL, "w"); sink(sinknull)
+Rprof(tmp <- tempfile(), interval = profinterval)
+for (i in 1:simruns) \{y <- y0 +  rnorm(n); xxx<- summary(lm(y\textasciitilde{}x))\}
+Rprof()
+
+Rprof\_out <- readProf(tmp)
+
+unlink(tmp)
+sink(); close(sinknull)
+
+str(Rprof\_out)
+
+## End(Not run)
+
+
+utilities
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{summary\_prof}{Summary for profiles}{summary.Rul.prof}
+\keyword{utilities}{summary\_prof}
+%
+\begin{Description}\relax
+Print a summary for the output of \code{\LinkA{readProf}{readProf}}.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+summary_prof(x)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{x}] A data structure as returned by  \code{\LinkA{readProf}{readProf}}.
+
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+None.
+\end{Value}
+%
+\begin{References}\relax
+  \url{http://sintro.r-forge.r-project.org/} 
+\end{References}
+%
+\begin{SeeAlso}\relax
+\code{\LinkA{summaryRprof}{summaryRprof}}
+\end{SeeAlso}
+%
+\begin{Examples}
+\begin{ExampleCode}
+	## Not run: 
+## Rprof() is not available on all platforms
+profinterval <- 0.001
+simruns <- 100
+
+n <- 10000
+x <- runif(n)
+y0 <- 2+ 3 * x
+
+sinknull <- textConnection(NULL, "w"); sink(sinknull)
+Rprof(tmp <- tempfile(), interval = profinterval)
+for (i in 1:simruns) {y <- y0 +  rnorm(n); xxx<- summary(lm(y~x))}
+Rprof()
+
+Rprof_out <- readProf(tmp)
+
+unlink(tmp)
+sink(); close(sinknull)
+
+summary_prof(Rprof_out)
+
+## End(Not run)
+
+\end{ExampleCode}
+\end{Examples}
+\printindex{}
+\end{document}
