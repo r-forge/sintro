@@ -13,7 +13,7 @@ str_prof <- function(x){
 		# timesRLE
 		# freq=table(collencstacks))
 
-	cat("First line:", dQuote(x$firstline),"\n")
+	cat("First line:", x$firstline,"\n")
 	cat(length(x$data),"Sampling intervals ")
 	if (length(x$timesRLE[1])==1) cat(" at",x$timesRLE[[2]],"micros\n") else {cat("in micros: ");print(x$timesRLE)}
 	cat(length(x$nodes),"nodes in",length(x$stacks$stacks), "stacks\n")	
@@ -22,16 +22,28 @@ str_prof <- function(x){
 	roots <- unique(x$stacks$stackheadnodes)
 	cat(length(roots), "Roots: ")
 	print(table(x$nodes[x$stacks$stackheadnodes]))
-	cat("Structure: ");str(x, max.level=1)
-	cat("stacks Structure: ");str(x$stacks, max.level=1, vec.len=2)		
+	cat("\n", deparse(substitute(x)), " Structure: "); str(x, max.level=1)
+	cat("\n","stacks Structure: "); str(x$stacks, max.level=1, vec.len=2)		
 }# str_prof 
 
+summary_profiles <- function(x){
+	if (is.null(x$id)) id <- paste("Profile Summary", date()) else id <- x$id
+	len <- length(x$data)
+	uniquestacks <- length(unique(x$data))
+	runs <- length(rle(x$data)) %/% 2
+	list(id=id, len=len, uniquestacks, runs)	
+}
+
+summary_nodes <- function(x){
+	nrnodes <- length(x$nodes)
+	ishead <- rep(FALSE,nrnodes); ishead[x$stacks$stackheadnodes] <- TRUE
+	nodes <- data.frame(name=x$nodes)
+}
 summary_terminals<- function(x){
-	
 	table(x$stacks$stackleafnodes)
 #	x$stacks$refcount
 }
 
-summary_prof <- function(x){
+summary.sprof <- function(x){
 	str_prof(x)
 }

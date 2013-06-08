@@ -6,7 +6,7 @@
 rrle <- function(x){
 	prevrle <- rle(x[nrow(x),])
 	collrle <- list(prevrle)
-	browser()
+	#browser()
 	if (nrow(x)>1) {for  (i in (nrow(x)-1): 1) {
 		ni <- length(prevrle$lengths)
 		endp <-cumsum(prevrle$lengths)

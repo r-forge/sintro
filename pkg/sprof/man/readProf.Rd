@@ -11,7 +11,8 @@ Read a log of stack entries, such as the output of the \code{\link{Rprof}} funct
 }
 \usage{
 readProf(filename = "Rprof.out", chunksize = 5000,
-	interval = 0.02, head=c("auto"))
+	interval = 0.02, 
+	head = c("auto", "none", "Rprofmem"))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -34,7 +35,9 @@ readProf(filename = "Rprof.out", chunksize = 5000,
  \code{"Rprofmem"} isolates headers as provided by  \code{Rprofmem}. \code{new page} entries are encoded as \code{malloc} requests with length 0.
 }
 \value{
-A list with components
+This data structure is subject to change.
+
+Temporarily: A list with components
 \item{firstline}{A verbatim copy of the first line of the input file. 
 	Typically this contains timing or formatting information.}
 \item{nodes}{A vector of node names. 
@@ -63,7 +66,7 @@ A list with components
 
  \code{\link{summaryRprof}}
  
-\code{\link{readRprofileData}} and  \code{flatProfile} in \code{library(proftools)}.
+\code{\link[proftools]{readRprofileData}} and  \code{\link[proftools]{flatProfile}} in \code{library(proftools)}.
 
 %\code{\link[profr]{parse_rprof}} in \code{library(profr)}.
 \code{{parse_rprof}} in \code{library(profr)}.

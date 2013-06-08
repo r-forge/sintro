@@ -82,7 +82,7 @@ readProf <- function(filename = "Rprof.out",
 		if (head=="Rprofmem")
 	#handle Rprofmem output
 	{
-			browser()
+			#browser()
 			cx <- sapply(chunk, function(x){sub("new page:", "0 :",x)}, USE.NAMES = FALSE)
 			cx <- strsplit(cx," :")
 			chunkmalloccounts <- as.numeric(sapply(cx, function(x){x[1]}, USE.NAMES = FALSE))
@@ -159,7 +159,7 @@ readProf <- function(filename = "Rprof.out",
 	#renc -> reversed  source
 	#browser()
  	collstacksdictrev <- sapply(stacksnode, function(x){paste(nodenames[x], collapse=" ")})
-   browser()
+   #browser()
 	stacks <- data.frame(
 		shortname = abbreviate(collstacksdictrev), # headers and control lines removed
 		# a convenience for accounting#nr of lines using stack --! should be adjusted for interval
