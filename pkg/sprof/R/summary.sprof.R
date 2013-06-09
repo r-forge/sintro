@@ -61,7 +61,7 @@ summary_profiles <- function(x){
 	list(id=id, len=len, uniquestacks=uniquestacks, runs=runs)	
 }
 
-summary.sprof <- function(x){
+summary.sprof <- function(x, ...){
 	summary_nodes(x)
 	summary_stacks(x)
 	summary_profiles(x)

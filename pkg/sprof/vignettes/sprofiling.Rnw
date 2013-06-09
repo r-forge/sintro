@@ -21,6 +21,15 @@
 \usepackage{SIntro}
 \setkeys{Gin}{width=1.0\textwidth}
 
+\newcommand{\R}{{\normalfont\textsf{R}}{}}
+\newcommand\ircode[1]{\textsl{\texttt{#1}}}
+\newcommand\ircodex[1]{\textsl{\texttt{#1}}\index{#1@\texttt{#1}|textit}}
+%??1
+\newcommand\irarg[1]{\small{$\langle$\verb+#1+$\rangle$}}% should be 
+%??2
+\newcommand\irfunx[2]{\keyword{#1}{#2}\ircode{#2()}\index[rfun]{#2@\texttt{#2}|textit}}% fun() & index, like \Link
+%??3
+
 \title{R profiling and optimization}
 \author{G\"unther Sawitzki}
 

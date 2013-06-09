@@ -30,7 +30,7 @@ print_profiles <- function(x){
 	invisible(sp)
 }
 
-print.sprof <- function(x){
+print.sprof <- function(x,...){
 	print_nodes(x)
 	print_stacks(x)
 	print_profiles(x)

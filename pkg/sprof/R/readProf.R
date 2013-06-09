@@ -1,15 +1,16 @@
 # filename = "Rprofsr01.out"; chunksize = 100, interval = 0.02
 # edit(file="~/Documents/lectures/src/insider/profile/sprof/pkg/man/readProf.Rd")
-# source('~/Documents/lectures/src/insider/profile/sprof/pkg/R/readProf.R', chdir = TRUE)
-# edit(file='/Users/sw/R/R-devel/src/library/utils/R/summRprof.R')
-# based on src/library/utils/R/summRprof.R
+# source('~/projects/rforge/sintro/pkg/sprof/R/readProf.R', chdir = TRUE)
+# file.edit('~/projects/rforge/sintro/pkg/sprof/R/readProf.R', chdir = TRUE)
+
 
 readProf <- function(filename = "Rprof.out", 
 	chunksize = 5000, 
 	interval = 0.02, 
-	head=c("auto", "none", "Rprofmem")){
+	head=c("auto", "none", "Rprofmem"),
+	id=NULL){
 	con <- file(filename, "rt")
-   
+    if (is.null(id)) id <- paste(deparse(substitute(filename)),  date())
 	firstline <- readLines(con, n = 1L)
 	
 	head <- match.arg(head)
@@ -205,7 +206,7 @@ readProf <- function(filename = "Rprof.out",
 		malloc=NULL,
 		timesRLE=NULL
 			)}
-		
+		class(Rprofdata) <- c("sprof","list")
 	return(Rprofdata)
 
 }# readProf
