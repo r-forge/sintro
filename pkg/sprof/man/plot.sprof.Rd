@@ -1,14 +1,19 @@
-%$Head:$
+%$HeadURL:$
 \encoding{UTF-8}
 
-\name{summary_prof}
-\alias{summary_prof}
-\title{Summary for profiles}
+\name{plot.sprof}
+\alias{plot}
+\alias{plot_nodes}
+\alias{plot_stacks}
+\alias{plot_profiles}
+
+\title{plot for profiles}
 \description{
-Print a summary for the output of \code{\link{readProf}}.
+plot a plot for the output of class \code{scode}.
 }
 \usage{
-summary_prof(x)
+plot(object, \dots)
+\method{plot}{sprof}(object, \dots)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -41,7 +46,7 @@ y0 <- 2+ 3 * x
 
 sinknull <- textConnection(NULL, "w"); sink(sinknull)
 Rprof(tmp <- tempfile(), interval = profinterval)
-for (i in 1:simruns) {y <- y0 +  rnorm(n); xxx<- summary(lm(y~x))}
+for (i in 1:simruns) {y <- y0 +  rnorm(n); xxx<- plot(lm(y~x))}
 Rprof()
 
 Rprof_out <- readProf(tmp)
@@ -49,9 +54,10 @@ Rprof_out <- readProf(tmp)
 unlink(tmp)
 sink(); close(sinknull)
 
-summary_prof(Rprof_out)
+plot(Rprof_out)
 }
 
 }
 
+\keyword{methods}
 \keyword{utilities}
