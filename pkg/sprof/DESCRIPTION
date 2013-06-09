@@ -2,9 +2,9 @@ Encoding: UTF-8
 Package: sprof
 Type: Package
 Title: Profiling, timing and optimization utilitites
-Version: 0.0-1
-Date: 2013-05-26
+Version: 0.0-2
+Date: 2013-06-09
 Author: Günther Sawitzki
 Maintainer: Günther Sawitzki <gsawitzki@r-forge.r-project.org>
-Description: Support utilitites
+Description: Support utilities for profiling and dynamic code analysis.
 License: GPL-3

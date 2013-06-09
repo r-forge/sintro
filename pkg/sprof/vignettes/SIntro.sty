@@ -1,0 +1,62 @@
+%$Header: /u/math/j40/cvsroot/lectures/src/shared/sty/SIntro.sty,v 1.2 2012/01/04 17:09:18 j40 Exp $
+\typeout{$Id: SIntro.sty,v 1.2 2012/01/04 17:09:18 j40 Exp $}
+\ProvidesPackage{SIntro}[2006/12/14 12:42:52]
+\IfFileExists{upquote.sty}{\RequirePackage{upquote}}{}
+\RequirePackage{graphicx}
+%\graphicspath{{./}{../graphics/}{../media/}{../Rnw_out}}%Graetzer, p. 420
+\RequirePackage{colortbl,array,color,hhline}
+\RequirePackage{fancybox}
+\RequirePackage{tabularx}
+\RequirePackage{listings}
+\RequirePackage[T1]{fontenc}
+\RequirePackage{graphicx,ae,fancyvrb}
+\RequirePackage{longtable}
+
+\setkeys{Gin}{width=0.8\textwidth}
+
+\definecolor{sincol}{rgb}{0.0,0.0,0.8}% darkblue [r=0,   g=0,   b=.8]
+\definecolor{soutcol}{rgb}{0.0,0.3,0.1}% darkgreen r=0.0,   g=.6, b=0]
+
+
+%R code, preferably within a chunk
+%\newenvironment{Sinput}{\begin{lstlisting}[language=R,linewidth=0.8\linewidth,frame=single, ]}{\end{lstlisting}}
+%
+%Sinput
+%
+%\newenvironment{Sinput}%
+\DefineVerbatimEnvironment{Sinput}{Verbatim}{label={Eingabe},fontshape=sl, frame=topline,gobble=1, formatcom=\color{sincol}, fontsize=\small}%formatcom=\color{green}]frame=single
+%
+%\newenvironment{Sinput}{\begin{Sxinput}}{\end{Sxinput}}
+%Soutput
+%
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{label={Ausgabe},frame=topline, fontsize=\small,formatcom=\color{soutcol}}
+
+%:Scode
+%
+\DefineVerbatimEnvironment{Scode}{Verbatim}{fontshape=sl}
+
+%R code, indented, no header, used outside chunks no gobble!
+\DefineVerbatimEnvironment{irin}{Verbatim}{fontshape=sl, formatcom=\color{sincol}, fontsize=\small,xleftmargin=1cm}%[gobble=1] %formatcom=\color{green}]
+\DefineVerbatimEnvironment{irout}{Verbatim}{fontsize=\small,formatcom=\color{soutcol},xleftmargin=1cm}
+%:ircode
+\theoremstyle{remark} %remark 
+%\newtheorem{Sexpl}{Beispiel}
+\newcounter{Sexpl}
+%\numberwithin{Sexpl}{chapter}
+
+\newenvironment{Schunk}{}{}
+
+%: Sframe
+\newenvironment{Sframe}[1][]{\refstepcounter{Sexpl}\begin{longtable}{|p{.99\linewidth}|}
+\hline
+\textbf{\emph{Beispiel \theSexpl: {#1}}}%
+\endfirsthead
+\hline
+\textbf{\emph{Beispiel (Fortsetzung): {#1}}}%
+\endhead%
+\hline
+\endfoot
+\hline
+\endlastfoot
+}{\end{longtable}}
+

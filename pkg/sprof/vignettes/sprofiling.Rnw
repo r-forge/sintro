@@ -17,6 +17,10 @@
 %\usepackage[applemac]{inputenc}
 \usepackage[english]{babel} %ngerman
 
+\usepackage{gssda}
+\usepackage{SIntro}
+\setkeys{Gin}{width=1.0\textwidth}
+
 \title{R profiling and optimization}
 \author{G\"unther Sawitzki}
 
@@ -56,7 +60,114 @@ Typeset: \today}                                           % Activate to display
 \maketitle
 \tableofcontents
 
-\section{Start}
+\section{Example data}
+<<label=RegressionExpl>>=
+n0RE <- 10000
+x0RE <- runif(n0RE)
+err0RE <- rnorm(n0RE)
+y0RE <- 2+ 3 * x0RE + err0RE
+
+<<label=Rprof01>>=
+profinterval <- 0.001
+simruns <- 100
+
+Rprof(filename="Rprofsr01.out", interval = profinterval)
+for (i in 1:simruns) xxx<- summary(lm(y0RE~x0RE))
+Rprof(NULL)
+@
+\section{A better grip on profile information}
+\label{sec:sprof}
+
+The basic information provided by all profilers in \R{} is a protocol of sampled stacks. 
+For each recorded event, the protcol records one line with a text string showing the sampled  stack 
+(in reverse order: most recent first). The stack lines may be preceded by header lines with event 
+specific information. The protocol may be interspersed with control information, such as information about the timing interval used. Examples of the protocol format used by the commen profilersin in \ref{sec:formats} on page \pageref{sec:formats}.
+
+We know that the structural information, static information as well as dynamic information, can be represented with the
+help of a graph. For a static analysis, the graph representation may be thr first choice. For a dynamic analysis, the stackinformaion is our first information. A stack is a connected path in the program graph. If we start with nodes and edges, 
+we loose information which is readily available in record of stacks.
+
+As we know that weare working with stacks, we know that they have their peculiarities. Stacks tend to grow and shrink. Subsequent events will have extensions and shrinkages of stacks (if the recording is on a fine scale), or stack sharing
+common stumbs (if the recording is on a coarser scale).
+
+The graph is a second instance that is (re)constructed from the stack recording.
+
+Here is the way we represent the profilie information:
+
+The profile log file is sanitized:
+\begin{itemize}
+\item{Control lines are extracted and recorded in a separate list.}
+\item{Head parts, if present, ere extracted and recorded in a matrix that is kept line-aligned with the remainder}
+\item{Line content is standardized, for example by removin stray quotation marks ets}
+\end{itemize}
+
+After this, the sanitized lines are encoded as a vector of  stacks, and references to this.
+
+If necessary,  thes steps are done by chunks to reduce memory load.
+
+From the vector of stacks, a vector of nodes (or rather node names) is derived.
+
+The stacks are now encoded by refrences to the nodes table.
+For convenience, we keep the (sanitized) textual representation of the stacks.
+
+So far, texts are in reverse order. For each stack, we record the trailing leaf, and then we reverse order. 
+The top of stack is now on first position.
+
+Several statistics can be accumulated easily as a side effect.
+
+Conceptually, the data structure consist of three tables (the implementtion may differ, and is subject to change).
+
+The pofiles table is the representation of the input file. Control lines are are collected in a special table. With the control lines removed, the rest is a table, one row per input line. The body of the line, the stack, is encoded as a reference to a stacks table (obligatory) and header information (optional).
+
+The stacks table contains the collected stacks, each stack enoded as a list of references to the node table. This is obligatory. This list is kept in reverse order (root at position 1). A source line representing the stack information may be kept (optional).
+
+The nodes table keeps the names af the nodes.
+
+To illustrate our data structure, we use \ircode{Rprofsr01.out} as provided in section \ref{subs:Rprof} on page \pageref{subs:Rprof}
+
+This is a temporary hack  to get a most recent private recent version of \ircode{library(sprof)}.
+<<label=sourcesprof>>=
+source('~/projects/rforge/sintro/pkg/sprof/R/readProf.R', chdir = TRUE)
+source('~/projects/rforge/sintro/pkg/sprof/R/rrle.R', chdir = TRUE)
+source('~/projects/rforge/sintro/pkg/sprof/R/sampleRprof.R', chdir = TRUE)
+source('~/projects/rforge/sintro/pkg/sprof/R/summary.sprof.R', chdir = TRUE)
+source('~/projects/rforge/sintro/pkg/sprof/R/print.sprof.R', chdir = TRUE)
+source('~/projects/rforge/sintro/pkg/sprof/R/plot.sprof.R', chdir = TRUE)
+# file.edit('~/projects/rforge/sintro/pkg/sprof/R/summary_prof.R')
+<<label=rdRprofsr01>>=
+rpo <- readProf("Rprofsr01.out")
+str_prof(rpo)
+@
+\subsection{Summary}
+<<label=rposumnodes>>=
+summary_nodes(rpo)
+<<label=rposumstacks>>=
+summary_stacks(rpo)
+<<label=rposumprofiles>>=
+summary_profiles(rpo)
+@
+The \irfunx{misc}{summary} mtehod for \ircode{sprof} objects concatenates thes three functions.
+
+\subsection{Print}
+<<label=rpoprintnodes>>=
+print_nodes(rpo)
+<<label=rpoprintstacks>>=
+print_stacks(rpo)
+<<label=rpoprintprofiles>>=
+print_profiles(rpo)
+@
+The \irfunx{misc}{print} method for \ircode{sprof} objects concatenates these three functions.
+
+\subsection{Plot}
+<<fig=TRUE, label=rpoplotnodes>>=
+plot_nodes(rpo)
+<<fig=TRUE, label=rpoplotstacks>>=
+plot_stacks(rpo)
+<<fig=TRUE, label=rpoplotprofiles>>=
+plot_profiles(rpo)
+@
+The \irfunx{misc}{plot} method for \ircode{sprof} objects concatenates these three functions.
+
 
 \index{Index01}
 %:Sweave examples
