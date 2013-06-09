@@ -37,7 +37,7 @@ plot_profiles <- function(x){
 	invisible(x)
 }
 
-plot.sprof <- function(x){
+plot.sprof <- function(x,...){
 	plot_nodes(x)
 	plot_stacks(x)
 	plot_profiles(x)
