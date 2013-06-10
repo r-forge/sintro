@@ -12,14 +12,16 @@ Read a log of stack entries, such as the output of the \code{\link{Rprof}} funct
 \usage{
 readProf(filename = "Rprof.out", chunksize = 5000,
 	interval = 0.02, 
-	head = c("auto", "none", "Rprofmem"))
+	head = c("auto", "none", "Rprofmem"),
+	 id = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
    \item{filename}{Name of a file produced by \code{Rprof()}.}
    \item{chunksize}{Number of lines to read at a time.}
-   \item{interval}{real: time interval between samples, in s.}
+   \item{interval}{Real: time interval between samples, in s.}
    \item{head}{\code{c("auto", "none", "Rprofmem")} to interpret control information as provided by \code{Rprof} or \code{Rprofmem}. See details.}
+   \item{id}{An optional identification  string. Defaults to filename and date.}
 }
 \details{
   This function reads a log file of stacks, one stack snapshot per line, stack entries separated by space.

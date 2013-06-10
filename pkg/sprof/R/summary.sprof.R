@@ -29,11 +29,23 @@ str_prof <- function(x){
 
 
 summary_nodes <- function(x){
+	nrstacks <- nrow(x$stacks)
 	nrnodes <- length(x$nodes)
-	ishead <- rep(FALSE,nrnodes); ishead[x$stacks$stackheadnodes] <- TRUE
-	isleaf <- rep(FALSE,nrnodes); isleaf[x$stacks$stackleafnodes]  <- TRUE
+	nrprofs <- length(x$data)
+	ishead <- rep("-",nrnodes); ishead[x$stacks$stackheadnodes] <- "ROOT"
+	isleaf <- rep("-",nrnodes); isleaf[x$stacks$stackleafnodes]  <- "LEAF"
+	self.time <- rep(0,nrnodes); 
+	total.time <- rep(0,nrnodes); 
+	for (i in (1: nrstacks))
+	{ whichn <- x$stacks$stackleafnodes[i]
+		 self.time[whichn] <-  self.time[whichn]+x$stacks$refcount[i]
+	whichn <- unlist(unique(x$stacksrenc[i]))
+		total.time[whichn] <- total.time[whichn]+x$stacks$refcount[i]
+	}
 	nodes <- data.frame(shortname=abbreviate(x$nodes), 
-	root= ishead, leaf=isleaf)
+	root= ishead, leaf=isleaf, 
+	self.time=self.time, self.pct = self.time/nrprofs*100,
+	total.time=total.time, total.pct= total.time/nrprofs*100)
 	rownames(nodes)<- x$nodes
 	nodes
 }
@@ -61,8 +73,9 @@ summary_profiles <- function(x){
 	list(id=id, len=len, uniquestacks=uniquestacks, runs=runs)	
 }
 
-summary.sprof <- function(x, ...){
-	summary_nodes(x)
-	summary_stacks(x)
-	summary_profiles(x)
+summary.sprof <- function(object, ...){
+	summary_nodes(object)
+	summary_stacks(object)
+	summary_profiles(object)
+	invisible(object)
 }
