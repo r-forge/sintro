@@ -2,7 +2,7 @@
 \encoding{UTF-8}
 
 \name{print.sprof}
-\alias{print}
+\alias{print.sprof}
 \alias{print_nodes}
 \alias{print_stacks}
 \alias{print_profiles}
@@ -12,13 +12,13 @@
 Print a print for the output of class \code{scode}.
 }
 \usage{
-print(object, \dots)
-\method{print}{sprof}(object, \dots)
+%print(x, \dots)
+\method{print}{sprof}(x, \dots)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{A data structure as returned by  \code{\link{readProf}}.
-}
+  \item{x}{A data structure as returned by  \code{\link{readProf}}.}
+  \item{\dots}{further arguments passed to or from other methods.}
 }
 %\details{
 %%  ~~ If necessary, more details than the description above ~~

@@ -1,8 +1,8 @@
-%$Head:$
+%$HeadURL$
 \encoding{UTF-8}
 
 \name{summary.sprof}
-\alias{summary}
+\alias{summary.sprof}
 \alias{summary_nodes}
 \alias{summary_stacks}
 \alias{summary_profiles}
@@ -12,13 +12,13 @@
 Print a summary for the output of class \code{scode}.
 }
 \usage{
-summary(object, \dots)
+%summary(object, \dots)
 \method{summary}{sprof}(object, \dots)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{A data structure as returned by  \code{\link{readProf}}.
-}
+  \item{object}{A data structure as returned by  \code{\link{readProf}}.}
+  \item{\dots}{further arguments passed to or from other methods.}
 }
 %\details{
 %%  ~~ If necessary, more details than the description above ~~

@@ -2,7 +2,8 @@
 \encoding{UTF-8}
 
 \name{plot.sprof}
-\alias{plot}
+%\alias{plot}
+\alias{plot.sprof}
 \alias{plot_nodes}
 \alias{plot_stacks}
 \alias{plot_profiles}
@@ -12,13 +13,13 @@
 plot a plot for the output of class \code{scode}.
 }
 \usage{
-plot(object, \dots)
-\method{plot}{sprof}(object, \dots)
+%plot(object, \dots)
+\method{plot}{sprof}(x, \dots)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{A data structure as returned by  \code{\link{readProf}}.
-}
+  \item{x}{A data structure as returned by  \code{\link{readProf}}.}
+  \item{\dots}{further arguments passed to or from other methods.}
 }
 %\details{
 %%  ~~ If necessary, more details than the description above ~~
