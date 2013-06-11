@@ -7,7 +7,7 @@
 # a commom worksheet for sprof
 
 #!/bin/sh
-cd ~/Documents/lectures/src/insider/profile/sprof/
+cd ~/projects/rforge/sintro/pkg/sprof/
 
 svn propset svn:keywords "Date Author Id Revision HeadURL"  *.R
 svn propset svn:keywords "Date Author Id Revision HeadURL" pkg/R/*.R
@@ -16,17 +16,22 @@ svn propset svn:keywords "Date Author Id Revision HeadURL" pkg/man/*.Rd
 export _R_CHECK_TIMINGS_=0
 export _R_CHECK_ALWAYS_LOG_VIGNETTE_OUTPUT_=TRUE
 
-R CMD CHECK pkg  --no-multiarch  --timings
-R CMD BUILD --compact-vignettes pkg --no-multiarch
-R CMD BUILD pkg
+R CMD CHECK sprof  --no-multiarch  --timings
+R CMD BUILD --compact-vignettes=gs+qpdf sprof --no-multiarch --md5
 
-rm sprof.pdf; R CMD Rd2pdf -o sprof.pdf  --internals --title="sprof" pkg
-R CMD Rd2pdf -o sprof.pdf  --internals --no-clean --title="sprof" pkg
+rm sprof.pdf; R CMD Rd2pdf -o sprof.pdf  --internals --no-clean --title="sprof internal" sprof
  
- 
+setwd('~/projects/rforge/sintro/pkg/sprof/')
 file.edit('~/projects/rforge/sintro/pkg/sprof/R/readProf.R', chdir = TRUE)
 
+source('~/projects/rforge/sintro/pkg/sprof/R/print.sprof.R', chdir = TRUE)
+source('~/projects/rforge/sintro/pkg/sprof/R/plot.sprof.R', chdir = TRUE)
 source('~/projects/rforge/sintro/pkg/sprof/R/readProf.R', chdir = TRUE)
+source('~/projects/rforge/sintro/pkg/sprof/R/rrle.R', chdir = TRUE)
+source('~/projects/rforge/sintro/pkg/sprof/R/sampleRprof.R', chdir = TRUE)
+source('~/projects/rforge/sintro/pkg/sprof/R/summary.sprof.R', chdir = TRUE)
+source('~/projects/rforge/sintro/pkg/sprof/R/profiles_matrix.R', chdir = TRUE)
+source('~/projects/rforge/sintro/pkg/sprof/R/stacks_matrix.R', chdir = TRUE)
 
 	cd /Users/gs/projects/rforge/sprof/pkg/inst/doc
 	mv sprofR.pdf sprofR_temp.pdf
@@ -42,7 +47,10 @@ R CMD INSTALL sprof
 
 #### R cmds for ad hoc construction
 setwd("/Users/gs/projects/rforge/sprof/")
-install.packages("/Users/gs/projects/rforge/sprof/sprof_0.1-76.tar.gz", repos=NULL, type="source")
+install.packages(pkgs=install.packages("/Users/gs/projects/rforge/sintro/pkg/sprof_0.0-2.tar.gz", repos=NULL, type="source")
 
 #####
-
+file.edit('~/projects/rforge/sintro/pkg/sprof/vignettes_temp/sprofiling.Rnw')
+% options(width=72); 
+% setwd("/Users/gs/projects/rforge/sintro/pkg/sprof/vignettes_temp/" )
+% Sweave(file= "sprofiling.Rnw", output="sprofiling.tex", keep.source=TRUE)
