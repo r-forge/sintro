@@ -210,3 +210,9 @@ readProf <- function(filename = "Rprof.out",
 	return(Rprofdata)
 
 }# readProf
+
+# recover stack entries (in reverse order) from sprof  object
+re_stackssource <- function(x) {
+   sapply(x$stacksrenc, function(xl) {x$nodes[xl]})
+}# re_stackssource
+
