@@ -216,3 +216,9 @@ re_stackssource <- function(x) {
    sapply(x$stacksrenc, function(xl) {x$nodes[xl]})
 }# re_stackssource
 
+#recover profile source (in reverse order ?) from sprof  object
+re_profilessource <- function(x) {
+	pm <- profiles_matrix(x)
+	pp <- function(x) {xr <- rev(rpo$nodes[x]); paste(xr[!is.na(xr)], collapse = ' ')}
+	return( apply(pm, 2, pp)) 
+}# re_profilessource
