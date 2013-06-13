@@ -21,16 +21,16 @@ sampleRprof <- function(expr, runs=NULL, gcFirst = TRUE, ...){
 	}
 
     #browser()
-	Rprof_out <- readProf(tmp)
+	sprof_out <- readProf(tmp)
 
 	unlink(tmp)
 	#sink(); close(sinknull)
 	if (gcFirst) 
         gcout <- gc(FALSE)
-	if (!is.null(gcin)) {Rprof_out$gcin <- gcin;Rprof_out$gcout <- gcout}
-		if (is.null(Rprof_out) || is.null(Rprof_out$data)) warning("No event data recorded.")
-	return(Rprof_out)
+	if (!is.null(gcin)) {sprof_out$gcin <- gcin;sprof_out$gcout <- gcout}
+		if (is.null(sprof_out) || is.null(sprof_out$data)) warning("No event data recorded.")
+	return(sprof_out)
 }# sampleRprof
 
-# ress0Rp <- sampleRprof( yy<- runif(1000), runs=100)
-# ressRp <- sampleRprof(for (i in 1:1000) yy<- lm(runif(1000)~rnorm(1000)), runs=100)
+# res_runif <- sampleRprof( yy<- runif(1000), runs=100)
+# res_lm <- sampleRprof(for (i in 1:1000) yy<- lm(runif(1000)~rnorm(1000)), runs=100)
