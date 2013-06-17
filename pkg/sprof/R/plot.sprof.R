@@ -7,8 +7,8 @@
 
 
 plot_nodes <- function(x){
-	sn <- summary_nodes(x)
-	plot(sn)
+	sn <- x$nodes
+	plot(sn$self.time, sn$total.time)
 	invisible(sn)
 }
 
@@ -26,8 +26,8 @@ plot_stacks <- function(x){
 
 plot_profiles <- function(x){
 	 sp <- summary_profiles(x)
-	 nrprof <- length(x$data)
-	z <- x$data; dim(z)=c(nrprof,1)
+	 nrprof <- length(x$profiles$data)
+	z <- x$profiles$data; dim(z)=c(nrprof,1)
 	image(x=1:nrprof,y=1,z, 
 	xlab="event", 
 	ylab="", yaxt="n" , ylim=c(1,nrprof), 

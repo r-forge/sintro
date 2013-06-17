@@ -17,12 +17,12 @@ str_prof <- function(x){
 	cat("First line:", x$firstline,"\n")
 	cat(length(x$data),"Sampling intervals ")
 	if (length(x$timesRLE[1])==1) cat(" at",x$timesRLE[[2]],"micros\n") else {cat("in micros: ");print(x$timesRLE)}
-	cat(length(x$nodes),"nodes in",length(x$stacks$stacks), "stacks\n")	
+	cat(length(x$nodes$name),"nodes in",length(x$stacks$stacks), "stacks\n")	
 	cat(length(unique(x$stacks$stackleafnodes)),"Terminals ", "\n")
 
 	roots <- unique(x$stacks$stackheadnodes)
 	cat(length(roots), "Roots: ")
-	print(table(x$nodes[x$stacks$stackheadnodes]))
+	print(table(x$nodes$name[x$stacks$stackheadnodes]))
 	cat("\n", deparse(substitute(x)), " Structure: "); str(x, max.level=1)
 	cat("\n","stacks Structure: "); str(x$stacks, max.level=1, vec.len=2)		
 }# str_prof 
@@ -30,7 +30,7 @@ str_prof <- function(x){
 
 summary_nodes <- function(x){
 	nrstacks <- nrow(x$stacks)
-	nrnodes <- length(x$nodes)
+	nrnodes <- length(x$nodes$name)
 	nrprofs <- length(x$data)
 	ishead <- rep("-",nrnodes); ishead[x$stacks$stackheadnodes] <- "ROOT"
 	isleaf <- rep("-",nrnodes); isleaf[x$stacks$stackleafnodes]  <- "LEAF"
@@ -42,11 +42,11 @@ summary_nodes <- function(x){
 	whichn <- unlist(unique(x$stacksrenc[i]))
 		total.time[whichn] <- total.time[whichn]+x$stacks$refcount[i]
 	}
-	nodes <- data.frame(shortname=abbreviate(x$nodes), 
+	nodes <- data.frame(shortname=abbreviate(x$nodes$name), 
 	root= ishead, leaf=isleaf, 
 	self.time=self.time, self.pct = self.time/nrprofs*100,
 	total.time=total.time, total.pct= total.time/nrprofs*100)
-	rownames(nodes)<- x$nodes
+	rownames(nodes)<- x$nodes$name
 	nodes
 }
 
@@ -67,10 +67,10 @@ summary_terminals<- function(x){
 
 summary_profiles <- function(x){
 	if (is.null(x$id)) id <- paste("Profile Summary", date()) else id <- x$id
-	len <- length(x$data)
-	uniquestacks <- length(unique(x$data))
-	runs <- length(rle(x$data)$lengths) 
-	list(id=id, len=len, uniquestacks=uniquestacks, runs=runs)	
+	len <- length(x$profiles$data)
+	uniquestacks <- length(unique(x$profiles$data))
+	runs <- length(rle(x$profiles$data)$lengths) 
+	list(id=id, len=len, uniquestacks=uniquestacks, nr_runs=runs)	
 }
 
 summary.sprof <- function(object, ...){
