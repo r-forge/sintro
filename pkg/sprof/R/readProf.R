@@ -22,9 +22,9 @@ readProf <- function(filename = "Rprof.out",
    
 	if(!length(firstline))
 		stop(gettextf("no lines found in %s", sQuote(filename)), domain = NA)
-	sampleinterval <- as.numeric(strsplit(firstline, "sample.interval=")[[1L]][2L]) # /1e6
-	# in micros. summaryRprof keeps intervals in s.
-	if (is.na(sampleinterval)) sampleinterval <- {interval*1e6}
+	sampleinterval <- as.numeric(strsplit(firstline, "sample.interval=")[[1L]][2L])  /1e3
+	# in ms. (summaryRprof keeps intervals in micros.)
+	if (is.na(sampleinterval)) sampleinterval <- {interval* 1e3}
 	
 	memory.profiling <- substr(firstline, 1L, 6L) == "memory"
     line.profiling <- grepl("line profiling", firstline)
@@ -64,7 +64,7 @@ readProf <- function(filename = "Rprof.out",
 		if (length(silines)>0){
 		for (i in silines) { #? should this give a msg?
 			#browser()
-			newinterval <- as.numeric(strsplit(chunk[i], "sample.interval=")[[1L]][2L])
+			newinterval <- as.numeric(strsplit(chunk[i], "sample.interval=")[[1L]][2L])/ 1e3 # ms
 			if (!is.na(newinterval)) {
 				if (newinterval != sampleinterval){
 					message(paste("Line ",i, dQuote(chunk[i])),"\n")
@@ -120,7 +120,8 @@ readProf <- function(filename = "Rprof.out",
 		newuniques <- chunku[matchcollu==0]
 		collstacksdict <- c(collstacksdict,newuniques)  # growing only.
 	
-		# these must be aligned. collenclines are references to 	collstacksdict. 
+		# these must be aligned. 
+		# collenclines are references to collstacksdict. 
 		collinterval<-c(collinterval, chunkinterval)  
 		collenclines <- unlist(c(collenclines, (match(chunk, collstacksdict))))
 
@@ -129,21 +130,73 @@ readProf <- function(filename = "Rprof.out",
 	
 	close(con)
 
-
 	if (!is.null(collcontrols)) dim(collcontrols) <-NULL
+	 
+
+# NUll structure -- fallback result. Keep this aligned with final stuct.
+{Rprofdata <- list(
+		# diagnostics support
+		firstline=firstline, 
+		ctllines=collcontrols,
+		ctllinenr=collcontrollinenr,
+		nodes=NULL,
+		stacksrenc=NULL,
+		data=NULL,
+		mem=NULL,
+		malloc=NULL,
+		timesRLE=NULL
+			)}
+			
 	if (length(collstacksdict)>0) {
+
+#browser()	
+	nrstacks <- length(collstacksdict)	
+
+    # split stacks to node level		
 	stackssplit <- strsplit(collstacksdict, " ")
 	nodenames <- sort(unique(unlist(strsplit(collstacksdict, " "))))
-	#browser()
+	nrnodes <- length(nodenames)
+
+	# recode stack to node references
 	stacksnode <- sapply(stackssplit,match,nodenames)
+	
+	# bubble down statistics -- profiles -> stacks
+	stackrefcount <- double(nrstacks)
+	for (i in seq_along(collenclines))  {
+		j<-collenclines[i] ;
+		stackrefcount[j]<- stackrefcount[j]+collinterval[i]}
+	#stackrefcount <- as.integer(table(factor(collenclines, levels=1:length(stacksnode),ordered=FALSE)))
+	
+	
+	
 	stacklength <- sapply(stacksnode,length)
 	stackleafnodes <- sapply(stacksnode,function(x){x[[1]]})
+	
+	
+	# bubble down statistics -- stacks -> nodes
+	# leaf records "by.self"
+	leafcount <- double(nrnodes)
+	for (i in seq_len(nrstacks)) {leafcount[stacksnode[[i]][1]] <- leafcount[stacksnode[[i]][1]] + stackrefcount[i]}
+	
 	leafnodes <- unique(sapply(stacksnode,function(x){x[[1]]}))
+	
+	#stacksnode <- rpo$stacks$node
+	totalcount <- double(nrnodes)
+	for (i in seq_len(nrstacks)) {
+		sunodes <- unique(stacksnode[[i]])
+		totalcount[sunodes] <- totalcount[sunodes] + stackrefcount[i]
+		}
+	
+	
+	# recode: root = first node
 	stacksnode <- sapply(stacksnode,rev)
+	
 	rootnodes <- unique(sapply(stacksnode,function(x){x[[1]]}))
 	stackheadnodes <- sapply(stacksnode,function(x){x[[1]]})
+
+	# bubble down statistics -- stacks -> nodes
 	
-	stackrefcount <- as.integer(table(factor(collenclines, levels=1:length(stacksnode),ordered=FALSE)))
+	
 	#stackrefcount collenclines
 	# browser()
 
@@ -161,56 +214,65 @@ readProf <- function(filename = "Rprof.out",
 	#browser()
  	collstacksdictrev <- sapply(stacksnode, function(x){paste(nodenames[x], collapse=" ")})
    #browser()
+   
+   # stacks
 	stacks <- data.frame(
-		shortname = abbreviate(collstacksdictrev), # headers and control lines removed
-		# a convenience for accounting#nr of lines using stack --! should be adjusted for interval
+		nodes = as.matrix(stacksnode),
+		shortname = abbreviate(collstacksdictrev), 
+		# headers and control lines removed
+		
+		# a convenience for accounting
+		#nr of lines using stack --! should be adjusted for interval
 		refcount = stackrefcount, 		
 		stacklength =stacklength,    # length(stacksrenc)
 		stackheadnodes =stackheadnodes, # stacksrenc[first]
 		stackleafnodes =stackleafnodes, # stacksrenc[last]
-		# a convenience to allow textual matching
-		stacks= collstacksdict  # headers and control lines removed
+		# a convenience to allow textual matching -- may be removed
+		stackssrc= collstacksdict  # headers and control lines removed
 		)	
+		row.names(stacks) <- seq_along(stacks$nodes)
+#		row.names(stacks) <- seq_along(stacks)  -- no. gives name by column
+#		rownames(stacks) <- rownames(stacks,do.NULL=FALSE, prefix="s")
+		#browser()
+		
 	Rprofdata <- list(
+		info= data.frame(
+		id = id,
+		date= Sys.time(),
+		nrnodes =nrnodes,
+		nrstacks = nrstacks,
+		nrrecords = length(collenclines),
 	   # diagnostics support
 		firstline=firstline, 
 		ctllines=collcontrols,
-		ctllinenr=collcontrollinenr,
-		
+		ctllinenr=collcontrollinenr
+		),
 		
 		# basic data tables
-		nodes=nodenames, 
-		
-		# these are conceptually a data frame and must be item aligned
-		stacksrenc =  stacksnode, # list of arrays of references to nodes
-		# a convenience to allow textual matching
+		nodes=data.frame(name=nodenames, 
+			self.time=leafcount, self.pct = round(leafcount/sum(leafcount)*100,2),
+			total.time=totalcount, total.pct = round(totalcount/sum(totalcount)*100,2)
+		),		
 		
 		stacks= stacks,
+		# profiles
 		# these are conceptually a data frame and must be line aligned
+        # shoule be improved to allow multiple profile collections 	
+        profiles =list(
 		data= collenclines,	# references to stacksrenc
 		mem = collmemcounts, # additional, line-synced  --- merge to data
 		malloc = collmalloccounts, # additional, line-synced  --- merge to data
 		timesRLE = rle(collinterval)  # --- merge to data
-		
 		)
-		} else
-		{Rprofdata <- list(
-				   # diagnostics support
-		firstline=firstline, 
-		ctllines=collcontrols,
-		ctllinenr=collcontrollinenr,
-		nodes=NULL,
-		stacksrenc=NULL,
-		data=NULL,
-		mem=NULL,
-		malloc=NULL,
-		timesRLE=NULL
-			)}
+		)
+		}
+		
 		class(Rprofdata) <- c("sprof","list")
 	return(Rprofdata)
 
 }# readProf
 
+# rpo <- readProf("Rprofsr01.out")
 # recover stack entries (in reverse order) from sprof  object
 re_stackssource <- function(x) {
    sapply(x$stacksrenc, function(xl) {x$nodes[xl]})

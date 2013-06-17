@@ -7,6 +7,7 @@
 # a commom worksheet for sprof
 
 #!/bin/sh
+cd ~/projects/rforge/sintro/pkg/
 cd ~/projects/rforge/sintro/pkg/sprof/
 
 svn propset svn:keywords "Date Author Id Revision HeadURL"  *.R
@@ -20,7 +21,18 @@ R CMD CHECK sprof  --no-multiarch  --timings
 R CMD BUILD --compact-vignettes=gs+qpdf sprof --no-multiarch --md5
 
 rm sprof.pdf; R CMD Rd2pdf -o sprof.pdf  --internals --no-clean --title="sprof internal" sprof
- 
+
+##
+vignette <- function(){ 
+options(width=72); setwd("/Users/gs/projects/rforge/sintro/pkg/sprof/work/vignettes/" )
+Sweave(file= "sprofiling.Rnw", output="sprofiling.tex", keep.source=TRUE)
+# debug=TRUE, eps=FALSE, pdf=TRUE, keep.source=TRUE
+}
+#
+
+##
+sources <- function(){} 
+
 setwd('~/projects/rforge/sintro/pkg/sprof/')
 file.edit('~/projects/rforge/sintro/pkg/sprof/R/readProf.R', chdir = TRUE)
 
@@ -39,25 +51,18 @@ source('~/projects/rforge/sintro/pkg/sprof/R/stacks_matrix.R', chdir = TRUE)
 	rm sprofR_temp.pdf
     cd /Users/gs/projects/rforge/sprof
 
-p <- profiles_matrix(rpo)
-
-pp <- function(x) {xr <- rev(rpo$nodes[x]); paste(xr[!is.na(xr)], collapse = ' ')}
-px<- apply(p,2,pp)
-
-rev(rpo$nodes[p[,1]])
-rpo$nodes[p[,1]]
-paste(yy[!is.na(yy)], collapse = ' ')
-
-re_profilessource <- function(x)
 
 # install package
 R CMD INSTALL sprof
 
 #### end of shell commands
+source('/Users/sw/R/R-devel/src/library/graphics/R/plot.R', chdir = TRUE)
+source('/Users/sw/R/R-devel/src/library/stats/R/plot.lm.R', chdir = TRUE)
+file.show('/Users/sw/R/R-devel/src/library/stats/R/plot.lm.R')
 
 #### R cmds for ad hoc construction
 setwd("/Users/gs/projects/rforge/sintro/pkg/sprof/")
-install.packages(pkgs=install.packages("/Users/gs/projects/rforge/sintro/pkg/sprof_0.0-2.tar.gz", repos=NULL, type="source")
+install.packages("/Users/gs/projects/rforge/sintro/pkg/sprof_0.0-2.tar.gz", repos=NULL, type="source")
 
 #####
 file.edit('~/projects/rforge/sintro/pkg/sprof/vignettes_temp/sprofiling.Rnw')
