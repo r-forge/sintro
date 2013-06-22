@@ -6,7 +6,7 @@
 
 
 sampleRprof <- function(expr, runs=NULL, gcFirst = TRUE, ...){
-	browser()
+	#browser()
 	#sinknull <- textConnection(NULL, "w"); sink(sinknull)
 	gcin <- NULL; gcout <- NULL
 	if (gcFirst) 
@@ -20,7 +20,7 @@ sampleRprof <- function(expr, runs=NULL, gcFirst = TRUE, ...){
 	Rprof(NULL)
 	}
 
-    #browser()
+    browser()
 	sprof_out <- readProf(tmp)
 
 	unlink(tmp)
@@ -28,7 +28,8 @@ sampleRprof <- function(expr, runs=NULL, gcFirst = TRUE, ...){
 	if (gcFirst) 
         gcout <- gc(FALSE)
 	if (!is.null(gcin)) {sprof_out$gcin <- gcin;sprof_out$gcout <- gcout}
-		if (is.null(sprof_out) || is.null(sprof_out$data)) warning("No event data recorded.")
+	browser()
+		if (is.null(sprof_out) || (sprof_out$info$nrrecords==0)) warning("No event data recorded.")
 	return(sprof_out)
 }# sampleRprof
 

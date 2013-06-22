@@ -6,8 +6,9 @@
 
 
 
-plot_nodes <- function(x){
+plot_nodes <- function(x, col=NULL){
 	sn <- x$nodes
+	if (is.null(col)) col <- terrain.colors(length(sn))
 	plot(sn$self.time, sn$total.time)
 	invisible(sn)
 }
