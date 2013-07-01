@@ -5,8 +5,8 @@
 #$Author$
 
 # a commom worksheet for sprof
-00sprofworksheet.R is the authotitive source for any current mess.
-Build instructions and correction notes are places here.
+00sprofworksheet.R is the authoritative source for any current mess.
+Build instructions and correction notes are placed here.
 Eventually, they will bubble down to other files.
 
 ###  To Do
@@ -17,12 +17,21 @@ complete cycle
 - read&pass to proftools
 - dots
 ##
+plot_nodes(rpo)
+plot_stacks(rpo)
+plot_profiles(rpo)
+
+
+
+##
 revise strategy: use <Rprof> replacement for controls
 ###
 cscore <- rank(rpo$nodes$total.time,ties.method="random")
 ###
 #!/bin/sh
 cd ~/projects/rforge/sintro/pkg/sprof/
+
+lapply(sprofRegressionExpl$stacks$nodes, function(x) {x[-(1:level)]}
 
 svn propset svn:keywords "Date Author Id Revision HeadURL"  *.R
 svn propset svn:keywords "Date Author Id Revision HeadURL" pkg/R/*.R
@@ -33,9 +42,15 @@ export _R_CHECK_ALWAYS_LOG_VIGNETTE_OUTPUT_=TRUE
 
 cd ~/projects/rforge/sintro/pkg/
 R CMD CHECK sprof  --no-multiarch  --timings
+cd ~/projects/rforge/sintro/pkg/
 R CMD BUILD --compact-vignettes=gs+qpdf sprof --no-multiarch --md5
 
 rm sprof.pdf; R CMD Rd2pdf -o sprof.pdf  --internals --no-clean --title="sprof internal" sprof
+#### R cmds for ad hoc construction
+setwd("/Users/gs/projects/rforge/sintro/pkg/sprof/")
+
+remove.packages("sprof")
+install.packages("/Users/gs/projects/rforge/sintro/pkg/sprof_0.0-4.tar.gz", repos=NULL, type="source")
 
 ##
 vignette <- function(){ 
@@ -57,7 +72,7 @@ file.edit('~/projects/rforge/sintro/pkg/sprof/R/readProf.R', chdir = TRUE)
 
 source('~/projects/rforge/sintro/pkg/sprof/R/print.sprof.R', chdir = TRUE)
 source('~/projects/rforge/sintro/pkg/sprof/R/plot.sprof.R', chdir = TRUE)
-source('~/projects/rforge/sintro/pkg/sprof/R/readProf.R', chdir = TRUE)
+source('~/projects/rforge/sintro/pkg/sprof/R/readRprof.R', chdir = TRUE)
 source('~/projects/rforge/sintro/pkg/sprof/R/rrle.R', chdir = TRUE)
 source('~/projects/rforge/sintro/pkg/sprof/R/sampleRprof.R', chdir = TRUE)
 source('~/projects/rforge/sintro/pkg/sprof/R/summary.sprof.R', chdir = TRUE)
@@ -79,11 +94,6 @@ source('/Users/sw/R/R-devel/src/library/graphics/R/plot.R', chdir = TRUE)
 source('/Users/sw/R/R-devel/src/library/stats/R/plot.lm.R', chdir = TRUE)
 file.show('/Users/sw/R/R-devel/src/library/stats/R/plot.lm.R')
 
-#### R cmds for ad hoc construction
-setwd("/Users/gs/projects/rforge/sintro/pkg/sprof/")
-
-remove.packages("sprof")
-install.packages("/Users/gs/projects/rforge/sintro/pkg/sprof_0.0-3.tar.gz", repos=NULL, type="source")
 
 #####
 file.edit('~/projects/rforge/sintro/pkg/sprof/vignettes_temp/sprofiling.Rnw')

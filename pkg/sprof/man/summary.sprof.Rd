@@ -17,7 +17,7 @@ Print a summary for the output of class \code{scode}.
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{object}{A data structure as returned by  \code{\link{readProf}}.}
+  \item{object}{A data structure as returned by  \code{\link{readRprof}}.}
   \item{\dots}{further arguments passed to or from other methods.}
 }
 %\details{

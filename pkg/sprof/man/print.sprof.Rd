@@ -49,7 +49,7 @@ Rprof(tmp <- tempfile(), interval = profinterval)
 for (i in 1:simruns) {y <- y0 +  rnorm(n); xxx<- print(lm(y~x))}
 Rprof()
 
-Rprof_out <- readProf(tmp)
+Rprof_out <- readRprof(tmp)
 
 unlink(tmp)
 sink(); close(sinknull)
