@@ -2,7 +2,7 @@ Encoding: UTF-8
 Package: sprof
 Type: Package
 Title: Profiling, timing and optimization utilitites
-Version: 0.0-3
+Version: 0.0-4
 Date: 2013-06-17
 Author: Günther Sawitzki
 Maintainer: Günther Sawitzki <gsawitzki@r-forge.r-project.org>

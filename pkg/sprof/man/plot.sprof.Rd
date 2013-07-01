@@ -18,7 +18,7 @@ plot a plot for the output of class \code{scode}.
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{A data structure as returned by  \code{\link{readProf}}.}
+  \item{x}{A data structure as returned by  \code{\link{readRprof}}.}
   \item{\dots}{further arguments passed to or from other methods.}
 }
 %\details{
@@ -50,7 +50,7 @@ Rprof(tmp <- tempfile(), interval = profinterval)
 for (i in 1:simruns) {y <- y0 +  rnorm(n); xxx<- plot(lm(y~x))}
 Rprof()
 
-Rprof_out <- readProf(tmp)
+Rprof_out <- readRprof(tmp)
 
 unlink(tmp)
 sink(); close(sinknull)
