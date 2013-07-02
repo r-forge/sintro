@@ -59,10 +59,6 @@ Sweave(file= "sprofiling.Rnw", output="sprofiling.tex", keep.source=TRUE)
 # debug=TRUE, eps=FALSE, pdf=TRUE, keep.source=TRUE
 }
 ##
-rn <- rstacks$nodes
-data.matrix(rn)
-data.frame(rn1)
-rnm <- as.matrix(rn)
 
 ##
 sources <- function(){} 
