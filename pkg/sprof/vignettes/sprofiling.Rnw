@@ -247,8 +247,8 @@ str(sprofRegressionExpl$info,
 
 We keep this example and use it extensively for illustration.
 <<>>=
-sintro01lm <- sprofRegressionExpl
-save(sintro01lm, file="sintro01lm.RData")
+sprof01lm <- sprofRegressionExpl
+save(sprof01lm, file="sprof01lm.RData")
 @
 As a convention, we do not re-arrange items for ad-hoc choices, but use a permutation 
 vector instead. 
