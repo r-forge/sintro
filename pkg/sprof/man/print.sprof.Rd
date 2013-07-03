@@ -17,7 +17,7 @@ Print a print for the output of class \code{scode}.
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{A data structure as returned by  \code{\link{readProf}}.}
+  \item{x}{A data structure as returned by  \code{\link{readRprof}}.}
   \item{\dots}{further arguments passed to or from other methods.}
 }
 %\details{
@@ -35,28 +35,8 @@ Print a print for the output of class \code{scode}.
  \code{\link{summaryRprof}}
 }
 \examples{
-	\dontrun{
-## Rprof() is not available on all platforms
-profinterval <- 0.001
-simruns <- 100
-
-n <- 10000
-x <- runif(n)
-y0 <- 2+ 3 * x
-
-sinknull <- textConnection(NULL, "w"); sink(sinknull)
-Rprof(tmp <- tempfile(), interval = profinterval)
-for (i in 1:simruns) {y <- y0 +  rnorm(n); xxx<- print(lm(y~x))}
-Rprof()
-
-Rprof_out <- readRprof(tmp)
-
-unlink(tmp)
-sink(); close(sinknull)
-
-print(Rprof_out)
-}
-
+data(sprof01lm)
+print(sprof01lm)
 }
 
 \keyword{methods}

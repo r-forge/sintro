@@ -300,6 +300,7 @@ writeRprof <- function(sprof, filename="Rprof.Out") {
 	
 	proft <- sapply(sprof$profiles$data, function(x){stackst[x]})
 	write(proft, file=filename)
+	invisible(proft)
 }
 # writeRprof(rpo, filename="rpo.out")
 

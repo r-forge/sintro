@@ -89,8 +89,8 @@ Typeset: \today}                                           % Activate to display
 event based instrumentation. However this source of information seems to be rarely
 used.
 
-Maybe the supporting tools are not adequate. The summaries in \R{} itself reduce the 
-information beyond necessity. The data structures in additional packages are not
+Maybe the supporting tools are not adequate. The summaries provided by \R{}  reduce the 
+information beyond necessity. Additional packages are available, but these are not
 sufficiently action oriented.
 
 With package \ircode{sprof} we want to give a data representation that keeps the full
@@ -100,11 +100,11 @@ should make it easy to extend the tools as required.
 The package is currently distributed at r-forge as part of the \ircode{sintro} material.
 
 \smallskip
-To install this package directly within \R{} , type \\
+To install this package directly within \R{}, type \\
  {\small   \ircode{install.packages("sprof",repos="http://r-forge.r-project.org")}}
 
 \smallskip
-To install the recent package from source directly within \R{} , type\\
+To install the recent package from source directly within \R{}, type\\
     {\small   \ircode{install.packages("sprof",repos="http://r-forge.r-project.org",type="source")}}
 
 \section*{\LaTeX{}  Layout Tools and Utilities}
@@ -155,17 +155,33 @@ This is to be used with
 
 \section{Profiling}
 The basic information provided by all profilers in is a protocol of sampled stacks. 
-For each recorded event, the protocol has one record , such as a line with a text string showing the sampled  stack.
+For each recorded event, the protocol has one record, such as a line with a text string showing the sampled  stack.
 
 We use profiles to provide hints on the dynamic behaviour of programs. Most often, this is used to improve or even optimise programs. Sometimes, it is even used to understand some algorithm.
 
 Profiles represent the program flow, which is considered to be laid out by the control structure of a program. The control structure is represented by the control graph, and this leads to the common approach to (re)construct the control graph, map the profile to this graph, and used graph based methods for further analysis. The prime example for this strategy is the GNU profiler \ircode{gprof} (see \url{http://sourceware.org/binutils/docs/gprof/}) which is used as master plan for many common profilers.
 
-It is only half of the truth that the control graph can serve as a base for the profiled stacks. The fine issues will be discussed below. But for now, we stay with this simplification.
+\medskip
+It is only half of the truth that the control graph can serve as a base for the profiled stacks. In \R{}, we have some peculiarities.
 
+\begin{description}
+\item[lazy evaluation] Arguments to functions can passed as promises. These are only evaluated when needed, which may be at a later time, and may then lead to insertions in the stack. So we may have information resulting from the data flow, interspersed with the control flow.
+\item[memory management] Allocation of memory, and garbage collection, may interfere and leave their traces in the stack. While allocation is closely related to the visible control flow, garbage collection is a collective effect largely out of control of the code to execute.
+\item[primitives] Internal functions may escape the usual stack conventions and execute without leaving any identifiable trace on the stack.
+\item[control structures] In \R{}, many control structures are implemented as function.
+Most notably, the \irfunx{misc}{apply} family appear as function calls and lead to cliques in the graph representation that do not correspond to relevnat structures. Since these functions are well know, they can have a special treatment.
+\end{description}
+
+So while the stack follows an overall well known dynamics, in \R{} there are exceptions from regularity.
+\medskip
+The general approach, by \irfunx{misc}{summaryRprof} and others, is to reduce the profile to node information, or two consider single transitions.
+
+\medskip
 We take a different approach.  We take the stacks, as recorded in the profiles as our basic information unit.  From this, we ask: what are the actions we need to answer our questions?
 Representation in graphs may come later, if they can help.
 
+If the stacks would come from the control flow only, we could make use of the sequential 
+nature of stacks. But since we have to live with the \R{} specific interferences, we stay with the raw stacks.
 <<>>=
 options(error = recover)
 library(sprof)
@@ -403,7 +419,7 @@ nodefreq <- rep(0,length(sprofRegressionExpl$nodes$name))
 for (i in (1:length(sprofRegressionExpl$stacks$nodes))){
 	nodefreq <- nodefreq +   
 		table( factor(sprofRegressionExpl$stacks$nodes[[i]], 
-			levels <- 1:length(sprofRegressionExpl$nodes$name) , 
+			levels <- 1:length(sprofRegressionExpl$nodes$name), 
 			ordered=FALSE))
 	}
 names(nodefreq) <- sprofRegressionExpl$nodes$name

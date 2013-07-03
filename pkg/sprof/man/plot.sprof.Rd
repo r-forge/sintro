@@ -1,4 +1,4 @@
-%$HeadURL:$
+%$HeadURL: svn+ssh://gsawitzki@svn.r-forge.r-project.org/svnroot/sintro/pkg/sprof/man/summary.sprof.Rd $
 \encoding{UTF-8}
 
 \name{plot.sprof}
@@ -26,9 +26,11 @@ plot a plot for the output of class \code{scode}.
 %}
 \value{None.}
 \references{  \url{http://sintro.r-forge.r-project.org/} }
-%\note{
-%%  ~~further notes~~
-%}
+\note{
+See the vignette for in-context explanations.
+
+Displays of the graph structure are given in the vignette.
+}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
@@ -36,29 +38,22 @@ plot a plot for the output of class \code{scode}.
  \code{\link{summaryRprof}}
 }
 \examples{
-	\dontrun{
-## Rprof() is not available on all platforms
-profinterval <- 0.001
-simruns <- 100
+data(sprof01lm)
 
-n <- 10000
-x <- runif(n)
-y0 <- 2+ 3 * x
+oldpar <- par(mfrow=c(2,2))
+plot_nodes(sprof01lm)
+par(oldpar)
 
-sinknull <- textConnection(NULL, "w"); sink(sinknull)
-Rprof(tmp <- tempfile(), interval = profinterval)
-for (i in 1:simruns) {y <- y0 +  rnorm(n); xxx<- plot(lm(y~x))}
-Rprof()
+oldpar <- par(mfrow=c(2,2))
+plot_stacks(sprof01lm)
+par(oldpar)
 
-Rprof_out <- readRprof(tmp)
-
-unlink(tmp)
-sink(); close(sinknull)
-
-plot(Rprof_out)
-}
+oldpar <- par(mfrow=c(2,2))
+plot_profiles(sprof01lm)
+par(oldpar)
 
 }
+
 
 \keyword{methods}
 \keyword{utilities}
