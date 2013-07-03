@@ -27,32 +27,41 @@ plot_nodes <- function(x, which=c(1L,2L, 3L), col=NULL,
 	oask <- devAskNewPage(TRUE)
 	on.exit(devAskNewPage(oask))
     }
-	nrnodes <- dim(xnodes)[1]
+ 	nrnodes <- dim(xnodes)[1]
+ 	totaltime <- sum(xnodes$self.time)
+ 	xnodes <- xnodes[xnodes$total.time < totaltime,]
+
 	#browser()
 	if (mincount>0) xnodes <- xnodes[xnodes$total.time>=mincount,]
 	trimmed <- nrnodes-dim(xnodes)[1]
-	legnd <-function(){
-		if (trimmed>0) 
-		legend("topright", legend=paste(nrnodes,"nodes\n", 
-		trimmed," nodes with",mincount,"or less\n total counts omitted\n"),bty="n") else 
-		legend("topright", legend=paste(nrnodes,"nodes"),bty="n") 
+	legnd <-function(trimmed=0, fulltime=0){
+		ltext <- paste(nrnodes,"nodes\n")
+		if (trimmed>0) ltext <- paste(ltext,trimmed," nodes with",mincount,"or less\n total counts omitted\n")
+		if (fulltime>0) ltext  <- paste(ltext,fulltime,"permanent nodes  omitted\n")
+		legend("topright", legend=ltext, bty="n") 
 }
 	
 	for (ip in which){
 		switch(ip,
-		plot(xnodes$self.time, xnodes$total.time, xlab="self", ylab="total", sub=src), 
+		{
+		plot(xnodes$self.time, xnodes$total.time, xlab="self", ylab="total", sub=src, main="Nodess")
+		}, 
 		{   orderself <- order(xnodes$self.time,decreasing=TRUE);
-			xno <- xnodes[orderself,]; xno <- xno[xno$self.time>0,]
-			barplot(xno$self.time,
+			xnodes <- xnodes[orderself,]; xnodes <- xnodes[xnodes$self.time>0,]
+			barplot(xnodes$self.time,
 			main="Nodes: time as last of stack",
-			names.arg = xno$name, sub=src, ylab="count", ...);
-			legnd()
+			names.arg = xnodes$name, sub=src, ylab="count", ...);
+			legnd(trimmed=trimmed, fulltime=0)
 			}, 
-		{ordertotal<- order(xnodes$total.time,decreasing=TRUE);
+		{   totaltime <- sum(xnodes$self.time)
+			fulltime <- dim(xnodes)[1]
+ 			xnodes <- xnodes[xnodes$total.time < totaltime,]
+ 			fulltime <- fulltime - dim(xnodes)[1]
+			ordertotal<- order(xnodes$total.time,decreasing=TRUE);
 			barplot(xnodes[ordertotal,]$total.time, 
 			main="Nodes: total time in stack",
 			names.arg = xnodes[ordertotal,]$name, sub=src, ylab="count", ...);
-			legnd()}
+			legnd(trimmed=trimmed, fulltime=fulltime)}
 		)
 	}
 
