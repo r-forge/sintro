@@ -24,7 +24,7 @@ plot a plot for the output of class \code{scode}.
 %\details{
 %%  ~~ If necessary, more details than the description above ~~
 %}
-\value{None.}
+\value{subject to change}
 \references{  \url{http://sintro.r-forge.r-project.org/} }
 \note{
 See the vignette for in-context explanations.

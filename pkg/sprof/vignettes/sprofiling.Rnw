@@ -33,9 +33,10 @@
 \newcommand\ircode[1]{\textsl{\texttt{#1}}}
 \newcommand\ircodex[1]{\textsl{\texttt{#1}}\index{#1@\texttt{#1}|textit}}
 %??2
-\newcommand{\keyword}[2]{\index[rtop]{\ Topic{\large\ \textbf{#1}}!#2@\texttt{#2}}}
-\newcommand\irfunx[2]{\keyword{#1}{#2}\ircode{#2()}\index[rfun]{#2@\texttt{#2}|textit}}% fun() & index, like \Link
-
+%\newcommand{\keyword}[2]{\index[rtop]{\ Topic{\large\ \textbf{#1}}!#2@\texttt{#2}}}
+\newcommand{\keyword}[2]{\index{\ Topic{\large\ \textbf{#1}}!#2@\texttt{#2}}}
+%\newcommand\irfunx[2]{\keyword{#1}{#2}\ircode{#2()}\index[rfun]{#2@\texttt{#2}|textit}}% fun() & index, like \Link
+\newcommand\irfunx[2]{\keyword{#1}{#2}\ircode{#2()}\index{#2@\texttt{#2}|textit}}
 
 %	\newcommand{\keyword}[2]{\sindex[rtop]{\ Topic{\large\ \textbf{#1}}!#2@\texttt{#2}}}
 %	\newcommand\irfunx[2]{\keyword{#1}{#2}\ircode{#2()}\sindex[rfun]{#2@\texttt{#2}|textit}}% fun() & index, like \Link
@@ -222,7 +223,7 @@ Rprof(NULL)
 @
 
 We now have the profile data in a file \ircode{RprofsRegressionExpl.out}.
-For this vignette, we use a frozen version\ircode{RprofsRegressionExpl01.out}.
+For this vignette, we use a frozen version \ircode{RprofsRegressionExpl01.out}.
 
 The basic \R{} invites us to get a summary.
 
@@ -237,13 +238,13 @@ The file contains several spurious recordings: nodes that have been recorded onl
 \filledpagebreak
 <<print = FALSE, results = tex, label=tab:prSRREbs>>=
 prxt(sumRprofRegressionExpl$by.self,
-	caption="by.self as final stack entry, all records", 
+	caption="\ircode{summaryRprof} result: by.self as final stack entry, all records", 
 	label="tab:prSRREbs")
 @
 \filledpagebreak
 <<print = FALSE, results = tex, label=tab:prSRREbt>>=
 prxt(sumRprofRegressionExpl$by.total[sumRprofRegressionExpl$by.total$total.time>0.004,],
-	caption="by.total, total time > 0.004s", 
+	caption="\ircode{summaryRprof} result: by.total, total time > 0.004s", 
 	label="tab:prSRREbt")
 @
 
@@ -252,8 +253,7 @@ In contrast, in our implementation we take a two step approach. First we read in
 
 <<>>=
 sprofRegressionExpl <- readRprof("RprofsRegressionExpl01.out")
-str(sprofRegressionExpl, max.level=2, vec.len=3, nchar.max=40)
-@
+                                                                                                                                                                                                                                                                                                                                                                                                                @
 << label=tab:prSREinfo>>=
 # xtable cannot handle posix
 str(sprofRegressionExpl$info,
