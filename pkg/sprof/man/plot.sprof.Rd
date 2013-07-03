@@ -1,4 +1,4 @@
-%$HeadURL: svn+ssh://gsawitzki@svn.r-forge.r-project.org/svnroot/sintro/pkg/sprof/man/summary.sprof.Rd $
+%$HeadURL$
 \encoding{UTF-8}
 
 \name{plot.sprof}

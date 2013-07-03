@@ -1,4 +1,4 @@
-# $HeadURL:$
+# $HeadURL$
 # convert list to matrix
 # list entries go to matrix columns, filled for equal length 
 

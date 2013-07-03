@@ -1,4 +1,4 @@
-# $HeadURL:$
+# $HeadURL$
 
 #\name{adjacency}
 #\alias{stackstoadj}

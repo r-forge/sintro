@@ -1,4 +1,4 @@
-%$HeadURL:$
+%$HeadURL$
 \encoding{UTF-8}
 
 \name{print.sprof}
