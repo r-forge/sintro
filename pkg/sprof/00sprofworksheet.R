@@ -21,6 +21,22 @@ plot_nodes(rpo)
 plot_stacks(rpo)
 plot_profiles(rpo)
 
+###
+promptClass(clName, filename = NULL, type = "class",
+            keywords = "classes", where = topenv(parent.frame()),
+            generatorName = clName)
+
+promptMethods(f, filename = NULL, methods)
+
+prompt(object, filename = NULL, name = NULL, ...)
+promptData(object, filename = NULL, name = NULL)
+
+## Default S3 method:
+prompt(object, filename = NULL, name = NULL,
+       force.function = FALSE, ...)
+
+## S3 method for class 'data.frame'
+prompt(object, filename = NULL, name = NULL, ...)
 
 
 ##
@@ -55,7 +71,7 @@ install.packages("/Users/gs/projects/rforge/sintro/pkg/sprof_0.0-4.tar.gz", repo
 ##
 vignette <- function(){ 
 options(width=72); setwd("/Users/gs/projects/rforge/sintro/pkg/sprof/work/vignettes/" )
-Sweave(file= "sprofiling.Rnw", output="sprofiling.tex", keep.source=TRUE)
+Sweave(file= "../../vignettes/sprofiling.Rnw", output="sprofiling.tex", keep.source=TRUE)
 # debug=TRUE, eps=FALSE, pdf=TRUE, keep.source=TRUE
 }
 ##

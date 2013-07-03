@@ -8,7 +8,7 @@
 
 plot_nodes <- function(x, which=c(1L,2L, 3L), col=NULL, 
 	ask = prod(par("mfcol")) < length(which) && dev.interactive(), 
-	src=NULL,
+	src=NULL, mincount=5, 
 	...){## full data
 	if (inherits(x,"sprof")) {
 		xnodes <- x$nodes
@@ -27,33 +27,41 @@ plot_nodes <- function(x, which=c(1L,2L, 3L), col=NULL,
 	oask <- devAskNewPage(TRUE)
 	on.exit(devAskNewPage(oask))
     }
-
-	orderself <- order(xnodes$self.time,decreasing=TRUE)
-	ordertotal<- order(xnodes$total.time,decreasing=TRUE)
+	nrnodes <- dim(xnodes)[1]
+	#browser()
+	if (mincount>0) xnodes <- xnodes[xnodes$total.time>=mincount,]
+	trimmed <- nrnodes-dim(xnodes)[1]
+	legnd <-function(){
+		if (trimmed>0) 
+		legend("topright", legend=paste(nrnodes,"nodes\n", 
+		trimmed," nodes with",mincount,"or less\n total counts omitted\n"),bty="n") else 
+		legend("topright", legend=paste(nrnodes,"nodes"),bty="n") 
+}
+	
 	for (ip in which){
 		switch(ip,
 		plot(xnodes$self.time, xnodes$total.time, xlab="self", ylab="total", sub=src), 
-		barplot(xnodes[orderself,]$self.time,
-			main="Nodes: time at end of stack",
-			names.arg = xnodes[orderself,]$name, sub=src), 
-		barplot(xnodes[ordertotal,]$total.time, 
+		{   orderself <- order(xnodes$self.time,decreasing=TRUE);
+			xno <- xnodes[orderself,]; xno <- xno[xno$self.time>0,]
+			barplot(xno$self.time,
+			main="Nodes: time as last of stack",
+			names.arg = xno$name, sub=src, ylab="count", ...);
+			legnd()
+			}, 
+		{ordertotal<- order(xnodes$total.time,decreasing=TRUE);
+			barplot(xnodes[ordertotal,]$total.time, 
 			main="Nodes: total time in stack",
-			names.arg = xnodes[ordertotal,]$name, sub=src) 
+			names.arg = xnodes[ordertotal,]$name, sub=src, ylab="count", ...);
+			legnd()}
 		)
 	}
-		# plot(xnodes$self.time, xnodes$total.time)
-	
-	# barplot(sort(xnodes$self.time, decreasing=TRUE),
-	# main="self",names.arg = xnodes$name)
-	
-	# barplot(sort(xnodes$total.time, decreasing=TRUE),
-	# main="total")
+
 	par(oldpar)
 	invisible(xnodes)
 }# plot_nodes
 
 plot_stacks <- function(x,which=c(1L, 2L),ask = prod(par("mfcol")) < length(which) && dev.interactive(), 
-		src=NULL,
+		src=NULL, mincount=5, 
 		...){
 		if (inherits(x,"sprof")) {
 		xstacks <- x$stacks
@@ -72,7 +80,18 @@ plot_stacks <- function(x,which=c(1L, 2L),ask = prod(par("mfcol")) < length(whic
 	oask <- devAskNewPage(TRUE)
 	on.exit(devAskNewPage(oask))
 	}
- 
+	#browser()
+ 	nrstacks <- dim(xstacks)[1]
+	#browser()
+	if (mincount>0) xstacks <- xstacks[xstacks$refcount>=mincount,]
+	trimmed <- nrstacks-dim(xstacks)[1]
+	legnd <-function(){
+		if (trimmed>0) 
+		legend("topright", legend=paste(nrstacks,"stacks\n", 
+		trimmed," stacks with",mincount,"or less\n total references omitted\n"),bty="n") else 
+		legend("topright", legend=paste(nrstacks,"stacks"),bty="n") 
+	}
+
  	for (ip in which){
 		switch(ip,
 		plot(xstacks$refcount, xstacks$stacklength, xlab="refcount", ylab="stack length", sub=src), 
@@ -81,9 +100,12 @@ plot_stacks <- function(x,which=c(1L, 2L),ask = prod(par("mfcol")) < length(whic
 			barplot(xstacks[ordercnt,]$refcount, 
 			names.arg= xstacks[ordercnt,]$id,
 			main="Stacks by reference count", 
-		sub=src)}
+			ylab="count",
+			xlab="stack",
+		sub=src,...);
+		legnd()}
 		)#switch
-	}
+	} #for
 
 	#plot(stacks)
 	#invisible(ss)

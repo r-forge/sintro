@@ -1,4 +1,4 @@
-%$Head:$
+%$URLHead:$
 \encoding{UTF-8}
 \name{readRprof}
 \alias{readRprof}
