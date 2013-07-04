@@ -22,11 +22,9 @@ A List of 4
 %\source{
 %%  ~~ reference to a publication or URL from which the data were obtained ~~
 %}
-\references{
-See the vignette of package \code{sprof}.
-}
+\references{See the vignette of package \code{sprof}.}
 \examples{
-data(sprof01lm)
+ data(sprof01lm)
  str(sprof01lm) 
  plot(sprof01lm) 
 }
