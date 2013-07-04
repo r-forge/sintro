@@ -140,20 +140,53 @@ options(digits = 6)
 %This is just a hack to get a nicer output from args:
 %<<>>=
 %prargs <- function(x){ str(args(x))}
+For larger tabels and data frames, we use a cludge to avoid long outputs.
+<<>>=
+xcutdata.frame <- function(df,  cut, margin){
+#! keep3, to add: margin top - random center - margin bottom
+	if (!is.data.frame(df)) return(df)
+	nrow <- nrow(df)
+	# cut a range if it is not empty. Quiet noop else. Does not cut single lines.
+	 cutrng <- function(cutfrom,cutto){
+	 	if (cutfrom<cutto){
+		df[cutfrom,] <- NA
+		if (!is.null(rownames(df))) rownames(df)[cutfrom] <- "< cut >"
+		if (!is.null(df$name)) df$name[cutfrom] <- ""
+		
+		cutfrom <- cutfrom+1
+		df[-(cutfrom:cutto),]
+		}#if
+	}
+	if (!missing(cut))  {df <- cutrng(cut[1],cut[2]); return(df)}
+	if (!missing(margin))  {
+		if (length(margin)==1) margin <-  c(margin,margin)
+	cut <- c(margin[1]+1,nrow-margin[2])
+	df <-cutrng(cut[1],cut[2]); 
+	return(df)}
+#	if (!missing(keep3))  { cut <- c(keep3[1]+1,keep3[1]+1,nrow-keep3[3]-1,nrow-keep3[3]-1)
+#	if (cut[3]-cut[4] > keep3[2]+2){delta<-(cut[3]-cut[2]) div 2; cut[3]<-0
+#	browser()
+#	} else df <- cutrng(cut[1],cut[4])
+#	cutrng(cut[1],cut[4]) return(df)}
+}
+
 @
 We use the \R{} function \ircode{xtable()} for output and \LaTeX \ \ircode{longtable}. A convenient wrapper to use this in out \ircode{Sweave} source is:
 <<>>= 
 library(xtable)
 prxt <- function (x, digits=3, 	caption=NULL, 
 	label=NULL, ...)  {
+	margin <- 10
+	if (nrow(x)> 2*margin+3) x <-xcutdata.frame(x, margin=margin)
 	print(
 		xtable(x, digits=digits, caption=caption, label=label, ...), 
-		floating=FALSE, tabular.environment="longtable")
+		floating=FALSE, tabular.environment="longtable", NA.string="\\vdots")
 	}
 @
 This is to be used with
 \verb+<<print = FALSE, results = tex, label=tab:prxxxx>>=+
 
+@
 \section{Profiling}
 The basic information provided by all profilers in is a protocol of sampled stacks. 
 For each recorded event, the protocol has one record, such as a line with a text string showing the sampled  stack.
@@ -298,9 +331,10 @@ barplot(sp4,
  main="Stacks, by reference count (4 obs. minimum)", ylab="count > 4")
 @
 On the first look, information on the profile level is not informative. Profile records are just recordings of some step, taken at regular intervals. We get a minimal information, if we encode the stacks in colour.
-<<fig=TRUE, label=sREplotprofiles242, width=12, height=6>>=
-par(mfrow=c(1,2))
+<<fig=TRUE, label=sREplotprofiles242, width=12, height=12>>=
+oldpar<-par(mfrow=c(2,2))
 plot_profiles(sprofRegressionExpl)
+par(oldpar)
 @
 We now do a step down analysis. Agregating the information from the profilingn events, we have the frequency of stack references. On the stack level, we encode the frequncy in colour, and  linking propagates this to tne profile level.
 <<fig=TRUE, label=sREplotstacks4col>>=
@@ -309,9 +343,10 @@ stackfreqscore4<- stackfreqscore[stacksperm][stacksnrobsok[stacksperm]]
 barplot(sp[stacksnrobsok[stacksperm]], main="Stacks, by reference count (4 obs. minimum)", ylab="count > 4",
 col=rainbow(80)[stackfreqscore4])
 @
-<<fig=TRUE, label=sREplotprofiles4, width=12, height=6>>=
-par(mfrow=c(1,2))
+<<fig=TRUE, label=sREplotprofiles4, width=12, height=12>>=
+oldpar<- par(mfrow=c(2,2))
 plot_profiles(sprofRegressionExpl)
+par(oldpar)
 @
 %<<>>=
 %nodesnrobsok <- sprofRegressionExpl$nodes$total.time > 4
@@ -362,8 +397,9 @@ Looking at lists of numbers is not too informative. We get a first impression by
 <<fig=TRUE, label=sREplotnodes, width=12, height=12>>=
 
 #plot_nodes(sprofRegressionExpl, col=nodescol[nodescore])
-par(mfrow=c(2,2))
+oldpar <- par(mfrow=c(2,2))
 plot_nodes(sprofRegressionExpl)
+par(oldpar)
 @
 %<<fig=TRUE, label=sREplotnodes>>=
 %
@@ -375,18 +411,19 @@ plot_nodes(sprofRegressionExpl)
 %
 %plot_nodes(sprofRegressionExpl, col=nodescol[nodescore])
 <<fig=TRUE, label=sREplotstacks, width=12, height=6>>=
-par(mfrow=c(1,2))
+oldpar <- par(mfrow=c(1,2))
 plot_stacks(sprofRegressionExpl)
+par(oldpar)
 <<>>=
 stacks_nodes <- list.as.matrix(sprofRegressionExpl$stacks$nodes)
 <<fig=TRUE, label=sREimgstacks>>=
 image(x=1:ncol(stacks_nodes),y=1:nrow(stacks_nodes), 
 t(stacks_nodes),xlab="stack", ylab="depth", main="nodes by stack")
 
-<<fig=TRUE, label=sREplotprofiles323, width=12, height=6>>=
-par(mfrow=c(1,2))
+<<fig=TRUE, label=sREplotprofiles323, width=12, height=12>>=
+oldpar <-par(mfrow=c(2,2))
 plot_profiles(sprofRegressionExpl)
-
+par(oldpar)
 @
 <<>>=
 profile_nodes <- profiles_matrix(sprofRegressionExpl)
@@ -562,12 +599,18 @@ print_profiles(rpo)
 The \irfunx{misc}{print} method for \ircode{sprof} objects concatenates these three functions.
 
 \subsection{Plot}
-<<fig=TRUE, label=rpoplotnodes>>=
+<<fig=TRUE, label=rpoplotnodes, width=12, height=12>>=
+oldpar<- par(mfrow=c(2,2))
 plot_nodes(rpo)
-<<fig=TRUE, label=rpoplotstacks>>=
+par(oldpar)
+<<fig=TRUE, label=rpoplotstacks, width=12, height=6>>=
+oldpar<- par(mfrow=c(1,2))
 plot_stacks(rpo)
-<<fig=TRUE, label=rpoplotprofiles>>=
+par(oldpar)
+<<fig=TRUE, label=rpoplotprofiles, width=12, height=12>>=
+oldpar<- par(mfrow=c(2,2))
 plot_profiles(rpo)
+par(oldpar)
 @
 The \irfunx{misc}{plot} method for \ircode{sprof} objects concatenates these three functions.
 

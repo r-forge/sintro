@@ -1,4 +1,5 @@
-# $HeadURLs:$
+# $HeadURL$
+# $Id$
 # setwd("")
 # source('~/Documents/lectures/src/insider/profile/sprof/pkg/R/plot_prof.R', chdir = TRUE)
 #! To Do
@@ -126,7 +127,7 @@ plot_stacks <- function(x,which=c(1L, 2L),ask = prod(par("mfcol")) < length(whic
 #}
 	
 
-plot_profiles <- function(x, which=c(1L,2L), col,ask = prod(par("mfcol")) < length(which) && dev.interactive(), 				src=NULL,
+plot_profiles <- function(x, which=c(1L,2L,3L, 4L), col,ask = prod(par("mfcol")) < length(which) && dev.interactive(), 				src=NULL,
 		 ...){
 		if (inherits(x,"sprof")) {
 		xprof<- x$profiles
@@ -142,7 +143,7 @@ plot_profiles <- function(x, which=c(1L,2L), col,ask = prod(par("mfcol")) < leng
 	warning("RLE and multiple timings not yet supported")
 	 #sp <- summary_profiles(x)
 	 nrprof <- length(xprof$data)
-	z <- xprof$data; dim(z)=c(nrprof,1)
+	z <- xprof$data; dim(z)=c(length(z),1)
 	
 	stackrng <- range(z)
 	if (missing(col)) {col <- rainbow(stackrng[2]-stackrng[1]+1)}
@@ -154,7 +155,18 @@ plot_profiles <- function(x, which=c(1L,2L), col,ask = prod(par("mfcol")) < leng
 
  	for (ip in which){
  		switch(ip,
-	barplot(t(z), main="stack ids by event", ylab="stack id", sub=src),
+ 	#1
+	plot(z[,1], main="stack ids by event", ylab="stack id", sub=src),
+	#2
+	{ zref <- sapply(z, function(xx) {x$stacks$refcount[xx] })
+	plot(zref, main="stack reference count by event", ylab="count", xlab="event",sub=src)
+	},
+	#3
+	{ zref <- sapply(z, function(xx) {x$stacks$stacklength[xx] })
+	plot(zref, main="stack length by event", ylab="count",  xlab="event", sub=src)
+	},
+
+	#4
 	image(x=1:nrprof,y=1,z, 
 	xlab="event", 
 	ylab="", yaxt="n" , ylim=c(1,nrprof), 
