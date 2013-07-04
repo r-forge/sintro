@@ -1,5 +1,5 @@
-% $HeadURL:$
-% $Id:$
+% $HeadURL$
+% $Id$
 \name{plot_profiles}
 \alias{plot_profiles}
 %- Also NEED an '\alias' for EACH other topic documented here.
