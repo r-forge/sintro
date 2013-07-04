@@ -1,4 +1,4 @@
-%$HeadURL: svn+ssh://gsawitzki@svn.r-forge.r-project.org/svnroot/sintro/pkg/sprof/man/sprof-package.Rd $
+%$HeadURL$
 \encoding{utf8}
 \name{profiles_matrix}
 \alias{profiles_matrix}

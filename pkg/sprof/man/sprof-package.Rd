@@ -17,8 +17,7 @@ License: \tab GPL-2\cr
 }
 \code{readProf} reads a profile file from \code{Rprof} or other profilers and returns a composite structure of class \code{sprof}.
 }
-\author{
-Günther Sawitzki <gsawitzki@r-forge.r-project.org>}
+\author{Günther Sawitzki <gsawitzki@r-forge.r-project.org>}
 %\references{
 %~~ Literature or other references for background information ~~
 %}
