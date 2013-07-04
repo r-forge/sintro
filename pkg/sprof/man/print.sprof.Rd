@@ -1,11 +1,14 @@
 %$HeadURL$
-\encoding{UTF-8}
+%$Id$
+%$Date$
+%$Author$
+%$Revision$
+\encoding{utf8}
 
 \name{print.sprof}
 \alias{print.sprof}
 \alias{print_nodes}
 \alias{print_stacks}
-\alias{print_profiles}
 
 \title{print for profiles}
 \description{
@@ -32,7 +35,7 @@ Print a print for the output of class \code{scode}.
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
- \code{\link{summaryRprof}}
+ \code{\link{summaryRprof}} \code{\link{plot_profile}}
 }
 \examples{
 data(sprof01lm)

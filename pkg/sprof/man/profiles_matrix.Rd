@@ -1,13 +1,16 @@
 %$HeadURL$
+%$Id$
+%$Date$
+%$Author$
+%$Revision$
 \encoding{utf8}
 \name{profiles_matrix}
 \alias{profiles_matrix}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Extract a node incidence matrix from profile information.
 }
-% \description{
-% %%  ~~ A concise (1-5 lines) description of what the function does. ~~
-% }
+\description{
+Extract a node incidence matrix from profile information.}
 \usage{
 profiles_matrix(x)
 }
@@ -36,8 +39,8 @@ a \code{sprof} data structure.
 % }
 \examples{
  data(sprof01lm)
- smat <-profiles_matrix}(sprof01lm)
- image(sm)
+ smat <-profiles_matrix(sprof01lm)
+ image(smat)
  }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

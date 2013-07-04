@@ -4,17 +4,15 @@
 \alias{stackstoadj}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Stacks to adjacency matrix}
-%%  ~~function to do ... ~~
-}
-% \description{
-% %%  ~~ A concise (1-5 lines) description of what the function does. ~~
-% }
+\description{
+convert stack information to adjacency matrix
+ }
 \usage{
 stackstoadj(xstacks, xfreq, maxnode)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{xstacks}{list of stacks}
+  \item{xstacks}{list of stack ids}
   \item{xfreq}{vector of frequencies or weights}
   \item{maxnode}{maximum of nodes (maybe higher then in stacks)
 }

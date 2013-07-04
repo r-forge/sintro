@@ -1,5 +1,9 @@
-# $HeadURL$
-# $Date$
+#$HeadURL$
+#$Id$
+#$Date$
+#$Author$
+#$Revision$
+#\encoding{utf8}
 # setwd("")
 # source('~/Documents/lectures/src/insider/profile/sprof/pkg/R/summary_prof.R', chdir = TRUE)
 #! To Do

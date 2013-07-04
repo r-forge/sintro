@@ -1,28 +1,36 @@
 %$HeadURL$
+%$Id$
+%$Date$
+%$Author$
+%$Revision$
 \encoding{utf8}
-\name{rrleb}
-\alias{rrleb}
+\name{print_profiles}
+\alias{print_profiles}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{Recursive run lenth encoding bottom up.}
+\title{Print profile information
+}
 \description{
-Encode a matrix as  run-length, bottom up.
-Encoding  respects previous runs, e.g line n-1 encodes rns in each run of line n.
+Print profile information.
 
-May be removed.
 }
 \usage{
-rrleb(x)
+print_profiles(x)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{
-a matrix.}
+a \code{sprof} data structure.
+}
 }
 % \details{
 % %%  ~~ If necessary, more details than the description above ~~
 % }
-\value{
-list of run length encoded lines
+\value{none
+%%  ~Describe the value returned
+%%  If it is a LIST, use
+%%  \item{comp1 }{Description of 'comp1'}
+%%  \item{comp2 }{Description of 'comp2'}
+%% ...
 }
 % \references{
 % %% ~put references to the literature/web site here ~
@@ -32,23 +40,14 @@ list of run length encoded lines
 % %%  ~~further notes~~
 % }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+% %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 % \seealso{
 % %% ~~objects to See Also as \code{\link{help}}, ~~~
 % }
 \examples{
-x <- matrix(c(
-	3,3,4,4,4,
-	 5,5,6,6,7,
-	 8,9,9,0,0,
-	 1,1,1,2,2
-
- ),nrow=4, ncol =5, byrow=TRUE)
- xrrleb <- rrleb(x)
- xrrleb
-
- t(sapply(xrrleb, inverse.rle))
+	 data(sprof01lm)
+	print_profiles(sprof01lm)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

@@ -1,3 +1,9 @@
+%$HeadURL$
+%$Id$
+%$Date$
+%$Author$
+%$Revision$
+\encoding{utf8}
 \name{sprof01lm}
 \alias{sprof01lm}
 \docType{data}

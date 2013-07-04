@@ -4,9 +4,7 @@
 \alias{summary_terminals}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Tabulate leaf nodes}
-% \description{
-% %%  ~~ A concise (1-5 lines) description of what the function does. ~~
-% }
+\description{Tabulate leaf nodes}
 \usage{
 summary_terminals(x)
 }
@@ -25,14 +23,14 @@ summary_terminals(x)
 %%  \item{comp1 }{Description of 'comp1'}
 %%  \item{comp2 }{Description of 'comp2'}
 %% ...
-}
+%}
 % \references{
 % %% ~put references to the literature/web site here ~
 % }
 \author{Günther Sawitzki <gsawitzki@r-forge.r-project.org>}
-\note{
+%\note{
 %%  ~~further notes~~
-}
+%}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
