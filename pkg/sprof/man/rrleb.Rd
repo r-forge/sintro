@@ -3,7 +3,7 @@
 \name{rrleb}
 \alias{rrleb}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{Recursive run lenth encoding bottom up.}
+\title{Recursive run length encoding bottom up.}
 \description{
 Encode a matrix as  run-length, bottom up.
 Encoding  respects previous runs, e.g line n-1 encodes rns in each run of line n.
@@ -34,9 +34,10 @@ list of run length encoded lines
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-% \seealso{
-% %% ~~objects to See Also as \code{\link{help}}, ~~~
-% }
+
+\seealso{
+ \code{\link{rle}}, ~~~
+}
 \examples{
 x <- matrix(c(
 	3,3,4,4,4,
@@ -53,3 +54,6 @@ x <- matrix(c(
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{util}
+\keyword{matrix}
+\keyword{manip}
+
