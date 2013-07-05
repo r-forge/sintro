@@ -49,6 +49,7 @@ cd ~/projects/rforge/sintro/pkg/sprof/
 
 lapply(sprofRegressionExpl$stacks$nodes, function(x) {x[-(1:level)]}
 
+svn propset svn:keywords "Date Author Id Revision HeadURL" sprof/man/*.Rd
 svn propset svn:keywords "Date Author Id Revision HeadURL" sprof/R/*.R
 svn propset svn:keywords "Date Author Id Revision HeadURL" sprof/work/*.R
 svn propset svn:keywords "Date Author Id Revision HeadURL" sprof/vignettes/*.Rnw
