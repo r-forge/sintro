@@ -35,7 +35,7 @@ Print a print for the output of class \code{scode}.
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
- \code{\link{summaryRprof}} \code{\link{plot_profile}}
+ \code{\link{summaryRprof}} \code{\link{plot.sprof}}
 }
 \examples{
 data(sprof01lm)

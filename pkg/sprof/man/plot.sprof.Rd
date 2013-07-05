@@ -4,8 +4,6 @@
 \name{plot.sprof}
 %\alias{plot}
 \alias{plot.sprof}
-\alias{plot_nodes}
-\alias{plot_stacks}
 
 \title{plot for profiles}
 \description{
@@ -34,7 +32,13 @@ Displays of the graph structure are given in the vignette.
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
- \code{\link{summaryRprof}}  \code{\link{plot_profiles}}
+ \code{\link{summaryRprof}}  
+ 
+ \code{\link{plot_profiles}}
+ 
+ \code{\link{plot_nodes}}
+\code{\link{plot_stacks}}
+
 }
 \examples{
 data(sprof01lm)

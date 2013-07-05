@@ -17,13 +17,13 @@ profiles_matrix(x)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{
-a \code{sprof} data structure.
+an \code{sprof} data structure.
 }
 }
 % \details{
 % %%  ~~ If necessary, more details than the description above ~~
 % }
-\value{an incidencematrix, NA filled.}
+\value{an incidence matrix, NA filled.}
 % \references{
 % %% ~put references to the literature/web site here ~
 % }

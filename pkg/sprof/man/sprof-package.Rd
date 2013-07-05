@@ -15,7 +15,13 @@ Version: \tab 0.0-1\cr
 Date: \tab 2013-05-26\cr
 License: \tab GPL-2\cr
 }
-\code{readProf} reads a profile file from \code{Rprof} or other profilers and returns a composite structure of class \code{sprof}.
+\code{readProf} reads a profile file from \code{\link{Rprof}} or other profilers and returns a composite structure of class \code{sprof}.
+
+To create a profile on the fly, use \code{\link{sampleRprof}}.
+
+To import profrile information written by \code{\link{Rprof}} or other profilers , use \code{\link{readRprof}}.
+
+For  \code{sprof}, the usual access functions are supported.
 }
 \author{Günther Sawitzki <gsawitzki@r-forge.r-project.org>}
 %\references{
