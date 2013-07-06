@@ -7,7 +7,9 @@ Date: 2013-06-17
 Author: Günther Sawitzki
 Maintainer: Günther Sawitzki <gsawitzki@r-forge.r-project.org>
 Description: Support utilities for profiling and dynamic code analysis.
-License: GPL-3
+License: GPL-2, GPL-3
 Suggests: proftools, timeit
+URL: http://http://sintro.r-forge.r-project.org
+ByteCompile: FALSE
 KeepSource: TRUE
 BuildVignettes: FALSE
