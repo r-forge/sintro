@@ -5,7 +5,7 @@
 \description{Various plots of a profile. }
 
 \usage{
-plot_nodes(x, which = c(1L, 2L, 3L), col = NULL, 
+plot_nodes(x, which = c(1L, 2L, 3L, 4L), col = NULL, 
 ask = prod(par("mfcol")) < length(which) && dev.interactive(), 
 src = NULL, mincount = 5, ...)
 }

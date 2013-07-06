@@ -7,7 +7,7 @@
 
 
 
-plot_nodes <- function(x, which=c(1L,2L, 3L), col=NULL, 
+plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL, 
 	ask = prod(par("mfcol")) < length(which) && dev.interactive(), 
 	src=NULL, mincount=5, 
 	...){## full data
@@ -44,9 +44,12 @@ plot_nodes <- function(x, which=c(1L,2L, 3L), col=NULL,
 	
 	for (ip in which){
 		switch(ip,
+		#1
 		{
-		plot(xnodes$self.time, xnodes$total.time, xlab="self", ylab="total", sub=src, main="Nodess")
+		plot(xnodes$self.time, xnodes$total.time, xlab="self", ylab="total", sub=src, main="Nodes by time")
+		text(xnodes$self.time, xnodes$total.time,xnodes$name)
 		}, 
+		#2
 		{   orderself <- order(xnodes$self.time,decreasing=TRUE);
 			xnodes <- xnodes[orderself,]; xnodes <- xnodes[xnodes$self.time>0,]
 			barplot(xnodes$self.time,
@@ -54,6 +57,7 @@ plot_nodes <- function(x, which=c(1L,2L, 3L), col=NULL,
 			names.arg = xnodes$name, sub=src, ylab="count", ...);
 			legnd(trimmed=trimmed, fulltime=0)
 			}, 
+		#3
 		{   totaltime <- sum(xnodes$self.time)
 			fulltime <- dim(xnodes)[1]
  			xnodes <- xnodes[xnodes$total.time < totaltime,]
@@ -62,7 +66,14 @@ plot_nodes <- function(x, which=c(1L,2L, 3L), col=NULL,
 			barplot(xnodes[ordertotal,]$total.time, 
 			main="Nodes: total time in stack",
 			names.arg = xnodes[ordertotal,]$name, sub=src, ylab="count", ...);
-			legnd(trimmed=trimmed, fulltime=fulltime)}
+			legnd(trimmed=trimmed, fulltime=fulltime)},
+		#4
+		{
+		plot(xnodes$self.time+1, xnodes$total.time, 
+		xlab="log(self+1)", ylab="log(total)", log="xy",
+		sub=src, main="Nodes by time (log scale)")
+		text(xnodes$self.time, xnodes$total.time,xnodes$name)
+		}
 		)
 	}
 
