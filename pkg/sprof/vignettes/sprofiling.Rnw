@@ -29,6 +29,8 @@
 \setkeys{Gin}{width=1.0\textwidth}
 
 \setcounter{tocdepth}{3}
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}
 
 \newcommand{\R}{{\normalfont\textsf{R}}{}}
 \newcommand\ircode[1]{\textsl{\texttt{#1}}}
@@ -137,8 +139,6 @@ Print parameters used here:
 options(width = 72)
 options(digits = 6)
 @
-\setlength{\parskip}{6pt}
-\setlength{\parindent}{0pt}
 
 We want immediate warnings, if necesary. Set to level 2 to handle warnings as error.
 <<>>=
@@ -652,7 +652,9 @@ par(oldpar)
 The \irfunx{misc}{plot} method for \ircode{sprof} objects concatenates these three functions.
 
 \subsection{Graph}
-%Packages used to run examples or%tests conditionally (e.g. via if(require(pkgname))) should be listed in ‘Suggests’ or%‘Enhances’.
+%Packages used to run examples or
+%tests conditionally (e.g. via if(require(pkgname))) should be listed in √îSuggests√ï or
+%√îEnhances√ï.
 To interface \ircode{sprof} to a graph handling package,  \irfunx{adjacency}{until} can extract the adjacency matrix from the profile.
 
 <<>>=
