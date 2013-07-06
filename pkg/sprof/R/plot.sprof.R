@@ -46,7 +46,9 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
 		switch(ip,
 		#1
 		{
-		plot(xnodes$self.time, xnodes$total.time, xlab="self", ylab="total", sub=src, main="Nodes by time")
+		plot(xnodes$self.time, xnodes$total.time, xlab="self", 
+		ylab="total", sub=src, main="Nodes by time")
+		if (require(wordcloud)) textplot(xnodes$self.time, xnodes$total.time,xnodes$name) else
 		text(xnodes$self.time, xnodes$total.time,xnodes$name)
 		}, 
 		#2
@@ -72,6 +74,7 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
 		plot(xnodes$self.time+1, xnodes$total.time, 
 		xlab="log(self+1)", ylab="log(total)", log="xy",
 		sub=src, main="Nodes by time (log scale)")
+		if (require(wordcloud)) textplot(xnodes$self.time, xnodes$total.time,xnodes$name) else
 		text(xnodes$self.time, xnodes$total.time,xnodes$name)
 		}
 		)
