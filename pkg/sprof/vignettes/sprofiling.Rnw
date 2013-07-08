@@ -86,8 +86,19 @@ Typeset: \today}                                           % Activate to display
 \makeindex
 \listfiles
 \begin{document}
+
+\section*{Pending changes}
+\begin{itemize}
+\item {Control information may be included as special stack in raw format.}
+\item {A list of profiles may become default. Only one profiling interval value per profile.}
+\end{itemize}
+\bigskip
+
 \maketitle
+{
+\setlength{\parskip}{0pt}
 \tableofcontents
+}
 \section*{Profiling facilities in \R{}}
 \R{} provides the basic instruments for profiling, both for time based samplers as for 
 event based instrumentation. However this source of information seems to be rarely
@@ -395,7 +406,7 @@ Stable framework effect can be detected automatically. ``burn in'' or ``fade out
 Before starting additional inspection, the data better be trimmed. At this point, it is a decision whether to adapt the timing information, or keept the original information. Since this decision does affect the structural information, it is not critical. But analysis is easier if unused nodes are eliminated.
 <<>>=
 sprof02 <- sprof01
-basetrim <- 12
+basetrim <- 13
 sprof02$stacks$nodes <- sapply(sprof02$stacks$nodes, function (x){if (length(x)> basetrim) x[-(1:basetrim)] })
 #sprof02$stacks$nodes <- sprof02$stacks$nodes[[!is.null(sprof02$stacks$nodes)]]
 <<fig=TRUE, label= sprof02collink, width=18, height=6>>=
