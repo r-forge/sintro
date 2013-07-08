@@ -5,6 +5,9 @@
 
 # recursive run length encoding of a matrix by row, top down
 rrle <- function(x){
+	collapseNA <- function(xline){
+		
+	}
 	prevrle <- rle(x[1,])
 	collrle <- list(prevrle)
 	#browser()

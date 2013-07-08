@@ -9,13 +9,14 @@
 Build instructions and correction notes are placed here.
 Eventually, they will bubble down to other files.
 
+ \code{\link[igraph]{get.adjacency}}
+ 
 ###  To Do
 complete cycle
 - read in & first info
 - massage // delete top & last
-- write to file
-- read&pass to proftools
-- dots
+##
+revise strategy: use <Rprof Ctrl> replacement for controls
 ##
 plot_nodes(rpo)
 plot_stacks(rpo)
@@ -39,8 +40,6 @@ prompt(object, filename = NULL, name = NULL,
 prompt(object, filename = NULL, name = NULL, ...)
 
 
-##
-revise strategy: use <Rprof> replacement for controls
 ###
 cscore <- rank(rpo$nodes$total.time,ties.method="random")
 ###

@@ -33,9 +33,17 @@ stackstoadj <-  function(xstacks, xfreq, maxnode)
 #\title{Adjacency matrix}
 #\desciption{Build an adjacency matrix from profile information}
 
-adjacency <- function(sprof, keep.names=TRUE) {
+adjacency <- function(sprof, keep.names=TRUE, rmzero=TRUE) {
 	adj <-stackstoadj(sprof$stacks$nodes,sprof$stacks$refcount,sprof$info$nrnodes)
 	if (keep.names) dimnames(adj) <-list(from=sprof$nodes$name, to=sprof$nodes$name)
+	
+	if (rmzero) {
+		rs <- rowSums(adj)
+cs <- colSums(adj)
+sums<- cs+rs
+adj <- adj[sums>0,sums>0]
+
+	}
 	adj
 }
 
