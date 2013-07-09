@@ -11,9 +11,9 @@ Profiling, timing and optimization utilitites}
 \tabular{ll}{
 Package: \tab sprof\cr
 Type: \tab Package\cr
-Version: \tab 0.0-1\cr
-Date: \tab 2013-05-26\cr
-License: \tab GPL-2\cr
+Version: \tab 0.0-5\cr
+Date: \tab 2013-07-09\cr
+License: \tab GPL-2 | GPL-3\cr
 }
 \code{readProf} reads a profile file from \code{\link{Rprof}} or other profilers and 
 returns a composite structure of class \code{sprof}.
@@ -31,14 +31,14 @@ For  \code{sprof}, the usual access functions are supported.
 %~~ Literature or other references for background information ~~
 %}
 \keyword{utilities}
-\seealso{
+%\seealso{
 %\code{\link[proftools:proftools-package]{proftools}}.
  
 %\code{\link[profr:profr-package]{profr}}.
 %\code{\link[profr]{profr-package}}
 
 %\code{\link{profr}}.
- }
+% }
 \examples{
 \dontrun{
  data(sprof01lm)

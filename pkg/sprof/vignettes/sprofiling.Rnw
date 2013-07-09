@@ -87,14 +87,16 @@ Typeset: \today}                                           % Activate to display
 \listfiles
 \begin{document}
 
+
+\maketitle
 \section*{Pending changes}
 \begin{itemize}
 \item {Control information may be included as special stack in raw format.}
 \item {A list of profiles may become default. Only one profiling interval value per profile.}
+\item {Nodes may implemented as \ircode{factor}.}
 \end{itemize}
 \bigskip
 
-\maketitle
 {
 \setlength{\parskip}{0pt}
 \tableofcontents
@@ -459,9 +461,16 @@ par(oldpar)
 @
 For a visual inspection, runs of the same node and level in the profile are easily perceived. For
 an analytical inspection, we have to reconstruct the runs from the data. In stacks, runs are organized hierarchically. On the root level, runs are just ordinary runs. On the next levels, runs have to be defined given (within) the previous runs. So we need a recursive version of \ircode{rle}, applied to the profile information.
+This gives a detailed information about the presence time of each node, by stack level.
 <<>>=
 profile_nodes_rle<- rrle(profile_nodes)
+profile_nodes_rlet <- lapply(profile_nodes_rle, function(x) table(x,dnn=c("count","node")) )
+invisible(lapply(profile_nodes_rlet, function(x) print.table(x,zero.print = ".") ))
 @
+\todo{add current level}
+
+\todo{generate a coplot representation}
+\todo{add time per call information}
 \subsection{The details}
 For each recorded event, the protocol records one line with a text string showing the sampled  stack 
 (in reverse order: most recent first). The stack lines may be preceded by header lines with event 
@@ -611,6 +620,36 @@ On the profiles level, we know the sample interval length, and the id of the sta
 
 Cheap statistics are collected as the come by. For example, from the stacks table it is cheap to identify root and leaf nodes, and this mark is propagated to the nodes table.
 
+\section{Surgery}
+Looking at nodes gives you a pointwise horizon. Looking at edges gives you a one step horizon. The stacks give a wider horizon, typically a step size of 10 or more. The stacks we get from \R{} have peculiarities, and we can handle with this broader perspective. These are not relevant if we look pointwise, but may become dominating if we try to get a global picture. We take a look ahead (details to come in \vref{sec:graph} and nave a preview how our example is represented as a graph. Left is the original graph es recovered from the edge information,  right the graph after we have cut off the scaffold effects.
+@
+\filledpagebreak
+\subsection{graph Package}
+<<fig=TRUE, label=sprofadj01NEL, width=24, height=12>>=
+oldpar <- par(mfrow=c(1,2))
+library(graph)
+plot(as(adjacency(sprof01),"graphNEL"),  main="graph layout sprof01", cex.main=2)
+plot(as(adjacency(sprof02),"graphNEL"),  main="graph layout sprof02", cex.main=2)
+par(oldpar)
+@
+\R{} ist function based, and control structures in general are implemented as functions. In a graph representation, they appear as nodes, concentrating and seeding to unrelated paths. We can detect these on the stack level and replace them by surrogates, introducing new nodes.
+\todo{implement}
+<<>>=
+newchopnode <- function(nodenames, chop) {
+tmpname <- paste("<",as.character(nodenames[chop]),">")
+# chec for existing.
+# add if necessary
+tmpname
+}
+chopstack <- function(x , chop, replacement) 
+{
+# is chop in x`
+# y: cut x.
+# merge x <- head + replacement + tiail
+return(x)
+}
+@
+\section{yyy}
 \subsubsection{Plot}
 Looking at lists of numbers is not too informative. We get a first impression by plotting the data. 
 
@@ -741,6 +780,7 @@ par(oldpar)
 The \irfunx{misc}{plot} method for \ircode{sprof} objects concatenates these three functions.
 
 \section{Graph}
+\label{sec:graph}
 %Packages used to run examples or
 %tests conditionally (e.g. via if(require(pkgname))) should be listed in ÔSuggestsÕ or
 %ÔEnhancesÕ.
@@ -765,7 +805,7 @@ This is  a format any graph package can handle.
 library(graph)
 sprofadjNEL <- as(sprofadj,"graphNEL")
 <<fig=TRUE, label=sprofadjNEL, width=24, height=24>>=
-plot(sprofadjNEL,  main="graph layout", cex.main=5)
+plot(sprofadjNEL,  main="graph layout", cex.main=2)
 #detach("package:graph")
 @
 \filledpagebreak
@@ -786,7 +826,11 @@ library(network)
 nwsprofadj <- as.network(sprofadj) # names is not imported 
 network.vertex.names(nwsprofadj) <- rownames(sprofadj) # not honoured by plot
 plot(nwsprofadj, label=rownames(sprofadj), main="network layout", cex.main=5)
-#plot(nwsprofadj, label=rownames(sprofadj), edge.lwd=sprofadj)
+
+<<fig=TRUE, label=nwsprofadje, width=24, height=24>>=
+
+edge.lwd <- trunc(sprofadj/max(sprofadj)*10)+1
+plot(nwsprofadj, label=rownames(sprofadj), main="network layout", cex.main=2, edge.lwd=edge.lwd)
 detach("package:network")
 @
 \filledpagebreak
