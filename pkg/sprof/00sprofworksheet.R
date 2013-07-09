@@ -65,7 +65,7 @@ rm sprof_internal.pdf; R CMD Rd2pdf -o sprof_internal.pdf  --internals --no-clea
 setwd("/Users/gs/projects/rforge/sintro/pkg/sprof/")
 
 remove.packages("sprof")
-install.packages("/Users/gs/projects/rforge/sintro/pkg/sprof_0.0-4.tar.gz", repos=NULL, type="source")
+install.packages("/Users/gs/projects/rforge/sintro/pkg/sprof_0.0-5.tar.gz", repos=NULL, type="source")
 
 ##
 vignette <- function(){ 
