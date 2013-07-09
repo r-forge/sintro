@@ -1,0 +1,124 @@
+------------------------------------------------------------------------
+r157 | gsawitzki | 2013-07-06 21:20:42 +0200 (Sat, 06 Jul 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/DESCRIPTION
+   M /pkg/sprof/R/plot.sprof.R
+   M /pkg/sprof/man/plot_nodes.Rd
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+
+nodes plot log scale added, vingnette updated
+------------------------------------------------------------------------
+r154 | gsawitzki | 2013-07-05 19:47:56 +0200 (Fri, 05 Jul 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/00sprofworksheet.R
+   M /pkg/sprof/man/plot.sprof.Rd
+   M /pkg/sprof/man/plot_profiles.Rd
+   M /pkg/sprof/man/print.sprof.Rd
+   M /pkg/sprof/man/profiles_matrix.Rd
+   M /pkg/sprof/man/rrle.Rd
+   M /pkg/sprof/man/rrleb.Rd
+   M /pkg/sprof/man/sprof-package.Rd
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+
+plot docu with images
+------------------------------------------------------------------------
+r149 | gsawitzki | 2013-07-03 18:44:11 +0200 (Wed, 03 Jul 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/R/plot.sprof.R
+   M /pkg/sprof/man/plot.sprof.Rd
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+
+plot total count max filtered
+------------------------------------------------------------------------
+r147 | gsawitzki | 2013-07-03 13:05:52 +0200 (Wed, 03 Jul 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/00sprofworksheet.R
+   M /pkg/sprof/R/plot.sprof.R
+   M /pkg/sprof/R/readRprof.R
+   M /pkg/sprof/man/plot.sprof.Rd
+   M /pkg/sprof/man/print.sprof.Rd
+   M /pkg/sprof/man/readRprof.Rd
+   M /pkg/sprof/man/sprof-package.Rd
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+
+trimming added in sprof plot
+------------------------------------------------------------------------
+r146 | gsawitzki | 2013-07-02 23:33:21 +0200 (Tue, 02 Jul 2013) | 1 line
+Changed paths:
+   D /pkg/sprof/data/sintro01lm.RData
+   A /pkg/sprof/data/sprof01lm.RData
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+
+renamed sample data to sprof01lm.RData
+------------------------------------------------------------------------
+r145 | gsawitzki | 2013-07-02 23:13:06 +0200 (Tue, 02 Jul 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/00sprofworksheet.R
+   M /pkg/sprof/R/sampleRprof.R
+   A /pkg/sprof/data/sintro01lm.RData
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+   M /pkg/sprof/vignettes/sprofiling.pdf
+
+sintro01lm.RData added, various fixes
+------------------------------------------------------------------------
+r139 | gsawitzki | 2013-06-17 18:35:21 +0200 (Mon, 17 Jun 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/00sprofworksheet.R
+   M /pkg/sprof/R/plot.sprof.R
+   M /pkg/sprof/R/readProf.R
+   M /pkg/sprof/R/summary.sprof.R
+
+sync: data format structured
+------------------------------------------------------------------------
+r132 | gsawitzki | 2013-06-09 17:24:56 +0200 (Sun, 09 Jun 2013) | 1 line
+Changed paths:
+   A /pkg/sprof/vignettes
+   A /pkg/sprof/vignettes/sprofiling.Rnw
+
+vignettes added
+------------------------------------------------------------------------
+r131 | gsawitzki | 2013-06-09 15:35:27 +0200 (Sun, 09 Jun 2013) | 1 line
+Changed paths:
+   A /pkg/sprof/R/plot.sprof.R
+   A /pkg/sprof/R/print.sprof.R
+   M /pkg/sprof/R/readProf.R
+   M /pkg/sprof/R/rrle.R
+   M /pkg/sprof/R/sampleRprof.R
+   M /pkg/sprof/R/summary.sprof.R
+   D /pkg/sprof/R/summary_prof.R
+   A /pkg/sprof/man/plot.sprof.Rd
+   A /pkg/sprof/man/print.sprof.Rd
+   M /pkg/sprof/man/readProf.Rd
+   M /pkg/sprof/man/sprof-package.Rd
+   M /pkg/sprof/man/summary.sprof.Rd
+   D /pkg/sprof/man/summary_prof.Rd
+
+plot, print added
+------------------------------------------------------------------------
+r130 | gsawitzki | 2013-06-09 14:00:40 +0200 (Sun, 09 Jun 2013) | 1 line
+Changed paths:
+   A /pkg/sprof/R/summary.sprof.R
+   A /pkg/sprof/man/summary.sprof.Rd
+
+summary added
+------------------------------------------------------------------------
+r128 | gsawitzki | 2013-06-06 20:29:19 +0200 (Thu, 06 Jun 2013) | 1 line
+Changed paths:
+   A /pkg/sprof
+   A /pkg/sprof/00sprofworksheet.R
+   A /pkg/sprof/DESCRIPTION
+   A /pkg/sprof/Makefile
+   A /pkg/sprof/NAMESPACE
+   A /pkg/sprof/R
+   A /pkg/sprof/R/0empty.R
+   A /pkg/sprof/R/readProf.R
+   A /pkg/sprof/R/rrle.R
+   A /pkg/sprof/R/sampleRprof.R
+   A /pkg/sprof/R/summary_prof.R
+   A /pkg/sprof/man
+   A /pkg/sprof/man/readProf.Rd
+   A /pkg/sprof/man/sprof-package.Rd
+   A /pkg/sprof/man/summary_prof.Rd
+
+sprof added
+------------------------------------------------------------------------
