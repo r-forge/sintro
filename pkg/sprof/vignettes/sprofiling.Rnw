@@ -701,38 +701,41 @@ For example, going one step back we can encode stacks and use these colour codes
 Or going two steps back, we can encode nodes in colour, giving coloured stacks, and use these in the display of profile data.
 
 \section{Standard output}
+<<>>=
+sprof <- sprof01
+@
 \subsection{Summary}
 <<label=rposumnodes>>=
-summary_nodes(rpo)
+summary_nodes(sprof)
 <<label=rposumstacks>>=
-summary_stacks(rpo)
+summary_stacks(sprof)
 <<label=rposumprofiles>>=
-summary_profiles(rpo)
+summary_profiles(sprof)
 @
 The \irfunx{misc}{summary} method for \ircode{sprof} objects concatenates these three functions.
 
 \subsection{Print}
 <<label=rpoprintnodes>>=
-print_nodes(rpo)
+print_nodes(sprof)
 <<label=rpoprintstacks>>=
-print_stacks(rpo)
+print_stacks(sprof)
 <<label=rpoprintprofiles>>=
-print_profiles(rpo)
+print_profiles(sprof)
 @
 The \irfunx{misc}{print} method for \ircode{sprof} objects concatenates these three functions.
 
 \subsection{Plot}
 <<fig=TRUE, label=rpoplotnodes, width=12, height=12>>=
 oldpar<- par(mfrow=c(2,2))
-plot_nodes(rpo)
+plot_nodes(sprof)
 par(oldpar)
 <<fig=TRUE, label=rpoplotstacks, width=12, height=6>>=
 oldpar<- par(mfrow=c(1,2))
-plot_stacks(rpo)
+plot_stacks(sprof)
 par(oldpar)
 <<fig=TRUE, label=rpoplotprofiles, width=12, height=12>>=
 oldpar<- par(mfrow=c(2,2))
-plot_profiles(rpo)
+plot_profiles(sprof)
 par(oldpar)
 @
 The \irfunx{misc}{plot} method for \ircode{sprof} objects concatenates these three functions.
