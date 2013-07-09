@@ -35,7 +35,7 @@ For  \code{sprof}, the usual access functions are supported.
 %\code{\link[proftools:proftools-package]{proftools}}.
  
 %\code{\link[profr:profr-package]{profr}}.
-\code{\link[profr]{profr-package}}
+%\code{\link[profr]{profr-package}}
 
 %\code{\link{profr}}.
  }
