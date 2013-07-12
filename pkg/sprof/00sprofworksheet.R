@@ -12,6 +12,8 @@ Eventually, they will bubble down to other files.
  \code{\link[igraph]{get.adjacency}}
  
 ###  To Do
+- sync colors & attributes
+- add consistent edge weights
 complete cycle
 - read in & first info
 - massage // delete top & last
@@ -59,7 +61,9 @@ cd ~/projects/rforge/sintro/pkg/
 R CMD CHECK sprof  --no-multiarch  --timings
 cd ~/projects/rforge/sintro/pkg/
 R CMD BUILD --compact-vignettes=gs+qpdf sprof --no-multiarch --md5
-svn log -r 165:HEAD -v > ChangeLog0
+svn log -r 166:HEAD -v > ChangeLog0
+cat ChangeLog >> ChangeLog0
+#$Revision$
 
 rm sprof_internal.pdf; R CMD Rd2pdf -o sprof_internal.pdf  --internals --no-clean --title="sprof internal" sprof
 #### R cmds for ad hoc construction
