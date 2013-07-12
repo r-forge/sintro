@@ -1,5 +1,11 @@
-#
+#$HeadURL$
+#$Id$
+#$Date$
+#$Author$
+#$Revision$
+#\encoding{utf8}
 # setwd("")
+# source('~/Documents/lectures/src/insider/profile/sprof/pkg/R/summary_prof.R', chdir = TRUE)
 #! To Do
 #!
 # A wrapper around Rprof
@@ -20,7 +26,7 @@ sampleRprof <- function(expr, runs=NULL, gcFirst = TRUE, interval = 0.001, ...){
 	Rprof(NULL)
 	}
 
-    browser()
+    #browser()
 	sprof_out <- readRprof(tmp)
 
 	unlink(tmp)

@@ -1,16 +1,18 @@
 # $HeadURL$
 # $Id$
 # setwd("")
-# source('~/Documents/lectures/src/insider/profile/sprof/pkg/R/plot_prof.R', chdir = TRUE)
 #! To Do
 #!
-
+# source('~/projects/rforge/sintro/pkg/sprof/R/plot.sprof.R', chdir = TRUE)
 
 
 plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL, 
 	ask = prod(par("mfcol")) < length(which) && dev.interactive(), 
 	src=NULL, mincount=5, 
-	...){## full data
+	...){
+		## plot_nodes(sprof01)
+		## full data
+		## xnodes <- sprof01$nodes
 	if (inherits(x,"sprof")) {
 		xnodes <- x$nodes
 		if (is.null(src)) src<-x$info$id
@@ -22,15 +24,17 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
 		if (is.null(src))  src<-deparse(substitute(x))
 	}
 	
-	if (is.null(col)) col <- terrain.colors(length(xnodes))
+
+ 	nrnodes <- dim(xnodes)[1]
+ 	totaltime <- sum(xnodes$self.time)
+ 	xnodes <- xnodes[xnodes$total.time < totaltime,]
+
+	if (is.null(col)) col <- terrain.colors(nrnodes)
 	oldpar <- par(no.readonly = TRUE)
 	    if (ask) {
 	oask <- devAskNewPage(TRUE)
 	on.exit(devAskNewPage(oask))
     }
- 	nrnodes <- dim(xnodes)[1]
- 	totaltime <- sum(xnodes$self.time)
- 	xnodes <- xnodes[xnodes$total.time < totaltime,]
 
 	#browser()
 	if (mincount>0) xnodes <- xnodes[xnodes$total.time>=mincount,]
@@ -44,19 +48,37 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
 	
 	for (ip in which){
 		switch(ip,
-		#1
-		{
+		
+		#1 scatterplot total ~ self
+		{ if (is.null(xnodes$icol)){
 		plot(xnodes$self.time, xnodes$total.time, xlab="self", 
 		ylab="total", sub=src, main="Nodes by time")
 		if (require(wordcloud)) textplot(xnodes$self.time, xnodes$total.time,xnodes$name, new=FALSE) else
+		text(xnodes$self.time, xnodes$total.time,xnodes$name)} else {
+			plot(xnodes$self.time, xnodes$total.time, xlab="self", 
+		ylab="total", pch=16, col= col[xnodes$icol], sub=src, main="Nodes by time")
+		if (require(wordcloud)) textplot(xnodes$self.time, xnodes$total.time,xnodes$name, new=FALSE) else
 		text(xnodes$self.time, xnodes$total.time,xnodes$name)
+		}
+		
 		}, 
 		#2
 		{   orderself <- order(xnodes$self.time,decreasing=TRUE);
 			xnodes <- xnodes[orderself,]; xnodes <- xnodes[xnodes$self.time>0,]
-			barplot(xnodes$self.time,
-			main="Nodes: time as last of stack",
-			names.arg = xnodes$name, sub=src, ylab="count", ...);
+			#barplot(xnodes$self.time,
+			#main="Nodes: time as last of stack",
+			#names.arg = xnodes$name, sub=src, ylab="count", ...);
+			if (is.null(xnodes$icol)){
+				barplot(xnodes$self.time,
+					main="Nodes: time as last of stack",
+					names.arg = xnodes$name, sub=src, ylab="count", ...);
+			} else
+			{ 	barplot(xnodes$self.time,
+					main="Nodes: time as last of stack",
+					names.arg = xnodes$name, 
+					sub=src, ylab="count",col=col[xnodes$icol],...)
+			}
+
 			legnd(trimmed=trimmed, fulltime=0)
 			}, 
 		#3
@@ -65,21 +87,38 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
  			xnodes <- xnodes[xnodes$total.time < totaltime,]
  			fulltime <- fulltime - dim(xnodes)[1]
 			ordertotal<- order(xnodes$total.time,decreasing=TRUE);
-			barplot(xnodes[ordertotal,]$total.time, 
-			main="Nodes: total time in stack",
-			names.arg = xnodes[ordertotal,]$name, sub=src, ylab="count", ...);
+			if (is.null(xnodes$icol)){
+				barplot(xnodes[ordertotal,]$total.time, 
+					main="Nodes: total time in stack",
+					names.arg = xnodes[ordertotal,]$name, sub=src, ylab="count", ...)
+				} else {
+				barplot(xnodes[ordertotal,]$total.time, 
+					main="Nodes: total time in stack",
+					names.arg = xnodes[ordertotal,]$name, 
+					sub=src, ylab="count", col=col[xnodes$icol],...)
+				}
+			
 			legnd(trimmed=trimmed, fulltime=fulltime)},
-		#4
-		{
-		plot(xnodes$self.time+1, xnodes$total.time, 
-		xlab="log(self+1)", ylab="log(total)", log="xy",
-		sub=src, main="Nodes by time (log scale)")
-		if (require(wordcloud)) textplot(xnodes$self.time, xnodes$total.time,xnodes$name, new=FALSE) else
-		text(xnodes$self.time, xnodes$total.time,xnodes$name)
+		#4 scatterplot log total ~ log (self+1)
+		{ if (is.null(xnodes$icol)){
+			plot(xnodes$self.time+1, xnodes$total.time, 
+				xlab="log(self+1)", ylab="log(total)", log="xy",
+		 		sub=src, main="Nodes by time")
+			if (require(wordcloud)) textplot(xnodes$self.time, 
+				xnodes$total.time,xnodes$name, new=FALSE) else
+				text(xnodes$self.time+1, xnodes$total.time,xnodes$name)
+		} else {
+			plot(xnodes$self.time+1, xnodes$total.time, 
+				xlab="log(self+1)", ylab="log(total)", log="xy",
+				pch=16, col= col[xnodes$icol], sub=src, main="Nodes by time", ...)
+			if (require(wordcloud)) textplot(xnodes$self.time+1, 
+				xnodes$total.time,xnodes$name, new=FALSE, col=col[xnodes$icol]) else
+				text(xnodes$self.time+1, xnodes$total.time,xnodes$name, col=col[xnodes$icol])
 		}
-		)
+		
 	}
-
+)#switch
+}#for
 	par(oldpar)
 	invisible(xnodes)
 }# plot_nodes
