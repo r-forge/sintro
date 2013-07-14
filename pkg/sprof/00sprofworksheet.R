@@ -52,17 +52,19 @@ lapply(sprofRegressionExpl$stacks$nodes, function(x) {x[-(1:level)]}
 
 svn propset svn:keywords "Date Author Id Revision HeadURL" sprof/man/*.Rd
 svn propset svn:keywords "Date Author Id Revision HeadURL" sprof/R/*.R
-svn propset svn:keywords "Date Author Id Revision HeadURL" sprof/work/*.R
 svn propset svn:keywords "Date Author Id Revision HeadURL" sprof/vignettes/*.Rnw
 xexport _R_CHECK_TIMINGS_=0
 export _R_CHECK_ALWAYS_LOG_VIGNETTE_OUTPUT_=TRUE
+# svn propset svn:keywords "Date Author Id Revision HeadURL" sprof/work/*.R
 
 cd ~/projects/rforge/sintro/pkg/
 R CMD CHECK sprof  --no-multiarch  --timings
 cd ~/projects/rforge/sintro/pkg/
 R CMD BUILD --compact-vignettes=gs+qpdf sprof --no-multiarch --md5
 svn log -r 166:HEAD -v > ChangeLog0
-cat ChangeLog >> ChangeLog0
+cat sprof/ChangeLog >> ChangeLog0
+##  check here !!!
+mv ChangeLog0  sprof/ChangeLog
 #$Revision$
 
 rm sprof_internal.pdf; R CMD Rd2pdf -o sprof_internal.pdf  --internals --no-clean --title="sprof internal" sprof

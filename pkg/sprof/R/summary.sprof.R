@@ -55,20 +55,26 @@ summary_nodes <- function(x){
 } # summary_nodes
 
 summary_stacks <- function(x){
-	nrstacks <- length(x)
-	stacksdf <- data.frame(len=x$stacks$stacklength,
-	refcount =x$stacks$refcount, 
-	root=x$stacks$stackheadnodes,
-	leafs=x$stacks$stackleafnodes)
-	stacksdf
+	stacks_nodes <- list.as.matrix(x$stacks$nodes)
+	list(nrstacks = x$info$nrstacks,
+	stacklength = range(x$stacks$stacklength),
+	nrnodesperlevel = apply(stacks_nodes,1, function(X){sum(!is.na(unique(X)))})
+	)
+	#nrstacks <- length(x)
+	# stacksdf <- data.frame(len=x$stacks$stacklength,
+	# refcount =x$stacks$refcount, 
+	# root=x$stacks$stackheadnodes,
+	# leafs=x$stacks$stackleafnodes)
+	# stacksdf
 	} # summary_stacks
 
 summary_terminals<- function(x){
 	table(x$stacks$stackleafnodes)
 #	x$stacks$refcount
 }
-	
-
+#stacks_nodes <- list.as.matrix(sprof$stacks$nodes)
+#sum(!is.na(unique(stacks_nodes[1,])))	
+#apply(stacks_nodes,1, function(x){sum(!is.na(unique(x)))})
 summary_profiles <- function(x){
 	if (is.null(x$id)) id <- paste("Profile Summary", date()) else id <- x$id
 	len <- length(x$profiles$data)
@@ -78,8 +84,8 @@ summary_profiles <- function(x){
 } # summary_profiles
 
 summary.sprof <- function(object, ...){
-	summary_nodes(object)
-	summary_stacks(object)
-	summary_profiles(object)
+	print(summary_profiles(object))
+	print(summary_stacks(object))
+	print(summary_nodes(object))
 	#invisible(object)
 }

@@ -30,7 +30,7 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
  	xnodes <- xnodes[xnodes$total.time < totaltime,]
 
 	if (is.null(col)) col <- terrain.colors(nrnodes)
-	oldpar <- par(no.readonly = TRUE)
+#	oldpar <- par(no.readonly = TRUE)
 	    if (ask) {
 	oask <- devAskNewPage(TRUE)
 	on.exit(devAskNewPage(oask))
@@ -64,19 +64,20 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
 		}, 
 		#2
 		{   orderself <- order(xnodes$self.time,decreasing=TRUE);
-			xnodes <- xnodes[orderself,]; xnodes <- xnodes[xnodes$self.time>0,]
+			xn <- xnodes[orderself,]
+			xn <- xn[xn$self.time>0,]
 			#barplot(xnodes$self.time,
 			#main="Nodes: time as last of stack",
 			#names.arg = xnodes$name, sub=src, ylab="count", ...);
-			if (is.null(xnodes$icol)){
-				barplot(xnodes$self.time,
+			if (is.null(xn$icol)){
+				barplot(xn$self.time,
 					main="Nodes: time as last of stack",
-					names.arg = xnodes$name, sub=src, ylab="count", ...);
+					names.arg = xn$name, sub=src, ylab="count", xpd=FALSE, ...);
 			} else
-			{ 	barplot(xnodes$self.time,
+			{ 	barplot(xn$self.time,
 					main="Nodes: time as last of stack",
-					names.arg = xnodes$name, 
-					sub=src, ylab="count",col=col[xnodes$icol],...)
+					names.arg = xn$name, 
+					sub=src, ylab="count",col=col[xn$icol], xpd=FALSE,...)
 			}
 
 			legnd(trimmed=trimmed, fulltime=0)
@@ -84,18 +85,18 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
 		#3
 		{   totaltime <- sum(xnodes$self.time)
 			fulltime <- dim(xnodes)[1]
- 			xnodes <- xnodes[xnodes$total.time < totaltime,]
- 			fulltime <- fulltime - dim(xnodes)[1]
-			ordertotal<- order(xnodes$total.time,decreasing=TRUE);
-			if (is.null(xnodes$icol)){
-				barplot(xnodes[ordertotal,]$total.time, 
+ 			xn <- xnodes[xnodes$total.time < totaltime,]
+ 			fulltime <- fulltime - dim(xn)[1]
+			ordertotal<- order(xn$total.time,decreasing=TRUE);
+			if (is.null(xn$icol)){
+				barplot(xn[ordertotal,]$total.time, 
 					main="Nodes: total time in stack",
-					names.arg = xnodes[ordertotal,]$name, sub=src, ylab="count", ...)
+					names.arg = xn[ordertotal,]$name, sub=src, ylab="count", xpd=FALSE, ...)
 				} else {
-				barplot(xnodes[ordertotal,]$total.time, 
+				barplot(xn[ordertotal,]$total.time, 
 					main="Nodes: total time in stack",
-					names.arg = xnodes[ordertotal,]$name, 
-					sub=src, ylab="count", col=col[xnodes$icol],...)
+					names.arg = xn[ordertotal,]$name, 
+					sub=src, ylab="count", col=col[xn[ordertotal,]$icol], xpd=FALSE,...)
 				}
 			
 			legnd(trimmed=trimmed, fulltime=fulltime)},
@@ -119,7 +120,7 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
 	}
 )#switch
 }#for
-	par(oldpar)
+#	par(oldpar)
 	invisible(xnodes)
 }# plot_nodes
 
