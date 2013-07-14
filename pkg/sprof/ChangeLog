@@ -1,4 +1,30 @@
 ------------------------------------------------------------------------
+r166 | gsawitzki | 2013-07-09 23:40:31 +0200 (Tue, 09 Jul 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/00sprofworksheet.R
+   A /pkg/sprof/ChangeLog
+   A /pkg/sprof/NEWS.Rd
+   M /pkg/sprof/vignettes/sprofiling.pdf
+
+NEWS, Changelog added to sprof
+------------------------------------------------------------------------
+r167 | gsawitzki | 2013-07-12 18:09:07 +0200 (Fri, 12 Jul 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/00sprofworksheet.R
+   M /pkg/sprof/R/plot.sprof.R
+   M /pkg/sprof/R/sampleRprof.R
+   M /pkg/sprof/R/summary.sprof.R
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+
+node plot colour extended
+------------------------------------------------------------------------
+r168 | gsawitzki | 2013-07-12 18:09:51 +0200 (Fri, 12 Jul 2013) | 1 line
+Changed paths:
+   D /pkg/sprof/NEWS.Rd
+   D /pkg/sprof/data/rpo.RData
+
+sync
+------------------------------------------------------------------------
 r157 | gsawitzki | 2013-07-06 21:20:42 +0200 (Sat, 06 Jul 2013) | 1 line
 Changed paths:
    M /pkg/sprof/DESCRIPTION
