@@ -172,6 +172,7 @@ options(warn=1)
 %<<>>=
 %prargs <- function(x){ str(args(x))}
 For larger tables and data frames, we use a kludge to avoid long outputs.
+\todo{add keep3 to keep header, some middle, tail}
 <<>>=
 xcutdata.frame <- function(df,  cut, margin){
 #! keep3, to add: margin top - random center - margin bottom
@@ -207,6 +208,7 @@ xcutdata.frame <- function(df,  cut, margin){
 
 @
 We use the \R{} function \ircode{xtable()} for output and \LaTeX \ \ircode{longtable}. A convenient wrapper to use this in out \ircode{Sweave} source is:
+\todo{remove text vdots from string/name columns}
 <<>>= 
 library(xtable)
 prxt <- function (x, digits=3, 	caption=NULL, 
@@ -344,13 +346,15 @@ The basic data structure consists of four data frames. The ircode{info} section 
 <<>>=
 str(sprof01, max.level=2, vec.len=3,nchar.max=40)
 @
-The nodes do not come in a specific order. Access via a permutation vector is preferred. This allows different views on the same data set. For example, \vref{tab:prspbt} uses a permutation by total time, and a selection (compare to \vref{tab:prSRREbt}). The only difference is that we work on a ms base internally, whereas \R{} uses seconds as a base. \todo{introduce cpu clock cycle as a time base}
+The nodes do not come in a specific order. Access via a permutation vector is preferred. This allows different views on the same data set. For example, \vref{tab:prspbt} uses a permutation by total time, and a selection (compare to \vref{tab:prSRREbt}). The only difference is that we work on a ms base internally, whereas \R{} uses seconds as a base. 
+\todo{introduce cpu clock cycle as a time base}
 << print = FALSE, results = tex, label=tab:prspbt>>=
 nodes <- sprof01$nodes[order(sprof01$nodes$total.time, decreasing=TRUE),]
 prxt(nodes[nodes$total.time>4,],
 caption="splot result: by.total, total time > 0.004s", 
 	label="tab:prspbt")
 @
+\todo{remove text vdots from string/name columns}
 Common rearrangements as by total time and by self time are supplied by the display functions.
 Plot, for example, currently gives a choice of four displays for nodes.
 <<fig=TRUE, label=sREplotnodes01, width=12, height=12>>=
@@ -442,8 +446,10 @@ plot_nodes(sprof01, col=col)
 par(oldpar)
 
 @
-This is what we get for free on our three levels: node, stack, and profile.
+We can go beyond node level.
 
+This is what we get for free from the node information on our three levels: node, stack, and profile.
+\todo{check and stabilize colour linking}
 << label= shownodes>>=
 shownodes <- function(sprof=sprof01, col) {
 #oldpar <- par(mfrow=c(1,3))
@@ -543,15 +549,36 @@ This gives a detailed information about the presence time of each node, by stack
 <<>>=
 profile_nodes <- profiles_matrix(sprof02)
 profile_nodes_rle<- rrle(profile_nodes)
+@
+On a given stack level, the run lenght is the best information on the time used per call, and the run count of a node is the best information on the numer of calls. So this is a prime starting point for in-dpeth analysis.
+\todo{keep as factor. This is a cube with margins node, stack level, run length.}
+
+<<>>=
 profile_nodes_rlet <- lapply(profile_nodes_rle, 
-	function(x) table(x,dnn=c("count","node")) )
+	function(x) table(x,dnn=c("run length","node")) )
 invisible(lapply(profile_nodes_rlet, 
 function(x) print.table(x,zero.print = ".") ))
+@
+These are some attempts to recover the factor structures.
+<<>>=
+xfi <- levels(sprof02$nodes$name)
+profile_nodes_rlefac <- lapply(profile_nodes_rle, function(xl) {xl$values <- factor(xl$values, levels=1:62, labels=xfi); xl}) # seems ok
+profile_nodes_rletfac <- lapply(profile_nodes_rle, 
+	function(x) table(x,dnn=c("run length","node")) ) #factors lost again
+colnames(profile_nodes_rletfac[[1]]) <- sprof02$nodes$name[ as.integer(colnames(profile_nodes_rletfac[[1]]))] 
+
+profile_nodes_rletfac1 <- lapply(profile_nodes_rletfac,
+	function(xl) {colnames(xl) <- sprof02$nodes$name[ as.integer(colnames(xl))];
+	xl} )
+
+invisible(lapply(profile_nodes_rletfac1, 
+function(x) print.table(t(x),zero.print = ".") ))
+
 @
 \todo{add current level}
 
 \todo{generate a coplot representation}
-\todo{add time per call information}
+\todo{add time per call information: add marginals statistics run time by node}
 \subsection{The details}
 For each recorded event, the protocol records one line with a text string showing the sampled  stack 
 (in reverse order: most recent first). The stack lines may be preceded by header lines with event 
@@ -918,7 +945,7 @@ par(oldpar)
 The \irfunx{misc}{plot} method for \ircode{sprof} objects concatenates these three functions.
 \filledpagebreak
 
-\section{Graph}
+\section{Graph: regression example}
 \label{sec:graph}
 %Packages used to run examples or
 %tests conditionally (e.g. via if(require(pkgname))) should be listed in ÔSuggestsÕ or
@@ -967,10 +994,14 @@ library(network)
 nwsprofadj <- as.network(sprofadj) # names is not imported 
 network.vertex.names(nwsprofadj) <- rownames(sprofadj) # not honoured by plot
 plot(nwsprofadj, label=rownames(sprofadj), main="network layout", cex.main=5)
-
+@
+\filledpagebreak
+Experiments to include weight. \todo{maximum edge.lwd?}
 <<fig=TRUE, label=nwsprofadje, width=24, height=24>>=
-
-edge.lwd <- trunc(sprofadj/max(sprofadj)*10)+1
+edge.lwd<-sprofadj
+edge.lwd[edge.lwd>0]<- rank(edge.lwd[edge.lwd>0], ties.method="max")
+#edge.lwd <- trunc(sprofadj/max(sprofadj)*10)+1
+edge.lwd <- round(edge.lwd/max(edge.lwd)*12)
 plot(nwsprofadj, label=rownames(sprofadj), main="network layout", cex.main=2, edge.lwd=edge.lwd)
 detach("package:network")
 @
@@ -1005,12 +1036,14 @@ plot(sprofadjRag,"circo", main="Graphviz circo layout", cex.main=5)
 <<fig=TRUE, label=sprofadjvizfdp, width=24, height=24>>=
 plot(sprofadjRag,"fdp", main="Graphviz fdp layout", cex.main=5)
 @
-\section{Graph II}
+\section{Graph II: trimmed regression example}
 \label{sec:graph}
 %Packages used to run examples or
 %tests conditionally (e.g. via if(require(pkgname))) should be listed in ÔSuggestsÕ or
 %ÔEnhancesÕ.
 In this section, we use the reduced version of our example, \ircode{sprof03} for demonstration. Except for the change of the data set, this is just a copy of the previous chapter, collecting the various layouts for easy reference.
+
+Some experiments may have found their way to this chapter. They will be expelled.
 
 You can re-run it, using your  \ircode{sprof} data by modifying this instruction:
 
@@ -1064,12 +1097,36 @@ detach("package:igraph")
 library(network)
 nwsprofadj <- as.network(sprofadj) # names is not imported 
 network.vertex.names(nwsprofadj) <- rownames(sprofadj) # not honoured by plot
-plot(nwsprofadj, label=rownames(sprofadj), main="network layout", cex.main=5)
-
+plot(nwsprofadj, label=rownames(sprofadj), main="network layout: trimmed data", cex.main=5)
+@
+\filledpagebreak
 <<fig=TRUE, label=s03nwsprofadje, width=24, height=24>>=
+edge.lwd<-sprofadj
+edge.lwd[edge.lwd>0]<- rank(edge.lwd[edge.lwd>0], ties.method="max")
+#edge.lwd <- trunc(sprofadj/max(sprofadj)*10)+1
+edge.lwd <- round(edge.lwd/max(edge.lwd)*12)
+plot(nwsprofadj, label=rownames(sprofadj), main="network layout: trimmed data", cex.main=2, edge.lwd=edge.lwd)
+@
+\filledpagebreak
+<<fig=TRUE, label=s03nwsprofadjekamadakawai, width=12, height=12>>=
+#12
+plot(nwsprofadj, label=rownames(sprofadj), 
+main="network kamadakawai layout: \n trimmed data", 
+mode="kamadakawai",
+cex.main=2, edge.lwd=edge.lwd)
+@
+\filledpagebreak
+<<fig=TRUE, label=s03nwsprofadjecircle, width=24, height=24>>=
+plot(nwsprofadj, label=rownames(sprofadj), 
+main="network circle layout: \n trimmed data", 
+mode="circle",
+cex.main=2, edge.lwd=edge.lwd)
+<<fig=TRUE, label=s03nwsprofadjefruchtermanreingold, width=24, height=24>>=
+plot(nwsprofadj, label=rownames(sprofadj), 
+main="network fruchtermanreingold layout: \n trimmed data", 
+mode="fruchtermanreingold",
+cex.main=2, edge.lwd=edge.lwd)
 
-edge.lwd <- trunc(sprofadj/max(sprofadj)*10)+1
-plot(nwsprofadj, label=rownames(sprofadj), main="network layout", cex.main=2, edge.lwd=edge.lwd)
 detach("package:network")
 @
 \filledpagebreak
@@ -1077,7 +1134,8 @@ detach("package:network")
 <<>>=
 library(Rgraphviz)
 sprofadjRag <- agopen(sprofadjNEL, name="Rprof Example")
-<<fig=TRUE, label=s03adjvizdot, width=24, height=24>>=
+<<fig=TRUE, label=s03adjvizdot, width=12, height=12>>=
+#12
 plot(sprofadjRag, main="Graphviz dot layout", cex.main=5)
 @
 %agopen(graph, name, nodes, edges, kind = NULL, layout = TRUE,
