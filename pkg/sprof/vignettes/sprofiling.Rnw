@@ -3,7 +3,12 @@
 %$HeadURL$x
 
 \listfiles
-
+%updateRprof <- function(sprof){
+%	sprof$info$date_updated <<- Sys.time()
+%	
+%	nrstacks <- length(sprof$stacks)	
+%
+%}
 
 % options(width=72); setwd("/Users/gs/projects/rforge/sintro/pkg/sprof/work/vignettes/" )
 % Sweave(file= "../../vignettes/sprofiling.Rnw", output="sprofiling.tex", keep.source=TRUE)
@@ -63,11 +68,13 @@
 \indent Im Neuenheimer Feld 294\newline
 \indent D 69120 Heidelberg\newline}%\\\bigskip\bigskip\bigskip\bigskip\bigskip \\ %
 \thanks{\emph{An \R{} vignette for package sprof. }\\
-\emph{URL:} \url{http://sintro. r-forge.r-project.org/}
+\indent \emph{URL:} \url{http://sintro. r-forge.r-project.org/
+}
 \ifx\private\undefined%
 \typeout{ommitting private stuff ********}
 \else
-\emph{Private Version}\\
+\\
+\indent \emph{Private Version}\\
 \fi
 }
 \email{gs@statlab.uni-heidelberg.de}
@@ -78,7 +85,7 @@
 %\svnInfoFile \svnInfoRevision
 %For quotation, please use the general reference \cite{gs94oned}.\\
 \emph{Revised:} July 2013\\
-\emph{Typeset}, with minor revisions: \today\  from SVN $Revision$ \svnInfoDate}  
+\indent \emph{Typeset}, with minor revisions: \today\  from SVN $Revision$ \svnInfoDate}  
 \thanks{\emph{URL:} \url{http://sintro. r-forge.r-project.org/}}
 
 %\usepackage{gssda}
@@ -118,6 +125,7 @@ used.
 Maybe the supporting tools are not adequate. The summaries provided by \R{}  reduce the 
 information beyond necessity. Additional packages are available, but these are not
 sufficiently action oriented.
+\todo{add reference to R profiling info}
 
 With package \ircode{sprof} we want to give a data representation that keeps the full
 profile information. Tools to answer common questions are provided. The data structure 
@@ -133,7 +141,9 @@ To install this package directly within \R{}, type \\
 To install the recent package from source directly within \R{}, type\\
     {\small   \ircode{install.packages("sprof",repos="http://r-forge.r-project.org",type="source")}}
 
-\section*{\LaTeX{}  Layout Tools and Utilities}
+\section*{\LaTeX{}  layout tools and \R{} settings}
+
+You may want to skip this section, unless you want to modify the vignette for your own purposes, or look at the internals.
 
 %Tests for TeX
 %
@@ -154,7 +164,20 @@ To install the recent package from source directly within \R{}, type\\
 %subs: \cref{subs:Rprof}
 %
 %tab: \cref{tab:prSRREbs}
+This is the main library we are going to use.
+<<>>=
+library(sprof)
+@
 
+We want immediate warnings, if necessary. Set to level 2 to handle warnings as error.
+<<>>=
+message("switching  options(warn=1) -- immediate warning on")
+options(warn=1)
+@
+We want a second chance on errors.
+<<>>=
+options(error = recover)
+@
 \smallskip
 Print parameters used here:
 <<>>=
@@ -162,12 +185,6 @@ options(width = 72)
 options(digits = 6)
 @
 
-We want immediate warnings, if necessary. Set to level 2 to handle warnings as error.
-<<>>=
-message("switching  options(warn=1) -- immediate warning on")
-options(warn=1)
-
-@
 %This is just a hack to get a nicer output from args:
 %<<>>=
 %prargs <- function(x){ str(args(x))}
@@ -211,7 +228,7 @@ We use the \R{} function \ircode{xtable()} for output and \LaTeX \ \ircode{longt
 \todo{remove text vdots from string/name columns}
 <<>>= 
 library(xtable)
-prxt <- function (x, digits=3, 	caption=NULL, 
+prxt <- function (x, digits=2, 	caption=NULL, 
 	label=NULL, ...)  {
 	margin <- 10
 	if (nrow(x)> 2*margin+3) x <-xcutdata.frame(x, margin=margin)
@@ -257,9 +274,9 @@ Representation in graphs may come later, if they can help.
 
 If the stacks would come from the control flow only, we could make use of the sequential 
 nature of stacks. But since we have to live with the \R{} specific interferences, we stay with the raw stacks.
-<<>>=
-options(error = recover)
-library(sprof)
+\todo{rearrange stacks? detect order?}
+
+
 @
 
 In this presentation, we will use a small list of examples Since \ircode{Rprof} is not implemented on all systems, and since the profiles tend to get very large, we use some prepared examples that are frozen in this vignette and not included in the distribution, but all the code to generate the examples is provided.
@@ -282,17 +299,23 @@ We will use this example to illustrate the basics. Of course the immediate quest
 Still we have parameters to choose. We can determine the profiling granularity by setting the timing interval, and we can use repeated measurements to increase precision below the timing interval.
 
 The timing interval should depend on the clock speed. Using for example 1ms amounts to some 1000 steps on a current CPU, per kernel.
+\todo{Can we calibrate times to CPU rate?}
+\todo{introduce cpu clock cycle as a time base}
 
 If we use repeated samples, the usual rules of statistics applies. So taking $100$ runs and taking the mean reduces the standard deviation by a factor $1/10$.
 %So with $simruns <- 100$, the mean 
 %var mean = var n x / n^2
 
+Following the usal \R{} conventions, seconds are used as time base for parameters. However report will use ms as a time base.
+
+Here is an example how to take a profile, using basic \R{}. See \vref{subsec:sprof}
+how to use \ircode{sampleRprof} in package \ircode{sprof}  for an easier solution.
 <<label=Rprof01>>=
 profinterval <- 0.001
 simruns <- 100
 
 Rprof(filename="RprofsRegressionExpl.out", interval = profinterval)
-for (i in 1:simruns) xxx<- summary(lm(y~x, data=reg0data))
+	for (i in 1:simruns) xxx<- summary(lm(y~x, data=reg0data))
 Rprof(NULL)
 @
 
@@ -319,51 +342,55 @@ prxt(sumRprofRegressionExpl$by.self,
 
 <<print = FALSE, results = tex, label=tab:prSRREbt>>=
 prxt(sumRprofRegressionExpl$by.total[sumRprofRegressionExpl$by.total$total.time>0.004,],
-	caption="summaryRprof result: by.total, total time > 0.004s", 
+	caption="summaryRprof result: by.total, total time > 4ms", 
 	label="tab:prSRREbt")
 @
 
 \filledpagebreak
 \subsubsection{Package sprof}
+\label{subsec:sprof}
 In contrast to the common \R{} packages, in our implementation we take a two step approach. First we read in the profile file to an internal representation. Analysis is done in later steps.
 
 <<>>=
-sprof01lm <- readRprof("RprofsRegressionExpl01.out")
-sprof01 <- sprof01lm
+sprof01<- readRprof("RprofsRegressionExpl01.out")
 @
 
 We keep this example and use the copy \ircode{sprof01} of it extensively for illustration.
 <<eval=FALSE>>=
-save(sprof01lm, file="sprof01lm.RData")
+save(sprof01, file="sprof01lm.RData")
 @
-To run the vignette with a different profile, replace \ircode{sprof01} by your example. You still have \ircode{sprof01lm} for reference.
+To run the vignette with a different profile, replace \ircode{sprof01} by your example. You still have the file for reference.
 
 Package \ircode{sprof} provides a function \irfunx{misc}{sampleRprof} to take a sample and create a profile on the fly, as in
 <<eval=FALSE>>=
 sprof01temp <- sampleRprof(runif(10000), runs=100)
 @
-The basic data structure consists of four data frames. The ircode{info} section collects global information from the input file, such as an identification strings and various global matrix. The \ircode{nodes} section initially gives the same information marginal information as  \ircode{summaryRprof}. The \ircode{stacks} section puts the node information into their calling context as found in the input profile file. The \ircode{profiles} section gives the temporal context. It is implemented as a list, but conceptually it is a data frame. Implementing it as a list allows run length encoding of variables, which unfortunately is not allowed by \R{} in data frames.
+The basic data structure consists of four data frames. The \ircode{info} section collects global information from the input file, such as an identification strings and various global matrix. The \ircode{nodes} section initially gives the same information marginal information as  \ircode{summaryRprof}. The \ircode{stacks} section puts the node information into their calling context as found in the input profile file. The \ircode{profiles} section gives the temporal context. It is implemented as a list, but conceptually it is a data frame. Implementing it as a list allows run length encoding of variables, which unfortunately is not allowed by \R{} in data frames.
+\todo{add sampling.interval, sampling.time for backward compability}
 <<>>=
 str(sprof01, max.level=2, vec.len=3,nchar.max=40)
 @
 The nodes do not come in a specific order. Access via a permutation vector is preferred. This allows different views on the same data set. For example, \vref{tab:prspbt} uses a permutation by total time, and a selection (compare to \vref{tab:prSRREbt}). The only difference is that we work on a ms base internally, whereas \R{} uses seconds as a base. 
-\todo{introduce cpu clock cycle as a time base}
+
 << print = FALSE, results = tex, label=tab:prspbt>>=
 nodes <- sprof01$nodes[order(sprof01$nodes$total.time, decreasing=TRUE),]
 prxt(nodes[nodes$total.time>4,],
-caption="splot result: by.total, total time > 0.004s", 
+caption="splot result: by.total, total time > 4ms", 
 	label="tab:prspbt")
 @
 \todo{remove text vdots from string/name columns}
 Common rearrangements as by total time and by self time are supplied by the display functions.
 Plot, for example, currently gives a choice of four displays for nodes.
-<<fig=TRUE, label=sREplotnodes01, width=12, height=12>>=
+<<fig=TRUE, label=sREplotnodes01, width=8, height=8>>=
 oldpar <- par(mfrow=c(2,2))
 plot_nodes(sprof01)
 par(oldpar)
 @
+\subsection{node classes}
 We can add attributes to the plots. But we can also attributes to the nodes, and use these in the plots. The attribute \ircode{icol} is a special case. If present, it will be interpreted as an index to a colour table. For example, we can collect special well known functions in groups:
-
+\todo{Move class 
+attributes to package: by keyword, by package, by custom}
+\todo{Supply colour tables}
 <<>>=
 x_apply <- c("apply", "lapply", "vapply", "sapply")
 x_as <- c("as.list", "as.data.frame", "as.list.data.frame",
@@ -398,12 +425,15 @@ adds a sticky color attribute. To interpret, you should choose your preferred co
 <<>>=
 col=c("red", "green", "blue", "yellow", "cyan", "magenta")
 @
+\todo{plot\_nodes: make col explicite}
+\todo{Defaults by class}
 <<fig=TRUE, label=sREplotnodes01col, width=12, height=12>>=
 oldpar <- par(mfrow=c(2,2))
-plot_nodes(sprof01, col=c("red", "green", "blue", "yellow", "cyan", "magenta"))
+plot_nodes(sprof01, col=col)
 par(oldpar)
 @
 You can break down the frequency by the classes you have define. But beware of Simpson's paradox. The information you think you see may be strongly affected by your choices - what you see are reflections of conditional distributions. These may very different from the global picture.
+\todo{this is by node count. use by time}
 <<fig=TRUE, label=sprof01coltab>>=
 plot(table(sprof01$nodes$icol),  
 	type="h", lwd=20,col=col, lend="square", ylab="count")
@@ -415,14 +445,19 @@ plot(table(sprof01$nodes$icol),
 %	colors="black",ordered.colors=FALSE,
 %	use.r.layout=FALSE,fixed.asp=TRUE, ...)
 If package \ircode{wordcloud} is installed, a different view is possible.
+
 <<fig=TRUE, label=snodes01cloudcol, width=12, height=12>>=
 nodescloud <- function(sprof,min.freq=3, col){
+if (require(wordcloud)){
 	wordcloud(sprof$nodes$name, freq = sprof$nodes$total.time,
 		min.freq=min.freq, 
 		random.order=FALSE,
 		rot.per=0.3,
 		colors = col[sprof01$nodes$icol],
 		ordered.colors=TRUE)
+		} else {
+			frame(); legend("center","package wordcloud \n is required for this plot")}
+		
 	}
 	
 nodescloud(sprof01, min.freq=5, 
@@ -434,11 +469,14 @@ nodescloud(sprof01, min.freq=5,
 The basic information provided by all profilers in \R{} is a protocol of sampled stacks. The conventional approach is to break the information down to nodes and edges. The stacks provide more information than this. One way to access it is to use linking to pass information. 
 
 To illustrate this, we encode the frequency of the nodes as colour. As a palette, we choose a heat map here. 
+\todo{apply colour to selction?}
+\todo{sprea colour on displayd part}
 <<>>=
 freqrank <- rank(-sprof01$nodes$total.time, ties.method="random")
 col <- heat.colors(length(freqrank))
 @
 Here is the node view using these choices:
+\todo{colour by class}
 <<fig=TRUE, label=sREplotnodes01freqcol, width=12, height=12>>=
 sprof01$nodes$icol <- freqrank
 oldpar <- par(mfrow=c(2,2))
@@ -522,10 +560,10 @@ The obvious message is that if seen by stack level, there are different structur
 Not so often, but a frequent phenomenon is to have some ``burn in'' or ``fade out''. To identify this, we need to look at the profile level.
 
 At a closer look, we may find stack patterns (maybe marked by specific nodes) that indicate administrative intervention and rather should be handled as separators between distinct profiles rather than as part of the general dynamics.
-
+\todo{example}
 Stable framework effect can be detected automatically. ``burn in'' or ``fade out' may need a closer look, and special stacks need and individual inspection on low frequency stacks. 
 
-Before starting additional inspection, the data better be trimmed. At this point, it is a decision whether to adapt the timing information, or keep the original information. Since this decision does affect the structural information, it is not critical. But analysis is easier if unused nodes are eliminated.
+Before starting additional inspection, the data better be trimmed. At this point, it is a decision whether to adapt the timing information, or keep the original information. Since this decision does affect the structural information, it is not critical. But analysis is easier if unused nodes are eliminated.\todo{add ?? function}
 <<>>=
 sprof02 <- sprof01
 basetrim <- 13
@@ -542,6 +580,8 @@ shownodes(sprof02)
 #24
 shownodes(sprof02)
 @
+\subsection{rle}
+\todo{need serious revision}
 For a visual inspection, runs of the same node and level in the profile 
 are easily perceived. For
 an analytical inspection, we have to reconstruct the runs from the data. In stacks, runs are organized hierarchically. On the root level, runs are just ordinary runs. On the next levels, runs have to be defined given (within) the previous runs. So we need a recursive version of \ircode{rle}, applied to the profile information.
@@ -579,7 +619,7 @@ function(x) print.table(t(x),zero.print = ".") ))
 
 \todo{generate a coplot representation}
 \todo{add time per call information: add marginals statistics run time by node}
-\subsection{The details}
+\subsection{The internal details}
 For each recorded event, the protocol records one line with a text string showing the sampled  stack 
 (in reverse order: most recent first). The stack lines may be preceded by header lines with event 
 specific information. The protocol may be interspersed with control information, such as information about the timing interval used. 
@@ -631,17 +671,16 @@ The nodes table keeps the names at the nodes.
 \todo{18*18}
 \subsection{The free lunch}
 This is what you get for free when using package \ircode{sprof}:
-<<fig=TRUE, label= shownodes02, width=18, height=18>>=
+\todo{colours. recolour}
+<<fig=TRUE, label= shownodes02, width=10, height=10>>=
 #18
 shownodes(sprof02)
 @
 If your want to wrap up the information and look at it from a graph point of view, here is just one example. More are in \vref{sec:graph}. But before changing to the graph perspective, we recommend to see the next sections, not to skip them. The preview, at his point, taking package \ircode{graph} as an example:
-<<fig=TRUE, label=sprofadjNEL, width=24, height=24>>=
-#24
+<<fig=TRUE, label=sprofadjNEL, width=10, height=10>>=
+#10
 library(graph)
 sprof02adjNEL <- as(adjacency(sprof02),"graphNEL")
-plot(sprof02adjNEL,  main="graph layout example", cex.main=2)
-<<fig=TRUE, label=sprofadjNEL12, width=12, height=12>>=
 plot(sprof02adjNEL,  main="graph layout example", cex.main=2)
 rm(sprof02adjNEL); 
 # detach("package:graph") 
@@ -657,13 +696,13 @@ str(sprof01$info,
 	caption="splot node info", 
 	label="tab:prSREinfo0")
 @
-As a convention, we do not re-arrange items for ad-hoc choices, but use a permutation 
-vector instead. 
-
-<<fig=TRUE, label= barplotNodes>>=
-rownames(sprof01$nodes) <- sprof01$nodes$names
-nodesperm <- order(sprof01$nodes$total.time,decreasing=TRUE)
-barplot(sprof01$nodes$total.time[nodesperm])
+%As a convention, we do not re-arrange items for ad-hoc choices, but use a permutation 
+%vector instead. 
+%
+%<<fig=TRUE, label= barplotNodes>>=
+%rownames(sprof01$nodes) <- sprof01$nodes$names
+%nodesperm <- order(sprof01$nodes$total.time,decreasing=TRUE)
+%barplot(sprof01$nodes$total.time[nodesperm])
 @
 Selections are recorded as selection vectors, with reference to the original order.
 This needs some caution to align them with the order choices.
@@ -674,12 +713,13 @@ names(sp) <- sprof01$nodes$name[nodesperm][nodesnrobsok[nodesperm]]
 barplot(sp,
  main="Nodes, by total time", ylab="total time")
 @
-<<fig=TRUE, label= barplotStacks>>=
-#rownames(sprof01$nodes) <- sprof01$nodes$names
-stacksperm <- order(sprof01$stacks$refcount,decreasing=TRUE)
-barplot(sprof01$stacks$refcount[stacksperm],main="Stacks, by reference count", ylab="count")
+%<<fig=TRUE, label= barplotStacks>>=
+%#rownames(sprof01$nodes) <- sprof01$nodes$names
+%stacksperm <- order(sprof01$stacks$refcount,decreasing=TRUE)
+%barplot(sprof01$stacks$refcount[stacksperm],main="Stacks, by reference count", ylab="count")
 
 @
+\todo{move to plot\_stacks}
 <<fig=TRUE, label= barplotStacks4>>=
 stacksnrobsok <- sprof01$stacks$refcount > 4
 sp4 <- sprof01$stacks$refcount[stacksperm][stacksnrobsok[stacksperm]]
@@ -688,7 +728,9 @@ names(sp4) <- sprof01$stacks$shortname[stacksperm][stacksnrobsok[stacksperm]]
 barplot(sp4,
  main="Stacks, by reference count (4 obs. minimum)", ylab="count > 4")
 @
+\fillepagebreak
 On the first look, information on the profile level is not informative. Profile records are just recordings of some step, taken at regular intervals. We get a minimal information, if we encode the stacks in colour.
+\todo{use stack colours}
 <<fig=TRUE, label=sREplotprofiles242, width=12, height=12>>=
 oldpar<-par(mfrow=c(2,2))
 plot_profiles(sprof01)
@@ -738,7 +780,8 @@ str(sprof01$profiles, max.level=1)
 A summary is provided on request.
 <<label=sumsprof01>>=
 sumsprof01 <- summary.sprof(sprof01)
-str(sumsprof01, max.level=2)
+str(sumsprof01, max.level=2, width=70
+)
 @
 
 The classical approach hides the work that has been done. Actually it breaks down the data to record items. This figure is not reported anywhere. In our case, it can be reconstructed. The profile data have 8456 words in 524 lines.
@@ -753,6 +796,8 @@ Cheap statistics are collected as the come by. For example, from the stacks tabl
 Looking at nodes gives you a point-wise horizon. Looking at edges gives you a one step horizon. The stacks give a wider horizon, typically a step size of 10 or more. The stacks we get from \R{} have peculiarities, and we can handle with this broader perspective. These are not relevant if we look point-wise, but may become dominating if we try to get a global picture. We take a look ahead (details to come in \vref{sec:graph} and nave a preview how our example is represented as a graph. Left is the original graph as recovered from the edge information,  right the graph after we have cut off the scaffold effects.
 @
 \filledpagebreak
+\todo{trimexample}
+\todo{cut next level}
 \subsection{graph Package}
 <<fig=TRUE, label=sprofadj01NEL, width=24, height=12>>=
 oldpar <- par(mfrow=c(1,2))
@@ -780,7 +825,7 @@ return(x)
 @
 \subsection{Apply \& Co}
 Control structures may be represented in \R{} as function, and these may lead to concentration points. Using information from the stacks, we can avoid these by introducing substitute nodes on the stack level. For example,
-
+\todo{collapse. cut tails}
 \ircode{"[" "lapply" ".getXlevels"  -> "<.getXlevels\_[>"}
 
 
@@ -798,6 +843,7 @@ sprof03 <- readRprof("RprofsRegressionExpl03.out")
 #sprof03$nodes$name[1] <-  sprof03$nodes$name[2]
 #sprof03$nodes$name[1]<-"<noop>"??
 @
+\todo{cut top levels}
 <<fig=TRUE, label=sprofadj03NEL, width=24, height=12>>=
 library(graph)
 a03<-adjacency(sprof03)
@@ -903,6 +949,7 @@ For a reference, here are complete outputs of the standard function.
 sprof <- sprof01
 @
 \subsection{Print}
+%<<print=FALSE, results =tex, label=rpoprintnodes>>=
 <<label=rpoprintnodes>>=
 print_nodes(sprof)
 <<label=rpoprintstacks>>=
@@ -945,8 +992,10 @@ par(oldpar)
 The \irfunx{misc}{plot} method for \ircode{sprof} objects concatenates these three functions.
 \filledpagebreak
 
-\section{Graph: regression example}
+\section{Graph}
 \label{sec:graph}
+\subsection{regression example}
+
 %Packages used to run examples or
 %tests conditionally (e.g. via if(require(pkgname))) should be listed in ÔSuggestsÕ or
 %ÔEnhancesÕ.
@@ -968,7 +1017,7 @@ sprofadj <- adjacency(sprof)
 This is  a format any graph package can handle (maybe).
 @
 \filledpagebreak
-\subsection{graph Package}
+\subsubsection{graph Package}
 <<>>=
 library(graph)
 sprofadjNEL <- as(sprofadj,"graphNEL")
@@ -999,7 +1048,7 @@ plot(nwsprofadj, label=rownames(sprofadj), main="network layout", cex.main=5)
 Experiments to include weight. \todo{maximum edge.lwd?}
 <<fig=TRUE, label=nwsprofadje, width=24, height=24>>=
 edge.lwd<-sprofadj
-edge.lwd[edge.lwd>0]<- rank(edge.lwd[edge.lwd>0], ties.method="max")
+edge.lwd[edge.lwd>0]<- rank(edge.lwd[edge.lwd>0], ties.method="min")
 #edge.lwd <- trunc(sprofadj/max(sprofadj)*10)+1
 edge.lwd <- round(edge.lwd/max(edge.lwd)*12)
 plot(nwsprofadj, label=rownames(sprofadj), main="network layout", cex.main=2, edge.lwd=edge.lwd)
@@ -1036,8 +1085,8 @@ plot(sprofadjRag,"circo", main="Graphviz circo layout", cex.main=5)
 <<fig=TRUE, label=sprofadjvizfdp, width=24, height=24>>=
 plot(sprofadjRag,"fdp", main="Graphviz fdp layout", cex.main=5)
 @
-\section{Graph II: trimmed regression example}
-\label{sec:graph}
+\subsection{trimmed regression example}
+\label{subsec:graph}
 %Packages used to run examples or
 %tests conditionally (e.g. via if(require(pkgname))) should be listed in ÔSuggestsÕ or
 %ÔEnhancesÕ.
@@ -1062,7 +1111,7 @@ adjname[adjname==""] <- "<NULL>"
 This is  a format any graph package can handle (maybe).
 @
 \filledpagebreak
-\subsection{graph Package}
+\subsubsection{graph Package}
 <<>>=
 library(graph)
 sprofadjNEL <- as(sprofadj,"graphNEL")

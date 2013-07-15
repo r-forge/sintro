@@ -43,7 +43,7 @@ summary_nodes <- function(x){
 	for (i in (1: nrstacks))
 	{ whichn <- x$stacks$stackleafnodes[i]
 		 self.time[whichn] <-  self.time[whichn]+x$stacks$refcount[i]
-	whichn <- unlist(unique(x$stacksrenc[i]))
+	whichn <- unlist(unique(x$stacks$nodes[i]))
 		total.time[whichn] <- total.time[whichn]+x$stacks$refcount[i]
 	}
 	nodes <- data.frame(shortname=abbreviate(x$nodes$name), 

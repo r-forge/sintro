@@ -53,6 +53,7 @@ lapply(sprofRegressionExpl$stacks$nodes, function(x) {x[-(1:level)]}
 svn propset svn:keywords "Date Author Id Revision HeadURL" sprof/man/*.Rd
 svn propset svn:keywords "Date Author Id Revision HeadURL" sprof/R/*.R
 svn propset svn:keywords "Date Author Id Revision HeadURL" sprof/vignettes/*.Rnw
+svn propset svn:keywords "Date Author Id Revision HeadURL"  sprof/tests/*.R
 xexport _R_CHECK_TIMINGS_=0
 export _R_CHECK_ALWAYS_LOG_VIGNETTE_OUTPUT_=TRUE
 # svn propset svn:keywords "Date Author Id Revision HeadURL" sprof/work/*.R

@@ -42,7 +42,7 @@ readRprof <- function(filename = "Rprof.out",
 	
 	# collected input lines, only stack part. Head is removed.
 	# These are references to the collstacksdict dictionary.
-	collenclines <- NULL
+	profile_lines <- NULL
 	
 	collinterval <- NULL
 	collmemcounts <- NULL
@@ -123,9 +123,9 @@ readRprof <- function(filename = "Rprof.out",
 		collstacksdict <- c(collstacksdict,newuniques)  # growing only.
 	
 		# these must be aligned. 
-		# collenclines are references to collstacksdict. 
+		# profile_lines are references to collstacksdict. 
 		collinterval<-c(collinterval, chunkinterval)  
-		collenclines <- unlist(c(collenclines, (match(chunk, collstacksdict))))
+		profile_lines <- unlist(c(profile_lines, (match(chunk, collstacksdict))))
 
 		linesread <- linesread+ linesinchunk;
 	})
@@ -133,7 +133,7 @@ readRprof <- function(filename = "Rprof.out",
 	close(con)
 
 	if (!is.null(collcontrols)) dim(collcontrols) <-NULL
-	 
+# end read data	 
 
 # NUll structure -- fallback result. Keep this aligned with final stuct.
 {Rprofdata <- list(
@@ -164,10 +164,10 @@ readRprof <- function(filename = "Rprof.out",
 	
 	# bubble down statistics -- profiles -> stacks
 	stackrefcount <- double(nrstacks)
-	for (i in seq_along(collenclines))  {
-		j<-collenclines[i] ;
+	for (i in seq_along(profile_lines))  {
+		j<-profile_lines[i] ;
 		stackrefcount[j]<- stackrefcount[j]+collinterval[i]}
-	#stackrefcount <- as.integer(table(factor(collenclines, levels=1:length(stacksnode),ordered=FALSE)))
+	#stackrefcount <- as.integer(table(factor(profile_lines, levels=1:length(stacksnode),ordered=FALSE)))
 	
 	
 	
@@ -199,7 +199,7 @@ readRprof <- function(filename = "Rprof.out",
 	# bubble down statistics -- stacks -> nodes
 	
 	
-	#stackrefcount collenclines
+	#stackrefcount profile_lines
 	# browser()
 
 	# nodes <- data.frame(name=nodenames, row.names=1)
@@ -207,9 +207,9 @@ readRprof <- function(filename = "Rprof.out",
 	# attr(nodes,"terminals") <- leafnodes
 	
 	# #stacks <- data.frame(sourcestr= collstacksdict,stacksrenc =  stacksnode)
-	# #attr(stacks, "freq") <- table(collenclines)
+	# #attr(stacks, "freq") <- table(profile_lines)
 
-	# data <- data.frame(stack=collenclines, mem = collmemcounts,malloc = collmalloccounts)
+	# data <- data.frame(stack=profile_lines, mem = collmemcounts,malloc = collmalloccounts)
 	# attr(data,"times") <-  rle(collinterval) # expand and add when reading
 	
 	#renc -> reversed  source
@@ -243,7 +243,7 @@ readRprof <- function(filename = "Rprof.out",
 		date= Sys.time(),
 		nrnodes =nrnodes,
 		nrstacks = nrstacks,
-		nrrecords = length(collenclines),
+		nrrecords = length(profile_lines),
 	   # diagnostics support
 		firstline=firstline, 
 		ctllines=collcontrols,
@@ -261,7 +261,7 @@ readRprof <- function(filename = "Rprof.out",
 		# these are conceptually a data frame and must be line aligned
         # shoule be improved to allow multiple profile collections 	
         profiles =list(
-		data= collenclines,	# references to stacksrenc
+		data= profile_lines,	# references to stacksrenc
 		mem = collmemcounts, # additional, line-synced  --- merge to data
 		malloc = collmalloccounts, # additional, line-synced  --- merge to data
 		timesRLE = rle(collinterval)  # --- merge to data
@@ -313,4 +313,5 @@ writeRprof <- function(sprof, filename="Rprof.Out") {
 # 	return( apply(pm, 2, pp)) #by columns
 # }# re_profilessource
 
-
+updateRprof <- function(sprof){
+}

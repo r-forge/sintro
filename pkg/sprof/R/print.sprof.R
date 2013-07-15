@@ -1,4 +1,11 @@
-# $Head:$
+#$HeadURL$
+#$Id$
+#$Date$
+#$Author$
+#$Revision$
+#\encoding{utf8}
+# setwd("")
+#!
 # setwd("")
 # source('~/Documents/lectures/src/insider/profile/sprof/pkg/R/print_prof.R', chdir = TRUE)
 #! To Do
