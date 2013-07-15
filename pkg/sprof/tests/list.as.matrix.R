@@ -1,6 +1,12 @@
-# $HeadURL: svn+ssh://gsawitzki@svn.r-forge.r-project.org/svnroot/sintro/pkg/sprof/R/list.as.matrix.R $
+#$HeadURL$
+#$Id$
+#$Revision$
+#$Date$
+#$Author$
+
 # convert list to matrix
 # list entries go to matrix columns, filled for equal length 
+library(sprof)
 
 x <- list(x1=c(1,2,3),
 	x2=3, 
