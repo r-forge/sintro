@@ -53,7 +53,7 @@ x <- matrix(c(
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{util}
-\keyword{matrix}
 \keyword{manip}
+\keyword{utilities}
+\keyword{matrix}
 
