@@ -135,7 +135,8 @@ readRprof <- function(filename = "Rprof.out",
 	if (!is.null(collcontrols)) dim(collcontrols) <-NULL
 # end read data	 
 
-# NUll structure -- fallback result. Keep this aligned with final stuct.
+# the following contains an inlined version of updateRprof
+# NUll structure -- fallback result. Keep this aligned with final struct.
 {Rprofdata <- list(
 		# diagnostics support
 		firstline=firstline, 
@@ -160,41 +161,43 @@ readRprof <- function(filename = "Rprof.out",
 	nrnodes <- length(nodenames)
 
 	# recode stack to node references
-	stacksnode <- sapply(stackssplit,match,nodenames)
+	stacks_nodes <- sapply(stackssplit,match,nodenames)
 	
 	# bubble down statistics -- profiles -> stacks
 	stackrefcount <- double(nrstacks)
 	for (i in seq_along(profile_lines))  {
 		j<-profile_lines[i] ;
 		stackrefcount[j]<- stackrefcount[j]+collinterval[i]}
-	#stackrefcount <- as.integer(table(factor(profile_lines, levels=1:length(stacksnode),ordered=FALSE)))
+	#stackrefcount <- as.integer(table(factor(profile_lines, levels=1:length(stacks_nodes),ordered=FALSE)))
 	
 	
 	
-	stacklength <- sapply(stacksnode,length)
-	stackleafnodes <- sapply(stacksnode,function(x){x[[1]]})
+	stacklength <- sapply(stacks_nodes,length)
+	stackleafnodes <- sapply(stacks_nodes,function(x){x[[1]]})
 	
 	
 	# bubble down statistics -- stacks -> nodes
 	# leaf records "by.self"
 	leafcount <- double(nrnodes)
-	for (i in seq_len(nrstacks)) {leafcount[stacksnode[[i]][1]] <- leafcount[stacksnode[[i]][1]] + stackrefcount[i]}
+	for (i in seq_len(nrstacks)) {
+		leafcount[stacks_nodes[[i]][1]] <- 
+			leafcount[stacks_nodes[[i]][1]] + stackrefcount[i]}
 	
-	leafnodes <- unique(sapply(stacksnode,function(x){x[[1]]}))
+	leafnodes <- unique(sapply(stacks_nodes,function(x){x[[1]]}))
 	
-	#stacksnode <- rpo$stacks$node
+	#stacks_nodes <- rpo$stacks$node
 	totalcount <- double(nrnodes)
 	for (i in seq_len(nrstacks)) {
-		sunodes <- unique(stacksnode[[i]])
+		sunodes <- unique(stacks_nodes[[i]])
 		totalcount[sunodes] <- totalcount[sunodes] + stackrefcount[i]
 		}
 	
 	
 	# recode: root = first node
-	stacksnode <- sapply(stacksnode,rev)
+	stacks_nodes <- sapply(stacks_nodes,rev)
 	
-	rootnodes <- unique(sapply(stacksnode,function(x){x[[1]]}))
-	stackheadnodes <- sapply(stacksnode,function(x){x[[1]]})
+	rootnodes <- unique(sapply(stacks_nodes,function(x){x[[1]]}))
+	stackheadnodes <- sapply(stacks_nodes,function(x){x[[1]]})
 
 	# bubble down statistics -- stacks -> nodes
 	
@@ -206,7 +209,7 @@ readRprof <- function(filename = "Rprof.out",
 	# attr(nodes,"roots") <- rootnodes
 	# attr(nodes,"terminals") <- leafnodes
 	
-	# #stacks <- data.frame(sourcestr= collstacksdict,stacksrenc =  stacksnode)
+	# #stacks <- data.frame(sourcestr= collstacksdict,stacksrenc =  stacks_nodes)
 	# #attr(stacks, "freq") <- table(profile_lines)
 
 	# data <- data.frame(stack=profile_lines, mem = collmemcounts,malloc = collmalloccounts)
@@ -214,12 +217,12 @@ readRprof <- function(filename = "Rprof.out",
 	
 	#renc -> reversed  source
 	#browser()
- 	collstacksdictrev <- sapply(stacksnode, function(x){paste(nodenames[x], collapse=" ")})
+ 	collstacksdictrev <- sapply(stacks_nodes, function(x){paste(nodenames[x], collapse=" ")})
    #browser()
    
    # stacks
 	stacks <- data.frame(
-		nodes = as.matrix(stacksnode),
+		nodes = as.matrix(stacks_nodes),
 		shortname = abbreviate(collstacksdictrev), 
 		# headers and control lines removed
 		

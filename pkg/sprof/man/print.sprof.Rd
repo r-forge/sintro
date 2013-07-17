@@ -42,5 +42,6 @@ data(sprof01lm)
 print(sprof01lm)
 }
 
-\keyword{methods}
-\keyword{utilities}
+\keyword{print}
+%\keyword{methods}
+%\keyword{utilities}
