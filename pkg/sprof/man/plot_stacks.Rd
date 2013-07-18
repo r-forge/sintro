@@ -22,6 +22,9 @@ passed.
 \details{
 %\if{html}{\figure{logo.jpg}{Our logo}}
 %\if{latex}{\figure{logo.jpg}{options: width=0.5in}}
+
+Note: these figures may be ourdated. Please run the examples.
+
 Plots are from this collection:
 
 \if{html}{\figure{rpoplotstacks.png}}

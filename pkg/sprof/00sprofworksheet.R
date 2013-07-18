@@ -8,7 +8,31 @@
 00sprofworksheet.R is the authoritative source for any current mess.
 Build instructions and correction notes are placed here.
 Eventually, they will bubble down to other files.
+##source('~/Documents/lectures/src/insider/profile_pkgs/profr_0.2/R/parse.r', chdir = TRUE)
+> .function_sources <- function(df) {
++   fs <- sapply(levels(df$f), function(x) do.call(getAnywhere, list(x))$where[1])
++   
++   packaged <- grep("package", fs)
++   names <- sapply(strsplit(fs[packaged], ":"), "[", 2)
++   
++   fs[-packaged] <- NA
++   fs[packaged] <- names
++   unname(fs[as.character(df$f)])
++ }
+> .function_sources("help")
+Error in df$f : $ operator is invalid for atomic vectors
 
+Enter a frame number, or 0 to exit   
+
+1: .function_sources("help")
+2: #2: sapply(levels(df$f), function(x) do.call(getAnywhere, list(x))$
+3: lapply(X = X, FUN = FUN, ...)
+4: levels(df$f)
+
+Selection: 0
+> fx <- function(x) do.call(getAnywhere, list(x))
+> fx("help")
+##
  \code{\link[igraph]{get.adjacency}}
  
 ###  To Do
