@@ -80,7 +80,8 @@
 %For quotation, please use the general reference \cite{gs94oned}.\\
 \emph{Revised:} July 2013\\
 \indent \emph{Typeset}, with minor revisions: \today\  from SVN $Revision$ \svnInfoDate}  
-\thanks{\emph{URL:} \url{http://sintro. r-forge.r-project.org/}}
+%bottom of title page
+%\thanks{\emph{URL:} \url{http://sintro. r-forge.r-project.org/}}
 
 %\usepackage{gssda}
 %\usepackage{gsSweave}%\usepackage{SIntro}%\usepackage{Sweave}
@@ -100,6 +101,9 @@
 \section*{Pending changes}
 Warning: this is under construction.
 
+This vignette contains experimental which may sink down to the package implementation, or vanish.
+
+Known issues:
 \begin{itemize}
 \item {Control information may be included as special stack in raw format.}
 \item {A list of profiles may become default. Only one profiling interval value per profile.}
@@ -408,7 +412,9 @@ par(oldpar)
 Colour is considered a volatile attribute. So you may need to pay some attention to keep colour indices (and colour palettes) aligned to your context.\todo{support colour in a structure}
 @
 \subsubsection{Node classes}
-We can add attributes to the plots. But we can also attributes to the nodes, and use these in the plots. The attribute \ircode{icol} is a special case which we used above. If present, it will be interpreted as an index to a colour table. For example, we can collect special well known functions in groups.
+We can add attributes to the plots. But we can also attributes to the nodes, and use these in the plots. In principle, this has been alway available. We are now making explicit use of this possibility.
+
+The attribute \ircode{icol} is a special case which we used above. If present, it will be interpreted as an index to a colour table. For example, we can collect special well known functions in groups.
 
 The node information is to some part arbitrary. You may achive the same functionality by different functions, and you will see different load in the profiles. Grouping nodes may be a mean to clarify the picture.
 
@@ -591,9 +597,9 @@ If your want to wrap up the information and look at it from a graph point of vie
 <<fig=TRUE, label=sprofadjNEL, width=8, height=8>>=
 #8
 library(graph)
-sprof02adjNEL <- as(adjacency(sprof02),"graphNEL")
-plot(sprof02adjNEL,  main="graph layout example", cex.main=2)
-rm(sprof02adjNEL); 
+sprof01adjNEL <- as(adjacency(sprof01),"graphNEL")
+plot(sprof01adjNEL,  main="graph layout example", cex.main=2)
+rm(sprof01adjNEL); 
 # detach("package:graph") 
 #! sorry. still needed by Rgraphviz -- clean up
 @
@@ -717,11 +723,19 @@ an analytical inspection, we have to reconstruct the runs from the data. In stac
 This gives a detailed information about the presence time of each node, by stack level.
 <<>>=
 profile_nodes <- profiles_matrix(sprof02)
+
 profile_nodes_rle<- rrle(profile_nodes)
-str(profile_nodes_rrle)
+str(profile_nodes_rle)
+@
+%<<>>=
+%# can we trust factor handling? For now, let us play it safe.
+%profile_nodesf <- factor(profile_nodes, levels=1:62, labels=sprof02$nodes$name)
+%dim(profile_nodesf) <- dim(profile_nodes)
+%profile_nodes_rlef<- rrle(profile_nodesf) # Error in rle(x[1, ]) : 'x' must be an atomic vector
+
 @
 On a given stack level, the run length is the best information on the time used per call, and the run count of a node is the best information on the number of calls. So this is a prime starting point for in-depth analysis.
-\todo{keep as factor. This is a cube with margins node, stack level, run length.}
+\todo{keep as factor. This is a saprse cube with margins node, stack level, run length. Nodes are mostly concentrated on few levels.}
 \todo{Warning: data structure still under discussion}
 <<>>=
 # side effect: NAs are removed
@@ -730,7 +744,7 @@ profile_nodes_rlet <- lapply(profile_nodes_rle,
 invisible(lapply(profile_nodes_rlet, 
 function(x) print.table(x,zero.print = ".") ))
 @
-This is a poor first attempt to tame \ircode{profile_nodes_rlet}.
+This is a poor first attempt to tame \ircode{profile\_nodes\_rlet}.
 \todo{some mess in the code below -- not working}
 \todo{replace by decent vector/array based implementation}
 \todo{add names for node dimension}
@@ -743,28 +757,54 @@ for (lev in (1:maxlevel) ) {
 	if (!is.null(proflev)) {
 		maxn <- max(proflev$values, na.rm=TRUE)
 		if (maxn>maxnode) maxnode <- maxn
-		maxl <- max(proflev$length, na.rm=TRUE)
+		maxl <- max(proflev$lengths, na.rm=TRUE)
 		if (maxl>maxlen) maxlen <- maxl
+		# cat("Level ",lev,maxn," Length:",maxl,"\n")
 	}
 }
-## collapse profile_nodes_rle to 3d array
+## collapse profile_nodes_rle to 3d array. Allocate memory first.
 profile_nodes_rlearray <- array(0, 
-	dim=c(maxnode,length(profile_nodes_rle), maxlevel), 
-	dimnames= c("node", "level", "run_length"))
-	
+	dim=c(maxnode,length(profile_nodes_rle), maxlen), 
+	dimnames= list("node"=sprof02$nodes$name[1:maxnode], "level"=1:length(profile_nodes_rle), "run_length"=1:maxlen))
+
+str(profile_nodes_rlearray)
+
 for (lev in (1:maxlevel) ) {
 	proflev <- profile_nodes_rle[[lev]]
 	if (!is.null(proflev)) {
-		for (j in (1: length(proflev))){
+		for (j in (1: length(proflev$lengths))){
 			if (!is.na(proflev$values[j])){
 				profile_nodes_rlearray[proflev$values[j],lev,proflev$lengths[j]] <-
 				profile_nodes_rlearray[proflev$values[j],lev,proflev$lengths[j]] +1
+			#cat(lev,j,":",proflev$values[j],lev,proflev$lengths[j],"\n")
 			}#if (!is.na
 		}#for j
 	}
 }
 	
+@
+\todo{add marginals and conditionals. Provide function node\_summary.}
+This allows us to extract marginal from \ircode{provlev[ node, level, run length]}.
+<<>>=
+node=41
+cat(sprof02$nodes$name[node],"\n")
 
+nn <- profile_nodes_rlearray[node, , ]
+#dimnames(nn)<- list( "level", "run_length")
+nn
+print.table(addmargins(nn), zero.print = ".")
+@
+\todo{rescale to application scale}
+\todo{replace sum by weighted sum}
+\todo{allow sorting, e.g. by marginals}
+<<>>=
+mt <- margin.table(profile_nodes_rlearray, margin = c(1,3))
+amt <- addmargins(mt)
+amt <- amt[amt[,"Sum"]>0,]
+print.table(amt, zero.print = ".")
+@
+%<<>>=
+%prop.table(profile_nodes_rlearray, margin = c(1,3))
 @
 These are some attempts to recover the factor structures.
 <<>>=

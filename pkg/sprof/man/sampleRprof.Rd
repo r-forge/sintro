@@ -1,5 +1,5 @@
-%$URLHead:$
-\encoding{UTF-8}
+%$HeadURL$
+\encoding{utf8}
 \name{sampleRprof}
 \alias{sampleRprof}
 \title{Get a sample profile}
