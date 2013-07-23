@@ -3,13 +3,13 @@ Package: sprof
 Type: Package
 Title: Profiling, timing and optimization utilitites
 Version: 0.0-5
-Date: 2013-07-09
+Date: 2013-07-23
 Author: Günther Sawitzki
 Maintainer: Günther Sawitzki <gsawitzki@r-forge.r-project.org>
 Description: Support utilities for profiling and dynamic code analysis.
 License: GPL-2 | GPL-3
 Suggests: wordcloud, timeit
-URL: http://http://sintro.r-forge.r-project.org
+URL: http://sintro.r-forge.r-project.org
 ByteCompile: FALSE
 KeepSource: TRUE
 BuildVignettes: FALSE

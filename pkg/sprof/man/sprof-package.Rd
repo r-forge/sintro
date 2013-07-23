@@ -12,11 +12,18 @@ Profiling, timing and optimization utilitites}
 Package: \tab sprof\cr
 Type: \tab Package\cr
 Version: \tab 0.0-5\cr
-Date: \tab 2013-07-09\cr
+Date: \tab 2013-07-23\cr
 License: \tab GPL-2 | GPL-3\cr
 }
-\code{readProf} reads a profile file from \code{\link{Rprof}} or other profilers and 
-returns a composite structure of class \code{sprof}.
+\code{\link{readProf}()} reads a profile file from \code{\link{Rprof}()} or other profilers and 
+returns a composite structure of class \code{sprof}. The basic components of \code{sprof} are (conceptually) four data frames
+\tabular{ll}{
+\code{info} \tab general information and summaries\cr
+\code{nodes} \tab node specific information\cr
+\code{stacks} \tab node specific information. Stacks are random snapshots from
+the program execution, possibly including side information such as traces of the memory management\cr
+\code{profiles} \tab collected records of a profile, encoded as references to stacks
+}
 
 To create a profile on the fly, use \code{\link{sampleRprof}}.
 

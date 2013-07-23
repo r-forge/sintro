@@ -315,6 +315,3 @@ writeRprof <- function(sprof, filename="Rprof.Out") {
 # 		paste(xr[!is.na(xr)], collapse = ' ')}
 # 	return( apply(pm, 2, pp)) #by columns
 # }# re_profilessource
-
-updateRprof <- function(sprof){
-}
