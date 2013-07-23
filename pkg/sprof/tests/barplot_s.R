@@ -24,4 +24,4 @@ barplot_s(x, lowtrim=0.2, hightrim=0.9, trimlegend=FALSE)
 
 barplot_s(x, colfun="grey")
 
-barplot_s(x, colfun="heat.colors")
+barplot_s(x, colfun=heat.colors)
