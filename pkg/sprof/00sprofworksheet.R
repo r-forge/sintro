@@ -8,7 +8,30 @@
 00sprofworksheet.R is the authoritative source for any current mess.
 Build instructions and correction notes are placed here.
 Eventually, they will bubble down to other files.
+#####
+
+todo <- function(){}
+reduce str, summary output
+
+weighted nodes for graphviz
+
+barplot_s
+
+nodei wants to modify sprof argument
+
 ##source('~/Documents/lectures/src/insider/profile_pkgs/profr_0.2/R/parse.r', chdir = TRUE)
+nodepackage <- function(node)
+{where <- getAnywhere(node)$where
+	if (length(where)==0) return("<not found>") else{
+	where <- strsplit(where,':')
+	if (is.null(where)) return("<??>") else
+		if (where[[1]][1] == "package") return(where[[1]][2]) else
+		{print(where); return("nn")}
+		}
+}
+
+#add similar for name space.
+
 > .function_sources <- function(df) {
 +   fs <- sapply(levels(df$f), function(x) do.call(getAnywhere, list(x))$where[1])
 +   
@@ -49,6 +72,7 @@ plot_stacks(rpo)
 plot_profiles(rpo)
 
 ###
+                                                                                                                                                      prompt <- function(name){
 promptClass(clName, filename = NULL, type = "class",
             keywords = "classes", where = topenv(parent.frame()),
             generatorName = clName)
@@ -64,7 +88,7 @@ prompt(object, filename = NULL, name = NULL,
 
 ## S3 method for class 'data.frame'
 prompt(object, filename = NULL, name = NULL, ...)
-
+}
 
 ###
 cscore <- rank(rpo$nodes$total.time,ties.method="random")
@@ -92,7 +116,11 @@ cat sprof/ChangeLog >> ChangeLog0
 mv ChangeLog0  sprof/ChangeLog
 #$Revision$
 
-rm sprof_internal.pdf; R CMD Rd2pdf -o sprof_internal.pdf  --internals --no-clean --title="sprof internal" sprof
+pdf <- function(){
+cd ~/projects/rforge/sintro/pkg/
+rm sprof_internal.pdf
+R CMD Rd2pdf -o sprof_internal.pdf  --internals --no-clean --title="sprof internal" sprof
+}
 #### R cmds for ad hoc construction
 setwd("/Users/gs/projects/rforge/sintro/pkg/sprof/")
 

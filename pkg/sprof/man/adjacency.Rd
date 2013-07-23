@@ -3,6 +3,7 @@
 %$Revision$
 %$Date$
 %$Author$
+%$Name:$
 \encoding{utf8}
 \name{adjacency}
 \alias{adjacency}
