@@ -18,6 +18,115 @@ Changed paths:
 
 node plot colour extended
 ------------------------------------------------------------------------
+r169 | gsawitzki | 2013-07-14 14:51:59 +0200 (Sun, 14 Jul 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/00sprofworksheet.R
+   M /pkg/sprof/ChangeLog
+   M /pkg/sprof/R/plot.sprof.R
+   M /pkg/sprof/R/summary.sprof.R
+   A /pkg/sprof/data/RprofsRegressionExpl03.out
+   A /pkg/sprof/inst/NEWS.Rd
+   A /pkg/sprof/inst/extdata
+   A /pkg/sprof/inst/extdata/RprofsRegressionExpl01.out
+   A /pkg/sprof/inst/extdata/RprofsRegressionExpl03.out
+   A /pkg/sprof/vignettes/RprofsRegressionExpl03.out
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+
+colour linking improved
+------------------------------------------------------------------------
+r171 | gsawitzki | 2013-07-14 22:45:53 +0200 (Sun, 14 Jul 2013) | 1 line
+Changed paths:
+   A /pkg/sprof/tests
+   A /pkg/sprof/tests/list.as.matrix.R
+   A /pkg/sprof/tests/rrle.R
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+
+working on factor handling
+------------------------------------------------------------------------
+r176 | gsawitzki | 2013-07-18 22:10:09 +0200 (Thu, 18 Jul 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/00sprofworksheet.R
+   M /pkg/sprof/man/figures/rpoplotnodes.pdf
+   M /pkg/sprof/man/figures/rpoplotnodes.png
+   M /pkg/sprof/man/plot_stacks.Rd
+   M /pkg/sprof/man/sampleRprof.Rd
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+   M /www/sprof/sprof_internal.pdf
+   M /www/sprof/sprofiling.pdf
+
+sprof rle reworked
+------------------------------------------------------------------------
+r178 | gsawitzki | 2013-07-23 21:13:13 +0200 (Tue, 23 Jul 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/00sprofworksheet.R
+   M /pkg/sprof/DESCRIPTION
+   M /pkg/sprof/R/adjacency.R
+   A /pkg/sprof/R/barplot_s.R
+   M /pkg/sprof/R/list.as.matrix.R
+   A /pkg/sprof/R/nodei.R
+   M /pkg/sprof/R/nodescloud.R
+   M /pkg/sprof/R/plot.sprof.R
+   M /pkg/sprof/R/print.sprof.R
+   M /pkg/sprof/R/profiles_matrix.R
+   M /pkg/sprof/R/readRprof.R
+   M /pkg/sprof/R/rrle.R
+   M /pkg/sprof/R/sampleRprof.R
+   M /pkg/sprof/R/shownodes.R
+   M /pkg/sprof/R/summary.sprof.R
+   M /pkg/sprof/R/updateRprof.R
+   M /pkg/sprof/man/adjacency.Rd
+   A /pkg/sprof/man/barplot_s.Rd
+   A /pkg/sprof/man/figures/barplots.pdf
+   A /pkg/sprof/man/figures/barplots.png
+   M /pkg/sprof/man/list.as.matrix.Rd
+   M /pkg/sprof/man/nodescloud.Rd
+   M /pkg/sprof/man/plot.sprof.Rd
+   M /pkg/sprof/man/plot_nodes.Rd
+   M /pkg/sprof/man/plot_profiles.Rd
+   M /pkg/sprof/man/plot_stacks.Rd
+   M /pkg/sprof/man/print.sprof.Rd
+   M /pkg/sprof/man/print_profiles.Rd
+   M /pkg/sprof/man/profiles_matrix.Rd
+   M /pkg/sprof/man/readRprof.Rd
+   M /pkg/sprof/man/rrle.Rd
+   M /pkg/sprof/man/rrleb.Rd
+   M /pkg/sprof/man/sampleRprof.Rd
+   M /pkg/sprof/man/shownodes.Rd
+   M /pkg/sprof/man/sprof-package.Rd
+   M /pkg/sprof/man/sprof01lm.Rd
+   M /pkg/sprof/man/stackstoadj.Rd
+   M /pkg/sprof/man/str_prof.Rd
+   M /pkg/sprof/man/summary.sprof.Rd
+   M /pkg/sprof/man/summary_terminals.Rd
+   M /pkg/sprof/man/updateRprof.Rd
+   M /pkg/sprof/man/writeRprof.Rd
+   A /pkg/sprof/tests/barplot_s.R
+   M /pkg/sprof/tests/list.as.matrix.R
+   M /pkg/sprof/tests/rrle.R
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+   M /pkg/sprof/vignettes/sprofiling.pdf
+
+barplot_s added
+------------------------------------------------------------------------
+r166 | gsawitzki | 2013-07-09 23:40:31 +0200 (Tue, 09 Jul 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/00sprofworksheet.R
+   A /pkg/sprof/ChangeLog
+   A /pkg/sprof/NEWS.Rd
+   M /pkg/sprof/vignettes/sprofiling.pdf
+
+NEWS, Changelog added to sprof
+------------------------------------------------------------------------
+r167 | gsawitzki | 2013-07-12 18:09:07 +0200 (Fri, 12 Jul 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/00sprofworksheet.R
+   M /pkg/sprof/R/plot.sprof.R
+   M /pkg/sprof/R/sampleRprof.R
+   M /pkg/sprof/R/summary.sprof.R
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+
+node plot colour extended
+------------------------------------------------------------------------
 r168 | gsawitzki | 2013-07-12 18:09:51 +0200 (Fri, 12 Jul 2013) | 1 line
 Changed paths:
    D /pkg/sprof/NEWS.Rd

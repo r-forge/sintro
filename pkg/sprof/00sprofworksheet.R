@@ -30,6 +30,24 @@ nodepackage <- function(node)
 		}
 }
 
+# edit(file="~/Documents/lectures/src/insider/profile/sprof/pkg/man/nodei.Rd")
+# source('~/projects/rforge/sintro/pkg/sprof/R/nodei.R', chdir = TRUE)
+# file.edit('~/projects/rforge/sintro/pkg/sprof/R/nodei.R', chdir = TRUE)
+
+
+nodei <- function(sprofx, node, warn = TRUE)
+{
+	i <- match(node, sprofx$nodes$name, nomatch=0)
+	if (i==0){
+		sprofx$nodes$name <<- as.character(sprofx$nodes$name)
+		sprofx$nodes <<- rbind(sprofx$nodes,NA)
+		i <- length(sprofx$nodes$name)
+		sprofx$nodes$name[i] <<- node
+		if (warn) warning("node added. An updateRprof() may be necessary.")
+	}
+	return(i)
+}
+# sprof <- sprof01; nodei(sprof,"kiki"); sprof$nodes
 #add similar for name space.
 
 > .function_sources <- function(df) {
@@ -110,7 +128,8 @@ cd ~/projects/rforge/sintro/pkg/
 R CMD CHECK sprof  --no-multiarch  --timings
 cd ~/projects/rforge/sintro/pkg/
 R CMD BUILD --compact-vignettes=gs+qpdf sprof --no-multiarch --md5
-svn log -r 166:HEAD -v > ChangeLog0
+cd ~/projects/rforge/sintro/pkg/
+svn log -r 176:HEAD -v > ChangeLog0
 cat sprof/ChangeLog >> ChangeLog0
 ##  check here !!!
 mv ChangeLog0  sprof/ChangeLog
