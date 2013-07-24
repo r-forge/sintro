@@ -9,8 +9,7 @@
 #
 # setwd("")
 #! To Do
-#! add trimming
-#! add auto-colour
+#! clean up
 
 # #  sorted barplot
 # \todo{move to plot\_stacks}
@@ -66,31 +65,44 @@ barplot_s <-function(height,
 		# if (!missing(lowtrim)){perm[sort_by <=lowtrim] <- NA; trimmedlow <- sum(is.na(perm))}
 	# if (!missing(hightrim)){perm[sort_by>=lowtrim] <- NA; trimmedhigh <- sum(is.na(perm))-trimmedlow}
 
-height[is.na(sort_by)] <- NA #! remove from plot. Should be handled by perm.
+height[is.na(sort_by)] <- NA #! remove from plot. Should be handled by perm.plotn
 	
 	
 	if (missing(coli)) coli <- rank(sort_by,ties.method="random")
-	if (decreasing) coli <- lenx- coli
+	if (decreasing) coli <- lenx- coli+1
 	
 	# unclear +1
 	if (missing(col)) { if (missing(colfun)) usecol<- FALSE else
 		{	usecol<- TRUE
 			if (is.character(colfun))
-				{if (colfun %in% c("grey", "gray")) col<-grey( (0:lenx)/lenx) else col<-colfun(lenx)} else
+				{if (colfun %in% c("grey", "gray")) col<-grey( (0:(lenx-1))/(lenx-1)) else col<-colfun(lenx)} else
 			col <- colfun(lenx)
 		}
 	} else {usecol<- TRUE}
 	
-	
-	if (usecol){
-		barplot(height[perm], main=main, col=col[coli[perm]], ...)
+	perm0 <- perm[!is.na(height)]
+	h0 <- height[perm]; 
+	h0 <- h0[!is.na(h0)]; 
+		if (usecol){col0 <- col[coli[perm]];col0 <- col0[!is.na(h0)]
+		barplot(h0, main=main, col=col0, ...)
 		if (trimlegend) {legnd(trimmedlow,trimmedhigh)}
 		invisible(data.frame(x=height,perm=perm,coli=coli, col=col ))
 	} else {
-		barplot(height[perm], main=main,  ...)
+		barplot(h0, main=main,  ...)
 		if (trimlegend) {legnd(trimmedlow,trimmedhigh)}
 		invisible(data.frame(x=height,perm=perm,coli=coli ))
 
 	}
+
+	# if (usecol){
+		# barplot(height[perm0], main=main, col=col[coli[perm0]], ...)
+		# if (trimlegend) {legnd(trimmedlow,trimmedhigh)}
+		# invisible(data.frame(x=height,perm=perm,coli=coli, col=col ))
+	# } else {
+		# barplot(height[perm0], main=main,  ...)
+		# if (trimlegend) {legnd(trimmedlow,trimmedhigh)}
+		# invisible(data.frame(x=height,perm=perm,coli=coli ))
+
+	# }
 }
 

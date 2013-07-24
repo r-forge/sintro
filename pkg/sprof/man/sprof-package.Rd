@@ -15,7 +15,7 @@ Version: \tab 0.0-5\cr
 Date: \tab 2013-07-23\cr
 License: \tab GPL-2 | GPL-3\cr
 }
-\code{\link{readProf}()} reads a profile file from \code{\link{Rprof}()} or other profilers and 
+\code{\link{readRprof}()} reads a profile file from \code{\link{Rprof}()} or other profilers and 
 returns a composite structure of class \code{sprof}. The basic components of \code{sprof} are (conceptually) four data frames
 \tabular{ll}{
 \code{info} \tab general information and summaries\cr
