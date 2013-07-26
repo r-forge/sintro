@@ -173,7 +173,7 @@ We want immediate warnings, if necessary. Set to level 2 to handle warnings as e
 message("switching  options(warn=1) -- immediate warning on")
 options(warn=1)
 @
-We want a second chance on errors.
+We want a second chance on errors. So install an error handler.
 <<>>=
 options(error = recover)
 @
@@ -227,19 +227,22 @@ We use the \R{} function \ircode{xtable()} for output and \LaTeX \ \ircode{longt
 \todo{remove text vdots from string/name columns. Use empty string.}
 <<>>= 
 library(xtable)
-prxt <- function (x, digits=2, 	caption=NULL, 
+prxt <- function (x, digits=2, cut=TRUE, caption=NULL, 
 	label=NULL, ...)  {
-	margin <- 10
-	if (nrow(x)> 2*margin+3) x <-xcutdata.frame(x, margin=margin)
+	if (cut) {margin <- 10
+	if (nrow(x)> 2*margin+3) x <-xcutdata.frame(x, margin=margin)}
 	print(
 		xtable(x, digits=digits, caption=caption, 
 				label=label, ...), 
 		floating=FALSE, 
 		tabular.environment="longtable", 
 		caption.placement="top",
+		zero.print = ".",
 		NA.string="\\vdots")
 	}
 @
+%#sanitize.text.function = function(x) { if (x=="\\vdots") " " else if (x=="$") "\\$" else x},
+		
 This is to be used with
 \verb+<<print=FALSE, results =tex, label=tab:prxx>>=+
 
@@ -325,6 +328,7 @@ The basic \R{} functions invite us to get a summary.
 
 <<>>=
 sumRprofRegressionExpl <- summaryRprof("RprofsRegressionExpl01.out")
+#str(profile_nodes_rle, max.level=2, vec.len=3, nchar.max=40, list.len=6)
 str(sumRprofRegressionExpl, vec.len=3)
 @
 
@@ -366,9 +370,10 @@ sprof01temp <- sampleRprof(runif(10000), runs=100)
 The basic data structure consists of four data frames. The \ircode{info} section collects global information from the input file, such as an identification strings and various global matrix. The \ircode{nodes} section initially gives the same information marginal information as  \ircode{summaryRprof}. The \ircode{stacks} section puts the node information into their calling context as found in the input profile file. The \ircode{profiles} section gives the temporal context. It is implemented as a list, but conceptually it is a data frame. Implementing it as a list allows run length encoding of variables, which unfortunately is not allowed by \R{} in data frames.
 \todo{add sampling.interval, sampling.time for backward compability}
 <<>>=
+#str(profile_nodes_rle, max.level=2, vec.len=3, nchar.max=40, list.len=6)
 str(sprof01, max.level=2, vec.len=3,nchar.max=40)
 @
-The nodes do not come in a specific order. Access via a permutation vector is preferred. This allows different views on the same data set. For example, \vref{tab:prspbt} uses a permutation by total time, and a selection (compare to \vref{tab:prSRREbt}). The only difference is that we work on a ms base internally, whereas \R{} uses seconds as a base. 
+The nodes do not come in a specific order. Access via a permutation vector is preferred. This allows different views on the same data set. For example, \vref{tab:prspbt} uses a permutation by total time, and a selection (compare to \vref{tab:prSRREbt}). The only difference is that \ircode{sprof} works uses a millisecond (ms) base, whereas \R{} in general uses seconds as a base. 
 
 << print = FALSE, results = tex, label=tab:prspbtself>>=
 nodes <- sprof01$nodes[order(sprof01$nodes$self.time, decreasing=TRUE),]
@@ -376,7 +381,7 @@ prxt(nodes[nodes$self.time>4,],
 caption="splot result: by.self, self time > 4ms", 
 	label="tab:prspbtself")
 @
-At this level, it is helpful to note the expectations, and only then inspect the timing results. Since we are using a linear model, we are not surprised to see functions related to linear models on the top of the list. we may however be surpised to see functions related to data acces and to character conversion very high on the list. The sizeable amount of time spent on NA handling is another aspect that is surprising.
+At this level, it is helpful to note the expectations, and only then inspect the timing results. Since we are using a linear model, we are not surprised to see functions related to linear models on the top of the list. We may however be surprised to see functions related to data access and to character conversion very high on the list. The sizeable amount of time spent on NA handling is another aspect that is surprising.
 
 << print = FALSE, results = tex, label=tab:prspbt>>=
 nodes <- sprof01$nodes[order(sprof01$nodes$total.time, decreasing=TRUE),]
@@ -389,22 +394,24 @@ Given the sampling structure of the profiles, two aspect are common. The samplin
 
 Common rearrangements as by total time and by self time are supplied by the display functions.
 
-Plot, for example, currently gives a choice of four displays for nodes.
-<<fig=TRUE, label=sREplotnodes01, width=8, height=8>>=
+Plot, for example, currently gives a choice of four displays for nodes, and supports trimming by default. Our profile starts with 62 nodes. The defaults cut off 34 nodes as uninformative, either because they are to rare, or ubiquitous.
+ 
+<<fig=TRUE, label=sREplotnodes01, width=10, height=10>>=
+#10
 oldpar <- par(mfrow=c(2,2))
 plot_nodes(sprof01)
 par(oldpar)
 @
 We can add colour. To illustrate this, we encode the frequency of the nodes as colour. As a palette, we choose a heat map here. 
-\todo{apply colour to selction?}
+\todo{apply colour to selection?}
 \todo{spread colour on displayed part}
 <<>>=
 freqrank01 <- rank(-sprof01$nodes$total.time, ties.method="random")
 freqrankcol01 <- heat.colors(length(freqrank01))
 @
 Here is the node view using these choices:
-\todo{colour by class --  redo. Bundle colour index with colour?}
-<<fig=TRUE, label=sREplotnodes01freqcol, width=12, height=12>>=
+<<fig=TRUE, label=sREplotnodes01freqcol, width=10, height=10>>=
+#10
 sprof01$nodes$icol <- freqrank01
 oldpar <- par(mfrow=c(2,2))
 plot_nodes(sprof01, col=freqrankcol01)
@@ -413,11 +420,12 @@ par(oldpar)
 Colour is considered a volatile attribute. So you may need to pay some attention to keep colour indices (and colour palettes) aligned to your context.\todo{support colour in a structure}
 @
 \subsubsection{Node classes}
-We can add attributes to the plots. But we can also attributes to the nodes, and use these in the plots. In principle, this has been alway available. We are now making explicit use of this possibility.
+We can add attributes to the plots. But we can also add attributes to the nodes, and use these in the plots. In principle, this has been alway available. We are now making explicit use of this possibility.
 
 The attribute \ircode{icol} is a special case which we used above. If present, it will be interpreted as an index to a colour table. For example, we can collect special well known functions in groups.
+\todo{colour by class --  redo. Bundle colour index with colour?}
 
-The node information is to some part arbitrary. You may achive the same functionality by different functions, and you will see different load in the profiles. Grouping nodes may be a mean to clarify the picture.
+The node information is to some part arbitrary. You may achieve the same functionality by different functions, and you will see different load in the profiles. Grouping nodes may be a mean to clarify the picture.
 
 Grouping may also help you to focus your attention. ``HOT'' and ``cold''  may be ver helpful tags. These can be used in a flexible way.
 
@@ -431,18 +439,56 @@ nodekeyword0 <- function(node)
 @
 \todo{add class by package for all nodes}
 <<>>=
-##source('~/Documents/lectures/src/insider/profile_pkgs/profr_0.2/R/parse.r', chdir = TRUE)
+## cf. source('~/Documents/lectures/src/insider/profile_pkgs/profr_0.2/R/parse.r', chdir = TRUE)
 nodepackage0 <- function(node)
 {where <- getAnywhere(node)$where
 	if (length(where)==0) return("<not found>") else{
 	where <- strsplit(where,':')
 	if (is.null(where)) return("<??>") else
 		if (where[[1]][1] == "package") return(where[[1]][2]) else
-		{print(where); return("nn")}
+		{print(paste(node,"not found. got:",where)); return("nn")}
 		}
 }
+nodepackage<- function(x)
+{
+x <- as.character(x)
+xpackage <- rep("nn",length(x))
+for (i in (1:length(x))) xpackage[i]<-nodepackage0(x[[i]])
+xpackage
+}
+<<>>=
+nodepackges <- nodepackage(sprof01$nodes$name)
+names(nodepackges) <- sprof01$nodes$name
+table(nodepackges)
+#nodepackges <- lapply(as.character(sprof01$nodes$name),nodepackage0)
 @
-\todo{Supply colour tables}
+<<>>=
+sprof01$nodes$icol <-as.factor(nodepackges)
+@
+%: floating figure
+\begin{figure}[htbp]
+\begin{center}
+<<fig = TRUE, echo = FALSE, print = FALSE, label=sREplotnodes01packcol1, width=10, height=15>>= 
+oldpar <- par(mfrow=c(3,2))
+
+if (require(RColorBrewer)) colpack <- brewer.pal(length(levels(sprof01$nodes$icol)), "Paired") else 
+	colpack <- rainbow(length(levels(sprof01$nodes$icol)))
+
+plot_nodes(sprof01, col=colpack)
+plot(table(sprof01$nodes$icol),  
+	type="h", lwd=20,col=colpack, lend="square", ylab="count")
+nodescloud(sprof01, min.freq=5,  col=colpack)
+par(oldpar)
+@
+
+\caption{Nodes by package}
+\label{fig:sREplotnodes01packcol1}
+\end{center}
+\end{figure}
+
+See \vref{fig:sREplotnodes01packcol1}.
+
+% floating figure end
 <<>>=
 x_apply <- c("apply", "lapply", "vapply", "sapply")
 x_as <- c("as.list", "as.data.frame", "as.list.data.frame",
@@ -477,20 +523,33 @@ sprof01$nodes$icol <-as.factor(nodeclass)
 @
 adds a sticky color attribute. To interpret, you should choose your preferred color palette, for example \todo{add a reference to colorbrewer}
 <<>>=
-classcol=c("red", "green", "blue", "yellow", "cyan", "magenta", "purple")
+classcol <- c("red", "green", "blue", "yellow", "cyan", "magenta", "purple")
 @
 \todo{plot\_nodes: make col explicite}
 \todo{Defaults by class}
 
-<<fig=TRUE, label=sREplotnodes01col, width=10, height=15>>=
+%: floating figure
+\begin{figure}[htbp]
+\begin{center}
+<<fig = TRUE,  label=sREplotnodes01col, width=10, height=15>>= 
 oldpar <- par(mfrow=c(3,2))
 plot_nodes(sprof01, col=classcol)
 plot(table(sprof01$nodes$icol),  
-	type="h", lwd=20,col=classcol, lend="square", ylab="count")
+	type="h", lwd=20, col=classcol, lend="square", ylab="count")
 nodescloud(sprof01, min.freq=5, 
 		col=classcol)
 par(oldpar)
 @
+
+\caption{Nodes by package}
+\label{fig:sREplotnodes01col}
+\end{center}
+\end{figure}
+
+See \vref{fig:sREplotnodes01col}.
+
+% floating figure end
+
 You can break down the frequency by the classes you have define. But beware of Simpson's paradox. The information you think you see may be strongly affected by your choices - what you see are reflections of conditional distributions. These may be very different from the global picture.
 
 @
@@ -591,11 +650,24 @@ This is what we get for free from the node information on our three levels: node
 %#12 freqrankcol01
 %sprof01$nodes$icol <- freqrank
 %shownodes(sprof01, col=freqrankcol01)
-<<fig=TRUE, label= shownodes01rb, width=8, height=8>>=
+@
+%: floating figure
+\begin{figure}[htbp]
+\begin{center}
+<<fig = TRUE, echo = TRUE, print = FALSE, label=shownodes01rb, width=8, height=8>>= 
 #8 rainbow
 sprof01$nodes$icol <- freqrank01
 shownodes(sprof01, col=rainbow(62))
 @
+\caption{Nodes by stack and profile}
+\label{fig:shownodes01rb}
+\end{center}
+\end{figure}
+
+See \vref{fig:shownodes01rb}.
+
+% floating figure end
+
 %<<fig=TRUE, label= shownodes01heat, width=8, height=8>>=
 %#8 heat.colors
 %shownodes(sprof01, col=heat.colors(62))
@@ -615,8 +687,17 @@ What you have seen so far is what you get for free when using package \ircode{sp
 \todo{colours. recolour. Propagate colour to graph.}
 @
 If your want to wrap up the information and look at it from a graph point of view, here is just one example. More are in \vref{sec:graph}. But before changing to the graph perspective, we recommend to see the next sections, not to skip them. The preview, at this point, taking package \ircode{graph} as an example:
-<<fig=TRUE, label=sprofadjNEL, width=8, height=8>>=
-#8
+%<<fig=TRUE, label=sprofadjNEL8, width=8, height=8>>=
+%#8 sprofadjNEL
+%library(graph)
+%sprof01adjNEL <- as(adjacency(sprof01),"graphNEL")
+%plot(sprof01adjNEL,  main="sprof01: graph layout example", cex.main=2)
+%rm(sprof01adjNEL); 
+%# detach("package:graph") 
+%#! sorry. still needed by Rgraphviz -- clean up
+@
+<<fig=TRUE, label=sprofadjNEL6, width=6, height=6>>=
+#6 sprofadjNEL
 library(graph)
 sprof01adjNEL <- as(adjacency(sprof01),"graphNEL")
 plot(sprof01adjNEL,  main="sprof01: graph layout example", cex.main=2)
@@ -638,12 +719,27 @@ sprof02$stacks$nodes <- sapply(sprof02$stacks$nodes,
 @
 \todo{handle empty stacks and zero counts gracefully}
 At this point, it is a decision whether to adapt the timing information, or keep the original information. Since this decision does affect the structural information, it is not critical. But analysis is easier if unused nodes are eliminated.\todo{add ?? function}
-
-<<label=sprof02sum>>=
-summary(sprof02)
-<<label=sprof02Upd>>=
+<<>>=
+str(sprof02$info)
+<<print=FALSE,  results=tex, label=tab:sprof02info1>>=
+print(xtable(sprof02$nodes, caption="sprof02, before update", 
+	label="tab:sprof02info1"),floating=FALSE, 
+		tabular.environment="longtable", 
+		caption.placement="top",
+		NA.string="\\vdots")
+#str(sprof02)
+<< label=sprof02Upd>>=
 sprof02 <- updateRprof(sprof02)
-summary(sprof02)
+#xtable(summary(sprof02))
+#summary(sprof02)
+str(sprof02$info)
+<<print=FALSE, results=tex, label=tab:sprof02info2>>=
+print(xtable(sprof02$nodes, caption="sprof02, after update", 
+	label="tab:sprof02info2"),floating=FALSE, 
+		tabular.environment="longtable", 
+		caption.placement="top",
+		NA.string="\\vdots")
+@
 <<fig=TRUE, label= shownodes02, width=8, height=8>>=
 #8
 shownodes(sprof02)
@@ -691,10 +787,6 @@ stf <- xsrc[xsrc>1]
 names(stf) <- rownames(xsrc)[xsrc>1]
 ostf <- order(stf,decreasing=TRUE)
 barplot(stf[ostf])
-<<fig=TRUE, label=sREplotstackfreq1>>=
-barplot(stf[ostf], col=terrain.colors(length(ostf)), horiz=TRUE)
-<<fig=TRUE, label=sREplotstackfreq2>>=
-barplot(stf[ostf], col=terrain.colors(length(ostf)))
 @
 There is no statistics on profiles. Profiling are our elementary data.
 However we can link to our derived data to get a more informative display.
@@ -722,7 +814,8 @@ node <- "<.getXlevels_[>"
 		sprof$nodes <- rbind(sprof$nodes,NA)
 		i <- length(sprof$nodes$name)
 		sprof$nodes$name[i] <- node
-		if (as.logical(options("warn"))) message("node added. An updateRprof() may be necessary.")
+		if (as.logical(options("warn"))) 
+			message("node added. An updateRprof() may be necessary.")
 	}
 	nodei <- i
 }
@@ -770,7 +863,7 @@ profile_nodes <- profiles_matrix(sprof02)
 
 profile_nodes_rle<- rrle(profile_nodes)
 # str(profile_nodes_rle)
-str(profile_nodes_rle, max.level=2, vec.len=3,nchar.max=40)
+str(profile_nodes_rle, max.level=2, vec.len=3, nchar.max=40, list.len=6)
 @
 %<<>>=
 %# can we trust factor handling? For now, let us play it safe.
@@ -810,20 +903,23 @@ for (lev in (1:maxlevel) ) {
 ## collapse profile_nodes_rle to 3d array. Allocate memory first.
 profile_nodes_rlearray <- array(0, 
 	dim=c(maxnode,length(profile_nodes_rle), maxlen), 
-	dimnames= list("node"=sprof02$nodes$name[1:maxnode], "level"=1:length(profile_nodes_rle), "run_length"=1:maxlen))
+	dimnames= list("node"=sprof02$nodes$name[1:maxnode], 
+		"level"=1:length(profile_nodes_rle), 
+		"run_length"=1:maxlen))
+#str(profile_nodes_rle, max.level=2, vec.len=3, nchar.max=40, list.len=6)
 
-str(profile_nodes_rlearray, max.level=2, vec.len=3,nchar.max=40)
+str(profile_nodes_rlearray, max.level=2, vec.len=3,nchar.max=40, list.len=6)
 
 for (lev in (1:maxlevel) ) {
 	proflev <- profile_nodes_rle[[lev]]
 	if (!is.null(proflev)) {
-		for (j in (1: length(proflev$lengths))){
-			if (!is.na(proflev$values[j])){
-				profile_nodes_rlearray[proflev$values[j],lev,proflev$lengths[j]] <-
-				profile_nodes_rlearray[proflev$values[j],lev,proflev$lengths[j]] +1
+	  for (j in (1: length(proflev$lengths))){
+		 if (!is.na(proflev$values[j])){
+			profile_nodes_rlearray[proflev$values[j],lev,proflev$lengths[j]] <-
+			profile_nodes_rlearray[proflev$values[j],lev,proflev$lengths[j]] +1
 			#cat(lev,j,":",proflev$values[j],lev,proflev$lengths[j],"\n")
-			}#if (!is.na
-		}#for j
+		 }#if (!is.na
+	   }#for j
 	}
 }
 	
@@ -854,13 +950,18 @@ print.table(amt, zero.print = ".")
 These are some attempts to recover the factor structures.
 <<>>=
 xfi <- levels(sprof02$nodes$name)
-profile_nodes_rlefac <- lapply(profile_nodes_rle, function(xl) {xl$values <- factor(xl$values, levels=1:62, labels=xfi); xl}) # seems ok
+profile_nodes_rlefac <- lapply(profile_nodes_rle, 
+	function(xl) {xl$values <- factor(xl$values, 
+		levels=1:62, 
+		labels=xfi); xl}) # seems ok
 profile_nodes_rletfac <- lapply(profile_nodes_rle, 
 	function(x) table(x,dnn=c("run length","node")) ) #factors lost again
-colnames(profile_nodes_rletfac[[1]]) <- sprof02$nodes$name[ as.integer(colnames(profile_nodes_rletfac[[1]]))] 
+	colnames(profile_nodes_rletfac[[1]]) <- 
+		sprof02$nodes$name[ as.integer(colnames(profile_nodes_rletfac[[1]]))] 
 
 profile_nodes_rletfac1 <- lapply(profile_nodes_rletfac,
-	function(xl) {colnames(xl) <- sprof02$nodes$name[ as.integer(colnames(xl))];
+	function(xl) {colnames(xl) <- 
+		sprof02$nodes$name[ as.integer(colnames(xl))];
 	xl} )
 
 invisible(lapply(profile_nodes_rletfac1, 
@@ -878,6 +979,7 @@ function(x) print.table(t(x),zero.print = ".") ))
 barplot_s(runif(10))
 << label=tab:prSREinfo>>=
 # xtable cannot handle posix, so we use print output here
+#  str(profile_nodes_rle, max.level=2, vec.len=3, nchar.max=40, list.len=6)
 str(sprof01$info,
 	caption="splot node info", 
 	label="tab:prSREinfo0")
@@ -922,8 +1024,9 @@ stackfreqscore <- rank(sprof01$stacks$refcount,ties.method="random")
 stacksperm <- order(sprof01$stacks$refcount,decreasing=TRUE)
 stacksnrobsok <- sprof01$stacks$refcount > 4
 stackfreqscore4<- stackfreqscore[stacksperm][stacksnrobsok[stacksperm]]
-barplot(sp[stacksnrobsok[stacksperm]], main="Stacks, by reference count (4 obs. minimum)", ylab="count > 4",
-col=rainbow(80)[stackfreqscore4])
+barplot(sp[stacksnrobsok[stacksperm]], 
+	main="Stacks, by reference count (4 obs. minimum)", ylab="count > 4",
+	col=rainbow(80)[stackfreqscore4])
 @
 <<fig=TRUE, label=sREplotprofiles4, width=12, height=12>>=
 oldpar<- par(mfrow=c(2,2))
@@ -945,7 +1048,8 @@ par(oldpar)
 <<print = FALSE, results = tex, label=tab:prSREnodes>>=
 prxt(sprof01$nodes,
 	caption="nodes", 
-	label="tab:prSREnodes", max.level=2, vec.len=3,nchar.max=40)
+	label="tab:prSREnodes", 
+	max.level=2, vec.len=3,nchar.max=40)
 @
 %<<print = FALSE, results = tex, label=tab:prSREstacks>>=
 %prxt(sprof01$stacks,
@@ -953,16 +1057,15 @@ prxt(sprof01$nodes,
 %	label="tab:prSREstacks")
 \filledpagebreak
 <<label=tab:prSREstacks>>=
-str(sprof01$stacks,  max.level=2, vec.len=3,nchar.max=40)
-
-<<>>=
-str(sprof01$profiles,  max.level=1, vec.len=3,nchar.max=40)
-
+str(sprof01$stacks,  max.level=2, vec.len=6,
+	nchar.max=40, list.len=20,width=70, strict.width="wrap")
 @
 A summary is provided on request.
 <<label=sumsprof01>>=
 sumsprof01 <- summary.sprof(sprof01)
-str(sumsprof01, max.level=2, vec.len=3, nchar.max=40, 
+#str(profile_nodes_rle, max.level=2, vec.len=3, nchar.max=40, list.len=6)
+str(sumsprof01, max.level=2, vec.len=3, 
+	nchar.max=40,  list.len=6,
 	width=70, strict.width="wrap"
 )
 @
@@ -979,8 +1082,10 @@ Cheap statistics are collected as the come by. For example, from the stacks tabl
 <<fig=TRUE, label=sprofadj01NEL, width=24, height=12>>=
 oldpar <- par(mfrow=c(1,2))
 library(graph)
-plot(as(adjacency(sprof01),"graphNEL"),  main="graph layout sprof01", cex.main=2)
-plot(as(adjacency(sprof02),"graphNEL"),  main="graph layout sprof02", cex.main=2)
+plot(as(adjacency(sprof01),"graphNEL"),  
+	main="graph layout sprof01", cex.main=2)
+plot(as(adjacency(sprof02),"graphNEL"),  
+	main="graph layout sprof02", cex.main=2)
 par(oldpar)
 @
 \R{} is function based, and control structures in general are implemented as functions. In a graph representation, they appear as nodes, concentrating and seeding to unrelated paths. We can detect these on the stack level and replace them by surrogates, introducing new nodes.
@@ -1119,8 +1224,6 @@ To interface \ircode{sprof} to a graph handling package,  \irfunx{util}{adjacenc
 
 There are various packages for finding a graph layout, and the choice is open to your preferences.  The \R{} packages for most of these are just wrapper
 
-
-
 <<>>=
 sprofadj <- adjacency(sprof)
 @
@@ -1141,7 +1244,7 @@ plot(sprofadjNEL,  main="sprof01: graph layout", cex.main=2)
 library(igraph)
 sprofig <- graph.adjacency(sprofadj)
 <<fig=TRUE, label=sprofig,width=8, height=8>>=
-#plot(sprofig, main="sprof01: igraph layout", cex.main=5)
+#plot(sprofig, main="sprof01: igraph layout", cex.main=2)
 plot(sprofig, main="sprof01: igraph layout")
 
 detach("package:igraph")
@@ -1152,7 +1255,7 @@ detach("package:igraph")
 library(network)
 nwsprofadj <- as.network(sprofadj) # names is not imported 
 network.vertex.names(nwsprofadj) <- rownames(sprofadj) # not honoured by plot
-plot(nwsprofadj, label=rownames(sprofadj), main="sprof01: network layout", cex.main=5)
+plot(nwsprofadj, label=rownames(sprofadj), main="sprof01: network layout", cex.main=2)
 @
 \filledpagebreak
 Experiments to include weight. \todo{maximum edge.lwd?}
@@ -1170,7 +1273,7 @@ detach("package:network")
 library(Rgraphviz)
 sprofadjRag <- agopen(sprofadjNEL, name="Rprof Example")
 <<fig=TRUE, label=sprofadjvizdot,width=8, height=8>>=
-plot(sprofadjRag, main="sprof01: Graphviz dot layout", cex.main=5)
+plot(sprofadjRag, main="sprof01: Graphviz dot layout", cex.main=2)
 @
 %agopen(graph, name, nodes, edges, kind = NULL, layout = TRUE,
 %layoutType = "dot",
@@ -1181,19 +1284,21 @@ plot(sprofadjRag, main="sprof01: Graphviz dot layout", cex.main=5)
 %dot, neato, twopi, circo, and fdp.
 \filledpagebreak
 <<fig=TRUE, label=sprofadjvizneato,width=8, height=8>>=
-plot(sprofadjRag,"neato", main="sprof01: Graphviz neato layout", cex.main=5)
+#8
+plot(sprofadjRag,"neato", main="sprof01: Graphviz neato layout", cex.main=2)
 @
 \filledpagebreak
 <<fig=TRUE, label=sprofadjviztwopi,width=8, height=8>>=
-plot(sprofadjRag,"twopi", main="sprof01: Graphviz twopi layout", cex.main=5)
+#6
+plot(sprofadjRag,"twopi", main="sprof01: Graphviz twopi layout", cex.main=2)
 @
 \filledpagebreak
 <<fig=TRUE, label=sprofadjvizcirco,width=8, height=8>>=
-plot(sprofadjRag,"circo", main="sprof01: Graphviz circo layout", cex.main=5)
+plot(sprofadjRag,"circo", main="sprof01: Graphviz circo layout", cex.main=2)
 @
 \filledpagebreak
 <<fig=TRUE, label=sprofadjvizfdp,width=8, height=8>>=
-plot(sprofadjRag,"fdp", main="sprof01: Graphviz fdp layout", cex.main=5)
+plot(sprofadjRag,"fdp", main="sprof01: Graphviz fdp layout", cex.main=2)
 @
 \filledpagebreak
 \subsection{Trimmed example: regression}
@@ -1245,27 +1350,32 @@ plot(sprofadjNEL,  main="sprof03: graph layout", cex.main=2)
 <<>>=
 library(igraph)
 sprofig <- graph.adjacency(sprofadj)
-<<fig=TRUE, label=s03ig,width=8, height=8>>=
-#plot(sprofig, main="sprof03: igraph layout", cex.main=5)
-plot(sprofig, main="sprof03: igraph layout")
-
+<<fig=TRUE, label=s03ig,width=6, height=6>>=
+#6
+#plot(sprofig, main="sprof03: igraph layout", cex.main=2)
+plot(sprofig, main="sprof03: igraph layout: trimmed data")
 detach("package:igraph")
 @
 \filledpagebreak
 \subsubsection{network package}
-<<fig=TRUE, label=s03nwsprofadj,width=8, height=8>>=
+<<fig=TRUE, label=s03nwsprofadj,width=6, height=6>>=
+#6
 library(network)
 nwsprofadj <- as.network(sprofadj) # names is not imported 
 network.vertex.names(nwsprofadj) <- rownames(sprofadj) # not honoured by plot
-plot(nwsprofadj, label=rownames(sprofadj), main="sprof03: network layout: trimmed data", cex.main=5)
+plot(nwsprofadj, label=rownames(sprofadj), 
+	main="sprof03: network layout: trimmed data", cex.main=2)
 @
 \filledpagebreak
 <<fig=TRUE, label=s03nwsprofadje,width=8, height=8>>=
+#8
 edge.lwd<-sprofadj
 edge.lwd[edge.lwd>0]<- rank(edge.lwd[edge.lwd>0], ties.method="max")
 #edge.lwd <- trunc(sprofadj/max(sprofadj)*10)+1
 edge.lwd <- round(edge.lwd/max(edge.lwd)*12)
-plot(nwsprofadj, label=rownames(sprofadj), main="sprof03: network layout: trimmed data", cex.main=2, edge.lwd=edge.lwd)
+plot(nwsprofadj, label=rownames(sprofadj), 
+	main="sprof03: network layout: trimmed data", 
+	cex.main=2, edge.lwd=edge.lwd)
 @
 \filledpagebreak
 <<fig=TRUE, label=s03nwsprofadjekamadakawai, width=12, height=12>>=
@@ -1278,14 +1388,14 @@ cex.main=2, edge.lwd=edge.lwd)
 \filledpagebreak
 <<fig=TRUE, label=s03nwsprofadjecircle,width=8, height=8>>=
 plot(nwsprofadj, label=rownames(sprofadj), 
-main="sprof03: network circle layout: \n trimmed data", 
-mode="circle",
-cex.main=2, edge.lwd=edge.lwd)
+	main="sprof03: network circle layout: \n trimmed data", 
+	mode="circle",
+	cex.main=2, edge.lwd=edge.lwd)
 <<fig=TRUE, label=s03nwsprofadjefruchtermanreingold,width=8, height=8>>=
 plot(nwsprofadj, label=rownames(sprofadj), 
-main="sprof03: network fruchtermanreingold layout: \n trimmed data", 
-mode="fruchtermanreingold",
-cex.main=2, edge.lwd=edge.lwd)
+	main="sprof03: network fruchtermanreingold layout: \n trimmed data", 
+	mode="fruchtermanreingold",
+	cex.main=2, edge.lwd=edge.lwd)
 
 detach("package:network")
 @
@@ -1294,9 +1404,9 @@ detach("package:network")
 <<>>=
 library(Rgraphviz)
 sprofadjRag <- agopen(sprofadjNEL, name="Rprof Example")
-<<fig=TRUE, label=s03adjvizdot, width=12, height=12>>=
-#12
-plot(sprofadjRag, main="sprof03: Graphviz dot layout", cex.main=5)
+<<fig=TRUE, label=s03adjvizdot, width=6, height=6>>=
+#6
+plot(sprofadjRag, main="sprof03: Graphviz dot layout", cex.main=2)
 @
 %agopen(graph, name, nodes, edges, kind = NULL, layout = TRUE,
 %layoutType = "dot",
@@ -1306,20 +1416,25 @@ plot(sprofadjRag, main="sprof03: Graphviz dot layout", cex.main=5)
 
 %dot, neato, twopi, circo, and fdp.
 \filledpagebreak
-<<fig=TRUE, label=s03adjvizneato,width=8, height=8>>=
-plot(sprofadjRag,"neato", main="sprof03: Graphviz neato layout", cex.main=5)
+<<fig=TRUE, label=s03adjvizneato,width=6, height=6>>=
+#6
+plot(sprofadjRag,"neato", main="sprof03: Graphviz neato layout", 
+	cex.main=2)
 @
 \filledpagebreak
-<<fig=TRUE, label=s03adjviztwopi,width=8, height=8>>=
-plot(sprofadjRag,"twopi", main="sprof03: Graphviz twopi layout", cex.main=5)
+<<fig=TRUE, label=s03adjviztwopi,width=6, height=6>>=
+#6
+plot(sprofadjRag,"twopi", main="sprof03: Graphviz twopi layout")
 @
 \filledpagebreak
-<<fig=TRUE, label=sprofadjvizcirco,width=8, height=8>>=
-plot(sprofadjRag,"circo", main="sprof03: Graphviz circo layout", cex.main=5)
+<<fig=TRUE, label=sprofadjvizcirco,width=6, height=6>>=
+#6
+plot(sprofadjRag,"circo", main="sprof03: Graphviz circo layout", cex.main=2)
 @
 \filledpagebreak
-<<fig=TRUE, label=s03adjvizfdp,width=8, height=8>>=
-plot(sprofadjRag,"fdp", main="sprof03: Graphviz fdp layout", cex.main=5)
+<<fig=TRUE, label=s03adjvizfdp,width=6, height=6>>=
+#6
+plot(sprofadjRag,"fdp", main="sprof03: Graphviz fdp layout", cex.main=2)
 @
 \index{Index01}
 %:Sweave examples

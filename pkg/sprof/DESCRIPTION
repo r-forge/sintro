@@ -8,7 +8,7 @@ Author: Günther Sawitzki
 Maintainer: Günther Sawitzki <gsawitzki@r-forge.r-project.org>
 Description: Support utilities for profiling and dynamic code analysis.
 License: GPL-2 | GPL-3
-Suggests: wordcloud, timeit
+Suggests: wordcloud, timeit, RColorBrewer
 URL: http://sintro.r-forge.r-project.org
 ByteCompile: FALSE
 KeepSource: TRUE
