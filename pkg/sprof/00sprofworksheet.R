@@ -18,6 +18,8 @@ weighted nodes for graphviz
 barplot_s
 
 nodei wants to modify sprof argument
+#
+str(profile_nodes_rle, max.level=2, vec.len=3, nchar.max=40, list.len=6 ,width=70, strict.width="wrap")
 
 ##source('~/Documents/lectures/src/insider/profile_pkgs/profr_0.2/R/parse.r', chdir = TRUE)
 nodepackage <- function(node)
