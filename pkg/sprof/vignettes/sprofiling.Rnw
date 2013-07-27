@@ -413,7 +413,7 @@ Given the sampling structure of the profiles, two aspect are common. The samplin
 
 Common rearrangements as by total time and by self time are supplied by the display functions.
 
-irfunx{hplot}{plot_nodes}, for example, currently gives a choice of four displays for nodes, and supports trimming by default. Our profile starts with 62 nodes. The defaults cut off 34 nodes as uninformative, either because they are to rare, or ubiquitous.
+irfunx{hplot}{plot\_nodes}, for example, currently gives a choice of four displays for nodes, and supports trimming by default. Our profile starts with 62 nodes. The defaults cut off 34 nodes as uninformative, either because they are to rare, or ubiquitous.
  
 %: floating figure
 \begin{figure}[htbp]
@@ -801,6 +801,7 @@ sprof02 <- sprof01
 sprof02$info$id <- "sprof02"
 @
 
+<<>>=
 basetrim <- 13
 sprof02$stacks$nodes <- sapply(sprof02$stacks$nodes, 
 	function (x){if (length(x)> basetrim) x[-(1:basetrim)] })
@@ -822,7 +823,7 @@ print(xtable(sprof02$nodes, caption="sprof02, before update",
 sprof02 <- updateRprof(sprof02)
 sprof02$info$id <- "sprof02 updated"
 @
-
+<<>>=
 #xtable(summary(sprof02))
 #summary(sprof02)
 strx(sprof02$info)

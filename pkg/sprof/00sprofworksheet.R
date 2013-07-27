@@ -92,7 +92,7 @@ plot_stacks(rpo)
 plot_profiles(rpo)
 
 ###
-                                                                                                                                                      prompt <- function(name){
+                                                                                                                                                  prompt <- function(name){
 promptClass(clName, filename = NULL, type = "class",
             keywords = "classes", where = topenv(parent.frame()),
             generatorName = clName)
@@ -147,7 +147,6 @@ setwd("/Users/gs/projects/rforge/sintro/pkg/sprof/")
 
 remove.packages("sprof")
 install.packages("/Users/gs/projects/rforge/sintro/pkg/sprof_0.0-5.tar.gz", repos=NULL, type="source")
-
 ##
 vignette <- function(){ 
 options(width=72); setwd("/Users/gs/projects/rforge/sintro/pkg/sprof/work/vignettes/" )
