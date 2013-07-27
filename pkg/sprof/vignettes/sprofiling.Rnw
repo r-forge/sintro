@@ -1,6 +1,10 @@
 %!TEX root = /Users/gs/projects/rforge/sintro/pkg/sprof/work/vignettes/sprofiling.tex
 % -*- mode: noweb; noweb-default-code-mode: R-mode; -*-
-%$HeadURL$x
+%#$HeadURL$
+%#$Id$
+%#$Date$
+%#$Author$
+%#$Revision$
 
 \listfiles
 
@@ -183,7 +187,13 @@ Print parameters used here:
 options(width = 72)
 options(digits = 6)
 @
-
+For \ircode{str} output, we generally use these settings:
+<<>>=
+strx <- function(x, ...){
+	str(x, max.level=2, vec.len=3, nchar.max=40, list.len=6,
+	width=70, strict.width="wrap",...)
+}
+@
 %This is just a hack to get a nicer output from args:
 %<<>>=
 %prargs <- function(x){ str(args(x))}
@@ -329,7 +339,7 @@ The basic \R{} functions invite us to get a summary.
 <<>>=
 sumRprofRegressionExpl <- summaryRprof("RprofsRegressionExpl01.out")
 #str(profile_nodes_rle, max.level=2, vec.len=3, nchar.max=40, list.len=6)
-str(sumRprofRegressionExpl, vec.len=3)
+strx(sumRprofRegressionExpl)
 @
 
 The summary reduces the information contained in the profile to marginal statistics per node. This is provided in two data frames giving the same information, only in different order.
@@ -351,10 +361,18 @@ prxt(sumRprofRegressionExpl$by.total[sumRprofRegressionExpl$by.total$total.time>
 \filledpagebreak
 \subsubsection{Package sprof}
 \label{subsec:sprof}
-In contrast to the common \R{} packages, in our implementation we take a two step approach. First we read in the profile file to an internal representation. Analysis is done in later steps.
+In contrast to the common \R{} packages, in the \ircode{sprof} implementation we take a two step approach. First we read in the profile file to an internal representation. Analysis is done in later steps.
 
 <<>>=
 sprof01<- readRprof("RprofsRegressionExpl01.out")
+@
+The data contain identification information for reference. This will be used in the functions of \ircode{sprof} and shown in the displays. Here is the summary of this section:
+<<>>=
+str(sprof01$info)
+@
+For this vignette, we change the \ircode{id} information. So in this context:
+<<>>=
+sprof01$info$id <- "sprof01"
 @
 
 We keep this example and use the copy \ircode{sprof01} of it extensively for illustration.
@@ -362,6 +380,8 @@ We keep this example and use the copy \ircode{sprof01} of it extensively for ill
 save(sprof01, file="sprof01lm.RData")
 @
 To run the vignette with a different profile, replace \ircode{sprof01} by your example. You still have the file for reference.
+ d
+The data contain identification information for reference. This will be used in 
 
 Package \ircode{sprof} provides a function \irfunx{misc}{sampleRprof} to take a sample and create a profile on the fly, as in
 <<eval=FALSE>>=
@@ -370,8 +390,7 @@ sprof01temp <- sampleRprof(runif(10000), runs=100)
 The basic data structure consists of four data frames. The \ircode{info} section collects global information from the input file, such as an identification strings and various global matrix. The \ircode{nodes} section initially gives the same information marginal information as  \ircode{summaryRprof}. The \ircode{stacks} section puts the node information into their calling context as found in the input profile file. The \ircode{profiles} section gives the temporal context. It is implemented as a list, but conceptually it is a data frame. Implementing it as a list allows run length encoding of variables, which unfortunately is not allowed by \R{} in data frames.
 \todo{add sampling.interval, sampling.time for backward compability}
 <<>>=
-#str(profile_nodes_rle, max.level=2, vec.len=3, nchar.max=40, list.len=6)
-str(sprof01, max.level=2, vec.len=3,nchar.max=40)
+strx(sprof01)
 @
 The nodes do not come in a specific order. Access via a permutation vector is preferred. This allows different views on the same data set. For example, \vref{tab:prspbt} uses a permutation by total time, and a selection (compare to \vref{tab:prSRREbt}). The only difference is that \ircode{sprof} works uses a millisecond (ms) base, whereas \R{} in general uses seconds as a base. 
 
@@ -394,14 +413,48 @@ Given the sampling structure of the profiles, two aspect are common. The samplin
 
 Common rearrangements as by total time and by self time are supplied by the display functions.
 
-Plot, for example, currently gives a choice of four displays for nodes, and supports trimming by default. Our profile starts with 62 nodes. The defaults cut off 34 nodes as uninformative, either because they are to rare, or ubiquitous.
+irfunx{hplot}{plot_nodes}, for example, currently gives a choice of four displays for nodes, and supports trimming by default. Our profile starts with 62 nodes. The defaults cut off 34 nodes as uninformative, either because they are to rare, or ubiquitous.
  
-<<fig=TRUE, label=sREplotnodes01, width=10, height=10>>=
+%: floating figure
+\begin{figure}[htbp]
+\begin{center}
+<<fig = TRUE, echo = TRUE, print = FALSE, label=sREplotnodes01, width=10, height=10>>=
 #10
 oldpar <- par(mfrow=c(2,2))
 plot_nodes(sprof01)
 par(oldpar)
 @
+\caption{Basic information on node level}
+\label{fig:sREplotnodes01}
+\end{center}
+\end{figure}
+
+See \vref{fig:sREplotnodes01}.
+
+% floating figure end
+
+Information in the scatterplots may sometimes more accessible
+when using a logarithmic scale, so this is added.
+
+If you prefer, you can have the bar charts in horizontal layout, giving more space for labels.
+%: floating figure
+\begin{figure}[htbp]
+\begin{center}
+<<fig = TRUE, echo = TRUE, print = FALSE, label=sREplotnodes01h, width=8, height=8>>=
+#8
+oldpar <- par(mfrow=c(2,2))
+plot_nodes(sprof01)
+par(oldpar)
+@
+\caption{Basic information on node level}
+\label{fig:sREplotnodes01h}
+\end{center}
+\end{figure}
+
+See \vref{fig:sREplotnodes01h}.
+
+% floating figure end
+
 We can add colour. To illustrate this, we encode the frequency of the nodes as colour. As a palette, we choose a heat map here. 
 \todo{apply colour to selection?}
 \todo{spread colour on displayed part}
@@ -410,15 +463,32 @@ freqrank01 <- rank(-sprof01$nodes$total.time, ties.method="random")
 freqrankcol01 <- heat.colors(length(freqrank01))
 @
 Here is the node view using these choices:
-<<fig=TRUE, label=sREplotnodes01freqcol, width=10, height=10>>=
+%: floating figure
+\begin{figure}[htbp]
+\begin{center}
+<<fig = TRUE, echo = TRUE, print = FALSE, label=sREplotnodes01freqcol, width=10, height=10>>=
 #10
 sprof01$nodes$icol <- freqrank01
 oldpar <- par(mfrow=c(2,2))
 plot_nodes(sprof01, col=freqrankcol01)
 par(oldpar)
 @
-Colour is considered a volatile attribute. So you may need to pay some attention to keep colour indices (and colour palettes) aligned to your context.\todo{support colour in a structure}
-@
+\caption{Basic information on node level, colour by total time.}
+\label{fig:sREplotnodes01freqcol}
+\end{center}
+\end{figure}
+
+See \vref{fig:sREplotnodes01h}.
+
+% floating figure end
+
+
+Colour is considered a volatile attribute. So you may need to pay some attention to keep colour indices (and colour 
+palettes) aligned to your context. You may want to do experiments with colour, trying to find a good solution for your 
+visual preferences. The recommended way is to use some stable colour index (the slot \ircode{icol} is reserved for this) and use this as an index to a choice of colour palettes. So \ircode{icol} becomes a part of the data structure, and the colour palette to be used is passed as a parameter.
+
+\todo{improve colour: support colour in a structure}
+
 \subsubsection{Node classes}
 We can add attributes to the plots. But we can also add attributes to the nodes, and use these in the plots. In principle, this has been alway available. We are now making explicit use of this possibility.
 
@@ -525,7 +595,6 @@ adds a sticky color attribute. To interpret, you should choose your preferred co
 <<>>=
 classcol <- c("red", "green", "blue", "yellow", "cyan", "magenta", "purple")
 @
-\todo{plot\_nodes: make col explicite}
 \todo{Defaults by class}
 
 %: floating figure
@@ -533,11 +602,11 @@ classcol <- c("red", "green", "blue", "yellow", "cyan", "magenta", "purple")
 \begin{center}
 <<fig = TRUE,  label=sREplotnodes01col, width=10, height=15>>= 
 oldpar <- par(mfrow=c(3,2))
-plot_nodes(sprof01, col=classcol)
-plot(table(sprof01$nodes$icol),  
-	type="h", lwd=20, col=classcol, lend="square", ylab="count")
-nodescloud(sprof01, min.freq=5, 
-		col=classcol)
+plot_nodes(sprof01, which=1:6, col=classcol)
+#plot(table(sprof01$nodes$icol),  
+#	type="h", lwd=20, col=classcol, lend="square", ylab="count")
+#nodescloud(sprof01, min.freq=5, 
+#		col=classcol)
 par(oldpar)
 @
 
@@ -549,8 +618,26 @@ par(oldpar)
 See \vref{fig:sREplotnodes01col}.
 
 % floating figure end
+%: floating figure
+\begin{figure}[htbp]
+\begin{center}
+<<fig = TRUE,  label=sREplotnodes01colcb, width=10, height=15>>= 
+oldpar <- par(mfrow=c(3,2))
+plot_nodes(sprof01, which=1:6)
+par(oldpar)
+@
 
-You can break down the frequency by the classes you have define. But beware of Simpson's paradox. The information you think you see may be strongly affected by your choices - what you see are reflections of conditional distributions. These may be very different from the global picture.
+\caption{Nodes by package: default colour selection}
+\label{fig:sREplotnodes01colcb}
+\end{center}
+\end{figure}
+
+See \vref{fig:sREplotnodes01colcb}.
+
+% floating figure end
+
+
+You can break down the frequency by  classes of your choice. But beware of Simpson's paradox. The information you think you see may be strongly affected by your choices - what you see are reflections of conditional distributions. These may be very different from the global picture.
 
 @
 %wordcloud(words,freq,
@@ -560,7 +647,7 @@ You can break down the frequency by the classes you have define. But beware of S
 %	colors="black",ordered.colors=FALSE,
 %	use.r.layout=FALSE,fixed.asp=TRUE, ...)
 If package \ircode{wordcloud} is installed, a different view is possible. This is added in the plots above.
-\todo{make more flexible and add to plot\_node}
+
 
 @
 \section{A better grip on profile information}
@@ -711,6 +798,9 @@ rm(sprof01adjNEL);
 Before starting additional inspection, the data better be trimmed. 
 <<>>=
 sprof02 <- sprof01
+sprof02$info$id <- "sprof02"
+@
+
 basetrim <- 13
 sprof02$stacks$nodes <- sapply(sprof02$stacks$nodes, 
 	function (x){if (length(x)> basetrim) x[-(1:basetrim)] })
@@ -720,7 +810,7 @@ sprof02$stacks$nodes <- sapply(sprof02$stacks$nodes,
 \todo{handle empty stacks and zero counts gracefully}
 At this point, it is a decision whether to adapt the timing information, or keep the original information. Since this decision does affect the structural information, it is not critical. But analysis is easier if unused nodes are eliminated.\todo{add ?? function}
 <<>>=
-str(sprof02$info)
+strx(sprof02$info)
 <<print=FALSE,  results=tex, label=tab:sprof02info1>>=
 print(xtable(sprof02$nodes, caption="sprof02, before update", 
 	label="tab:sprof02info1"),floating=FALSE, 
@@ -730,20 +820,33 @@ print(xtable(sprof02$nodes, caption="sprof02, before update",
 #str(sprof02)
 << label=sprof02Upd>>=
 sprof02 <- updateRprof(sprof02)
+sprof02$info$id <- "sprof02 updated"
+@
+
 #xtable(summary(sprof02))
 #summary(sprof02)
-str(sprof02$info)
+strx(sprof02$info)
 <<print=FALSE, results=tex, label=tab:sprof02info2>>=
-print(xtable(sprof02$nodes, caption="sprof02, after update", 
-	label="tab:sprof02info2"),floating=FALSE, 
-		tabular.environment="longtable", 
-		caption.placement="top",
-		NA.string="\\vdots")
+prxt(sprof02$nodes, caption="sprof02, after update", 
+	label="tab:sprof02info2")
+	
 @
-<<fig=TRUE, label= shownodes02, width=8, height=8>>=
+%: floating figure
+\begin{figure}[htbp]
+\begin{center}
+<<fig = TRUE, echo = TRUE, print = FALSE, label=shownodes02, width=8, height=8>>= 
 #8
 shownodes(sprof02)
 @
+\caption{Nodes by stack and profile}
+\label{fig:shownodes02}
+\end{center}
+\end{figure}
+
+See \vref{fig:shownodes02}.
+
+% floating figure end
+
 \subsubsection{Trimming}
 \todo{trimexample}
 
@@ -862,8 +965,8 @@ This gives a detailed information about the presence time of each node, by stack
 profile_nodes <- profiles_matrix(sprof02)
 
 profile_nodes_rle<- rrle(profile_nodes)
-# str(profile_nodes_rle)
-str(profile_nodes_rle, max.level=2, vec.len=3, nchar.max=40, list.len=6)
+
+strx(profile_nodes_rle)
 @
 %<<>>=
 %# can we trust factor handling? For now, let us play it safe.
@@ -906,9 +1009,8 @@ profile_nodes_rlearray <- array(0,
 	dimnames= list("node"=sprof02$nodes$name[1:maxnode], 
 		"level"=1:length(profile_nodes_rle), 
 		"run_length"=1:maxlen))
-#str(profile_nodes_rle, max.level=2, vec.len=3, nchar.max=40, list.len=6)
 
-str(profile_nodes_rlearray, max.level=2, vec.len=3,nchar.max=40, list.len=6)
+strx(profile_nodes_rlearray)
 
 for (lev in (1:maxlevel) ) {
 	proflev <- profile_nodes_rle[[lev]]
@@ -980,9 +1082,7 @@ barplot_s(runif(10))
 << label=tab:prSREinfo>>=
 # xtable cannot handle posix, so we use print output here
 #  str(profile_nodes_rle, max.level=2, vec.len=3, nchar.max=40, list.len=6)
-str(sprof01$info,
-	caption="splot node info", 
-	label="tab:prSREinfo0")
+strx(sprof01$info)
 @
 
 %As a convention, we do not re-arrange items for ad-hoc choices, but use a permutation 
@@ -1057,17 +1157,18 @@ prxt(sprof01$nodes,
 %	label="tab:prSREstacks")
 \filledpagebreak
 <<label=tab:prSREstacks>>=
-str(sprof01$stacks,  max.level=2, vec.len=6,
-	nchar.max=40, list.len=20,width=70, strict.width="wrap")
+#str(sprof01$stacks,  max.level=2, vec.len=6,
+#	nchar.max=40, list.len=20,width=70, strict.width="wrap"
+strx(sprof01$stacks)
 @
 A summary is provided on request.
 <<label=sumsprof01>>=
 sumsprof01 <- summary.sprof(sprof01)
 #str(profile_nodes_rle, max.level=2, vec.len=3, nchar.max=40, list.len=6)
-str(sumsprof01, max.level=2, vec.len=3, 
-	nchar.max=40,  list.len=6,
-	width=70, strict.width="wrap"
-)
+strx(sumsprof01)
+#str(sumsprof01, max.level=2, vec.len=3, 
+#	nchar.max=40,  list.len=6,
+#	width=70, strict.width="wrap")
 @
 
 The classical approach hides the work that has been done. Actually it breaks down the data to record items. This figure is not reported anywhere. In our case, it can be reconstructed. The profile data have 8456 words in 524 lines.
@@ -1095,6 +1196,7 @@ par(oldpar)
 \todo{fix null name}
 <<>>=
 sprof03 <- readRprof("RprofsRegressionExpl03.out")
+sprof03$info$id <- "sprof03"
 #sprof03$nodes$name[1] <-  sprof03$nodes$name[2]
 #sprof03$nodes$name[1]<-"<noop>"??
 @

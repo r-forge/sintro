@@ -1,3 +1,8 @@
+%#$HeadURL$
+%#$Id$
+%#$Date$
+%#$Author$
+%#$Revision$
 \name{plot_nodes}
 \alias{plot_nodes}
 %- Also NEED an '\alias' for EACH other topic documented here.
@@ -7,7 +12,7 @@
 \usage{
 plot_nodes(x, which = c(1L, 2L, 3L, 4L), col = NULL, 
 ask = prod(par("mfcol")) < length(which) && dev.interactive(), 
-src = NULL, mincount = 5, ...)
+src = NULL, mincount = 5, horiz=FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -20,7 +25,7 @@ Colour table
   \item{src}{
 String to be used as source identifier.}
   \item{mincount}{minimum total frequency count for node to be shown in barcharts.}
-
+  \item{horiz}{draw horizontal bar plots.}
   \item{\dots}{passed.}
 
 }
