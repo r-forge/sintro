@@ -1,10 +1,17 @@
+%#$HeadURL$
+%#$Id$
+%#$Date$
+%#$Author$
+%#$Revision$
 \name{plot_stacks}
 \alias{plot_stacks}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Plot profiling information on stack level.}
 \description{Various plots of a profile. }
 \usage{
-plot_stacks(x, which = c(1L, 2L), ask = prod(par("mfcol")) < length(which) && dev.interactive(), src = NULL, mincount = 5, ...)
+plot_stacks(x, which = c(1L, 2L), 
+	ask = prod(par("mfcol")) < length(which) && dev.interactive(), 
+	src = NULL, mincount = 5, horiz = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -13,17 +20,15 @@ plot_stacks(x, which = c(1L, 2L), ask = prod(par("mfcol")) < length(which) && de
 
   \item{ask}{boolean. Ask for a new page?}
   \item{src}{String to be used as source identifier.}
-  \item{mincount}{minimum total frequency count for stack to be shown in barcharts.
-}
- \item{\dots}{
-passed.
-}
+  \item{mincount}{minimum total frequency count for stack to be shown in barcharts.}
+  \item{horiz}{draw horizontal bar plots.}
+ \item{\dots}{passed.}
 }
 \details{
 %\if{html}{\figure{logo.jpg}{Our logo}}
 %\if{latex}{\figure{logo.jpg}{options: width=0.5in}}
 
-Note: these figures may be ourdated. Please run the examples.
+Note: these figures may be outdated. Please run the examples.
 
 Plots are from this collection:
 

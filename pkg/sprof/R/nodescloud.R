@@ -11,11 +11,12 @@
 
 nodescloud <- function(sprof,min.freq=3, col){
 if (require(wordcloud)){
-	wordcloud(sprof$nodes$name, freq = sprof$nodes$total.time,
+	if (inherits(sprof,"sprof")) nodes <- sprof$nodes else nodes <- sprof
+	wordcloud(nodes$name, freq = nodes$total.time,
 		min.freq=min.freq, 
 		random.order=FALSE,
 		rot.per=0.3,
-		colors = col[sprof$nodes$icol],
+		colors = col[nodes$icol],
 		ordered.colors=TRUE)
 		} else {
 			frame()

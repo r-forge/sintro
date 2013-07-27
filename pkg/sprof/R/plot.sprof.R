@@ -8,7 +8,7 @@
 
 plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL, 
 	ask = prod(par("mfcol")) < length(which) && dev.interactive(), 
-	src=NULL, mincount=5, 
+	src=NULL, mincount=5, horiz=FALSE,
 	...){
 		## plot_nodes(sprof01)
 		## full data
@@ -24,6 +24,8 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
 		if (is.null(src))  src<-deparse(substitute(x))
 	}
 	
+	
+	if (horiz) lasb <-2 else lasb <- 0
 
  	nrnodes <- dim(xnodes)[1]
  	totaltime <- sum(xnodes$self.time)
@@ -51,14 +53,15 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
 		
 		#1 scatterplot total ~ self
 		{ if (is.null(xnodes$icol)){
-		plot(xnodes$self.time, xnodes$total.time, xlab="self", 
-		ylab="total", sub=src, main="Nodes by time")
-		if (require(wordcloud)) textplot(xnodes$self.time, xnodes$total.time,xnodes$name, new=FALSE) else
-		text(xnodes$self.time, xnodes$total.time,xnodes$name)} else {
 			plot(xnodes$self.time, xnodes$total.time, xlab="self", 
-		ylab="total", pch=16, col= col[xnodes$icol], sub=src, main="Nodes by time")
-		if (require(wordcloud)) textplot(xnodes$self.time, xnodes$total.time,xnodes$name, new=FALSE) else
-		text(xnodes$self.time, xnodes$total.time,xnodes$name)
+				ylab="total", sub=src, main="Nodes by time")
+			if (require(wordcloud)) textplot(xnodes$self.time, xnodes$total.time,xnodes$name, new=FALSE) else
+				text(xnodes$self.time, xnodes$total.time,xnodes$name)
+			} else {
+				plot(xnodes$self.time, xnodes$total.time, xlab="self", 
+					ylab="total", pch=16, col= col[xnodes$icol], sub=src, main="Nodes by time")
+				if (require(wordcloud)) textplot(xnodes$self.time, xnodes$total.time,xnodes$name, new=FALSE) else
+				text(xnodes$self.time, xnodes$total.time,xnodes$name)
 		}
 		
 		}, 
@@ -72,12 +75,12 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
 			if (is.null(xn$icol)){
 				barplot(xn$self.time,
 					main="Nodes: time as last of stack",
-					names.arg = xn$name, sub=src, ylab="count", xpd=FALSE, ...);
+					names.arg = xn$name, sub=src, ylab="count", xpd=FALSE, horiz=horiz, las=lasb, ...);
 			} else
 			{ 	barplot(xn$self.time,
 					main="Nodes: time as last of stack",
 					names.arg = xn$name, 
-					sub=src, ylab="count",col=col[xn$icol], xpd=FALSE,...)
+					sub=src, ylab="count",col=col[xn$icol], xpd=FALSE, horiz=horiz,  las=lasb,...)
 			}
 
 			legnd(trimmed=trimmed, fulltime=0)
@@ -91,12 +94,14 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
 			if (is.null(xn$icol)){
 				barplot(xn[ordertotal,]$total.time, 
 					main="Nodes: total time in stack",
-					names.arg = xn[ordertotal,]$name, sub=src, ylab="count", xpd=FALSE, ...)
+					names.arg = xn[ordertotal,]$name, sub=src, ylab="count", xpd=FALSE,
+					 horiz=horiz, las=lasb,...)
 				} else {
 				barplot(xn[ordertotal,]$total.time, 
 					main="Nodes: total time in stack",
 					names.arg = xn[ordertotal,]$name, 
-					sub=src, ylab="count", col=col[xn[ordertotal,]$icol], xpd=FALSE,...)
+					sub=src, ylab="count", col=col[xn[ordertotal,]$icol], xpd=FALSE,
+					horiz=horiz, las=lasb,...)
 				}
 			
 			legnd(trimmed=trimmed, fulltime=fulltime)},
@@ -115,9 +120,18 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
 			if (require(wordcloud)) textplot(xnodes$self.time+1, 
 				xnodes$total.time,xnodes$name, new=FALSE, col=col[xnodes$icol]) else
 				text(xnodes$self.time+1, xnodes$total.time,xnodes$name, col=col[xnodes$icol])
-		}
+		}},
 		
-	}
+		#5
+		{ if (is.null(xnodes$icol)){
+			frame()
+			legend("center","icol \n is required for this plot")} else
+			plot(table(xnodes$icol), type="h", lwd=20, col=col, lend="square", ylab="count")
+		},
+		#6
+		{nodescloud(x, min.freq=mincount, col=col)}
+		
+	
 )#switch
 }#for
 #	par(oldpar)
@@ -125,8 +139,9 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
 }# plot_nodes
 
 plot_stacks <- function(x,which=c(1L, 2L),ask = prod(par("mfcol")) < length(which) && dev.interactive(), 
-		src=NULL, mincount=5, 
+		src=NULL, mincount=5, horiz=FALSE,
 		...){
+		#$Id$
 		if (inherits(x,"sprof")) {
 		xstacks <- x$stacks
 		if (is.null(src)) src<-x$info$id
@@ -137,6 +152,11 @@ plot_stacks <- function(x,which=c(1L, 2L),ask = prod(par("mfcol")) < length(whic
 		xstacks <- x	
 		if (is.null(src))  src<-deparse(substitute(x))
 	}
+
+	
+	
+	if (horiz) lasb <-2 else lasb <- 0
+
 
 	#ss <- summary_stacks(xstacks)
 	
@@ -166,7 +186,9 @@ plot_stacks <- function(x,which=c(1L, 2L),ask = prod(par("mfcol")) < length(whic
 			main="Stacks by reference count", 
 			ylab="count",
 			xlab="stack",
-		sub=src,...);
+			horiz=horiz,
+			las=lasb,
+		    sub=src,...);
 		legnd()}
 		)#switch
 	} #for
