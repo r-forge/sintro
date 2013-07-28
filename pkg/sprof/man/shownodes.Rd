@@ -20,7 +20,7 @@ shownodes(sprof, col)
   \item{col}{A colour palette for the plots.}
 }
 \details{
-Note: these figures may be ourdated. Please run the examples.
+Note: these figures may be outdated. Please run the examples.
 
 Plots are from this collection:
 

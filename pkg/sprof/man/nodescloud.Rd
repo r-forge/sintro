@@ -7,16 +7,17 @@
 \name{nodescloud}
 \alias{nodescloud}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{Nodescloud of nodes fromrpofile data}
+\title{Nodescloud of nodes from profile  data}
 \description{
 Show the nodes from a profile, with class encoded as colour and frequency encoded as size.}
 \usage{
-nodescloud(sprof, min.freq = 3, col)
+nodescloud(sprof, min.freq = 3, icol, col)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{sprof}{A data structure as returned by  \code{\link{readRprof}}.}
   \item{min.freq}{Minimum frequency to be included.}
+  \item{icol}{An index vector to colour palette. Defaults to \code{sprof$nodes$icol}.}
   \item{col}{A colour palette.}
 }
 \details{

@@ -43,17 +43,19 @@ Displays of the graph structure are given in the vignette.
 \examples{
 data(sprof01lm)
 
-oldpar <- par(mfrow=c(2,2))
-plot_nodes(sprof01lm)
-par(oldpar)
+plot.sprof(sprof01lm)
 
-oldpar <- par(mfrow=c(2,2))
-plot_stacks(sprof01lm)
-par(oldpar)
-
-oldpar <- par(mfrow=c(2,2))
-plot_profiles(sprof01lm)
-par(oldpar)
+%oldpar <- par(mfrow=c(2,2))
+%plot_nodes(sprof01lm)
+%par(oldpar)
+%
+%oldpar <- par(mfrow=c(2,2))
+%plot_stacks(sprof01lm)
+%par(oldpar)
+%
+%oldpar <- par(mfrow=c(2,2))
+%plot_profiles(sprof01lm)
+%par(oldpar)
 
 }
 
