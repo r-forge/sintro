@@ -9,13 +9,15 @@
 Build instructions and correction notes are placed here.
 Eventually, they will bubble down to other files.
 #####
-
+check index style
+utils::toLatex
+add zero.print from print.table to xtable
 todo <- function(){}
+
 reduce str, summary output
 
 weighted nodes for graphviz
 
-barplot_s
 
 nodei wants to modify sprof argument
 #

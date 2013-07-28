@@ -20,5 +20,6 @@ if (require(wordcloud)){
 		ordered.colors=TRUE)
 		} else {
 			frame()
-			legend("center","package wordcloud \n is required for this plot")}
+			legend("center","package wordcloud \n is required for this plot")
+		}
 	}
