@@ -190,7 +190,8 @@ options(digits = 6)
 For \ircode{str} output, we generally use these settings:
 <<>>=
 strx <- function(x, ...){
-	str(x, max.level=2, vec.len=3, nchar.max=40, list.len=6,
+	str(x, max.level=2, vec.len=3, nchar.max=40, 
+	list.len=12,
 	width=70, strict.width="wrap",...)
 }
 @
@@ -505,14 +506,11 @@ Grouping may also help you to focus your attention. ``HOT'' and ``cold''  may be
 nodekeyword0 <- function(node)
 {
 }
-
 @
-\todo{add class by package for all nodes}
 <<>>=
 nodepackges <- nodepackage(sprof01$nodes$name)
 names(nodepackges) <- sprof01$nodes$name
 table(nodepackges)
-#nodepackges <- lapply(as.character(sprof01$nodes$name),nodepackage0)
 @
 <<>>=
 sprof01$nodes$icol <-as.factor(nodepackges)
@@ -527,9 +525,6 @@ if (require(RColorBrewer)) colpack <- brewer.pal(length(levels(sprof01$nodes$ico
 	colpack <- rainbow(length(levels(sprof01$nodes$icol)))
 
 plot_nodes(sprof01, which=1:6, col=colpack)
-#plot(table(sprof01$nodes$icol),  
-#	type="h", lwd=20,col=colpack, lend="square", ylab="count")
-#nodescloud(sprof01, min.freq=5,  col=colpack)
 par(oldpar)
 @
 
@@ -583,22 +578,20 @@ classcol <- c("red", "green", "blue", "yellow", "cyan", "magenta", "purple")
 \begin{figure}[htbp]
 \begin{center}
 <<fig = TRUE,  label=sREplotnodes01col, width=10, height=15>>= 
+#10 15
 oldpar <- par(mfrow=c(3,2))
 plot_nodes(sprof01, which=1:6, col=classcol)
-#plot(table(sprof01$nodes$icol),  
-#	type="h", lwd=20, col=classcol, lend="square", ylab="count")
-#nodescloud(sprof01, min.freq=5, 
-#		col=classcol)
 par(oldpar)
 @
 
-\caption{Nodes by package}
+\caption{Nodes by class}
 \label{fig:sREplotnodes01col}
 \end{center}
 \end{figure}
 
 Nodes by package: See \vref{fig:sREplotnodes01col}.
 
+\todo{classes need separate colour palette}
 % floating figure end
 %: floating figure
 \begin{figure}[htbp]
@@ -610,12 +603,12 @@ plot_nodes(sprof01, which=1:6)
 par(oldpar)
 @
 
-\caption{Nodes by package: default colour selection}
+\caption{Nodes by class: default colour selection}
 \label{fig:sREplotnodes01colcb}
 \end{center}
 \end{figure}
 
-Nodes by package: default colour selection. See \vref{fig:sREplotnodes01colcb}.
+Nodes by class: default colour selection. See \vref{fig:sREplotnodes01colcb}.
 
 % floating figure end
 
@@ -623,12 +616,6 @@ Nodes by package: default colour selection. See \vref{fig:sREplotnodes01colcb}.
 You can break down the frequency by  classes of your choice. But beware of Simpson's paradox. The information you think you see may be strongly affected by your choices - what you see are reflections of conditional distributions. These may be very different from the global picture.
 
 @
-%wordcloud(words,freq,
-%	scale=c(4,.5),min.freq=3,max.words=Inf,
-%	random.order=TRUE, random.color=FALSE, 
-%	rot.per=.1, 	
-%	colors="black",ordered.colors=FALSE,
-%	use.r.layout=FALSE,fixed.asp=TRUE, ...)
 If package \ircode{wordcloud} is installed, a different view is possible. This is added in the plots above.
 
 
@@ -743,13 +730,42 @@ See \vref{fig:shownodes01rb}.
 %shownodes(sprof01, col=heat.colors(62))
 
 @
-The obvious message is that if seen by stack level, there are different structures. Profiling usually takes place in a framework. So at the base of the stacks, we find entries that are (almost) persistent. Then usually we have some few steps where the algorithm splits, and then we have the finer details. These can be identified using information on the stack level, but of course they are not visible on the node or edge level.
+The obvious message is that if seen by stack level, there are different structures. Profiling usually takes place in a framework. So at the base of the stacks, we find entries that are (almost) persistent. Then usually we have some few steps where the algorithm splits, and then we have the finer details. These can be identified using information on the stack level, but of course they are not visible on the node or edge level in a graph representation. On the stack level, we see a socket. If we want a statistic, we can look at number of different nodes by level.
+@
+%: floating figure
+\begin{figure}[htbp]
+\begin{center}
+<<fig = TRUE, echo = TRUE, print = FALSE, label=nrunique, width=3, height=6>>= 
+stacks_nodes <- list.as.matrix(sprof01$stacks$nodes)
+nrnodes <- apply(stacks_nodes,1,function(x) {length(unique(x))})
+cat("nr unique nodes per stack level\n")
+nrnodes
+plot(x=nrnodes, y= 1:length(nrnodes), xlab="nr of unique nodes", ylab="stack level")
+abline(h=3.5,col="yellow")
+abline(h=12.5,col="yellow")
+@
+\caption{Nr of unique nodes by stack level.}
+\label{fig:nrunique}
+\end{center}
+\end{figure}
 
-Not so often, but a frequent phenomenon is to have some ``burn in'' or ``fade out''. To identify this, we need to look at the profile level.
+Nr of unique nodes by stack level: See \vref{ig:nrunique}. We will come to finer tools in \vref{sec:rle} but for the moment the rough information should suffice to take a decision, with a matter of taste as to go for two levels to cut off, or three. Level three leaves us to start with five roots on the next level in our example.
+
+% floating figure end
+Not so often, but a frequent phenomenon is to have some ``burn in'' or ``fade out''. To identify this, we need to look at the profile level. The indicator to check is to whether we have very low frequency stacks at the beginning or the end of our recording.
+<<>>=
+# reference
+summary(sprof01$stacks$freq)
+#
+df <- data.frame(stack=sprof01$profiles$data, count=sprof01$stacks$refcount[sprof01$profiles$data])
+xcutdata.frame(df, margin=10)
+@
+Here at least two recordings on either side are candidates to be off.
 
 At a closer look, we may find stack patterns (maybe marked by specific nodes) that indicate administrative intervention and rather should be handled as separators between distinct profiles rather than as part of the general dynamics.
 \todo{example}
-Stable framework effect can be detected automatically. ``burn in'' or ``fade out' may need a closer look, and special stacks need and individual inspection on low frequency stacks. 
+
+Stable framework effects sometimes are obvious and can be detected automatically. ``burn in'' or ``fade out' may need a closer look, and special stacks need and individual inspection on low frequency stacks.  Tools for trimming are in \vref{sec:trimming}.
 
 
 \subsection{The free lunch}
@@ -796,22 +812,24 @@ At this point, it is a decision whether to adapt the timing information, or keep
 <<>>=
 strx(sprof02$info)
 <<print=FALSE,  results=tex, label=tab:sprof02info1>>=
-print(xtable(sprof02$nodes, caption="sprof02, before update", 
-	label="tab:sprof02info1"),floating=FALSE, 
-		tabular.environment="longtable", 
-		caption.placement="top",
-		NA.string="\\vdots")
-#str(sprof02)
+prxt(sprof02$nodes,cut=FALSE,  
+	caption="sprof02, before update",label="tab:sprof02info1")
 << label=sprof02Upd>>=
 sprof02 <- updateRprof(sprof02)
 sprof02$info$id <- "sprof02 updated"
 @
+%print(xtable(sprof02$nodes, caption="sprof02, before update", 
+%	label="tab:sprof02info1"),floating=FALSE, 
+%		tabular.environment="longtable", 
+%		caption.placement="top",
+%		NA.string="\\vdots")
+%#str(sprof02)
 <<>>=
 #xtable(summary(sprof02))
 #summary(sprof02)
 strx(sprof02$info)
 <<print=FALSE, results=tex, label=tab:sprof02info2>>=
-prxt(sprof02$nodes, caption="sprof02, after update", 
+prxt(sprof02$nodes, cut=FALSE, caption="sprof02, after update", 
 	label="tab:sprof02info2")
 	
 @
@@ -832,7 +850,13 @@ See \vref{fig:shownodes02}.
 % floating figure end
 
 \subsubsection{Trimming}
+\label{sec:trimming}
+
+\todo{This section needs to be reworked}
+
 \todo{trimexample}
+
+\todo{add trim by keyword}
 
 <<>>=
 trimstacks <- function(sprof, level){
@@ -947,6 +971,7 @@ return(x)
 
 @
 \subsection{Run length}
+\label{sec:rle}
 \todo{needs serious revision}
 \todo{support na removal in rrle}
 For a visual inspection, runs of the same node and level in the profile 
@@ -1112,7 +1137,7 @@ oldpar<-par(mfrow=c(2,2))
 plot_profiles(sprof01)
 par(oldpar)
 @
-We now do a step down analysis. Aggregating the information from the profiling events, we have the frequency of stack references. On the stack level, we encode the frequency in color, and  linking propagates this to the profile level.
+We now do a step down analysis. Aggregating the information from the profiling events, we have the frequency of stack references. On the stack level, we encode the frequency in color, and linking propagates this to the profile level.
 <<fig=TRUE, label=sREplotstacks4col>>=
 stackfreqscore <- rank(sprof01$stacks$refcount,ties.method="random")
 stacksperm <- order(sprof01$stacks$refcount,decreasing=TRUE)

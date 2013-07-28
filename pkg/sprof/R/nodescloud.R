@@ -8,15 +8,15 @@
 # source('~/Documents/lectures/src/insider/profile/sprof/pkg/R/nodescloud.R', chdir = TRUE)
 #! To Do
 #!
-
-nodescloud <- function(sprof,min.freq=3, col){
+nodescloud <- function(sprof,min.freq=3,icol, col){
 if (require(wordcloud)){
 	if (inherits(sprof,"sprof")) nodes <- sprof$nodes else nodes <- sprof
+	if (missing(icol)) icol <- nodes$icol
 	wordcloud(nodes$name, freq = nodes$total.time,
 		min.freq=min.freq, 
 		random.order=FALSE,
 		rot.per=0.3,
-		colors = col[nodes$icol],
+		colors = col[icol],
 		ordered.colors=TRUE)
 		} else {
 			frame()

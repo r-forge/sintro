@@ -60,13 +60,15 @@ barplot_s(height,
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-x <- runif(10)
+x <- runif(100)
 
 barplot_s(x)
+
+x <- rnorm(100)
+
+barplot_s(x, colfun=heat.colors, lowtrim=-1)
 
 rm(x)
 
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{hplot}

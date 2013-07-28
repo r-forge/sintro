@@ -1,37 +1,42 @@
 ------------------------------------------------------------------------
-r176 | gsawitzki | 2013-07-18 22:10:09 +0200 (Thu, 18 Jul 2013) | 1 line
+r184 | gsawitzki | 2013-07-28 13:18:38 +0200 (Sun, 28 Jul 2013) | 1 line
 Changed paths:
    M /pkg/sprof/00sprofworksheet.R
-   M /pkg/sprof/man/figures/rpoplotnodes.pdf
-   M /pkg/sprof/man/figures/rpoplotnodes.png
+   M /pkg/sprof/R/nodescloud.R
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+
+package retrieval for nodes added
+------------------------------------------------------------------------
+r183 | gsawitzki | 2013-07-27 18:58:03 +0200 (Sat, 27 Jul 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/00sprofworksheet.R
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+   M /pkg/sprof/vignettes/sprofiling.pdf
+   M /www/sprof/sprof_internal.pdf
+   M /www/sprof/sprofiling.pdf
+
+sync
+------------------------------------------------------------------------
+r182 | gsawitzki | 2013-07-27 17:52:16 +0200 (Sat, 27 Jul 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/R/nodescloud.R
+   M /pkg/sprof/R/plot.sprof.R
+   M /pkg/sprof/man/plot_nodes.Rd
    M /pkg/sprof/man/plot_stacks.Rd
-   M /pkg/sprof/man/sampleRprof.Rd
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+
+sync
+------------------------------------------------------------------------
+r181 | gsawitzki | 2013-07-26 18:15:13 +0200 (Fri, 26 Jul 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/00sprofworksheet.R
+   M /pkg/sprof/ChangeLog
+   M /pkg/sprof/DESCRIPTION
    M /pkg/sprof/vignettes/sprofiling.Rnw
    M /www/sprof/sprof_internal.pdf
    M /www/sprof/sprofiling.pdf
 
-sprof rle reworked
-------------------------------------------------------------------------
-r177 | gsawitzki | 2013-07-18 22:19:34 +0200 (Thu, 18 Jul 2013) | 1 line
-Changed paths:
-   A /pkg/sprof/R/nodescloud.R
-   A /pkg/sprof/R/shownodes.R
-   A /pkg/sprof/R/updateRprof.R
-   A /pkg/sprof/man/figures/snodes01cloudcol.pdf
-   A /pkg/sprof/man/figures/snodes01cloudcol.png
-   A /pkg/sprof/man/nodescloud.Rd
-   A /pkg/sprof/man/shownodes.Rd
-   A /pkg/sprof/man/updateRprof.Rd
-
-barplot_s added
-------------------------------------------------------------------------
-r179 | gsawitzki | 2013-07-23 21:54:31 +0200 (Tue, 23 Jul 2013) | 1 line
-Changed paths:
-   M /pkg/sprof/00sprofworksheet.R
-   M /pkg/sprof/R/barplot_s.R
-   M /pkg/sprof/tests/barplot_s.R
-
-sync
+color and display improved
 ------------------------------------------------------------------------
 r180 | gsawitzki | 2013-07-24 18:27:41 +0200 (Wed, 24 Jul 2013) | 1 line
 Changed paths:
@@ -47,6 +52,32 @@ Changed paths:
    M /www/sprof/sprofiling.pdf
 
 barplot_s improved
+------------------------------------------------------------------------
+r177 | gsawitzki | 2013-07-18 22:19:34 +0200 (Thu, 18 Jul 2013) | 1 line
+Changed paths:
+   A /pkg/sprof/R/nodescloud.R
+   A /pkg/sprof/R/shownodes.R
+   A /pkg/sprof/R/updateRprof.R
+   A /pkg/sprof/man/figures/snodes01cloudcol.pdf
+   A /pkg/sprof/man/figures/snodes01cloudcol.png
+   A /pkg/sprof/man/nodescloud.Rd
+   A /pkg/sprof/man/shownodes.Rd
+   A /pkg/sprof/man/updateRprof.Rd
+
+barplot_s added
+------------------------------------------------------------------------
+r176 | gsawitzki | 2013-07-18 22:10:09 +0200 (Thu, 18 Jul 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/00sprofworksheet.R
+   M /pkg/sprof/man/figures/rpoplotnodes.pdf
+   M /pkg/sprof/man/figures/rpoplotnodes.png
+   M /pkg/sprof/man/plot_stacks.Rd
+   M /pkg/sprof/man/sampleRprof.Rd
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+   M /www/sprof/sprof_internal.pdf
+   M /www/sprof/sprofiling.pdf
+
+sprof rle reworked
 ------------------------------------------------------------------------
 r166 | gsawitzki | 2013-07-09 23:40:31 +0200 (Tue, 09 Jul 2013) | 1 line
 Changed paths:
@@ -104,58 +135,6 @@ Changed paths:
    M /www/sprof/sprofiling.pdf
 
 sprof rle reworked
-------------------------------------------------------------------------
-r178 | gsawitzki | 2013-07-23 21:13:13 +0200 (Tue, 23 Jul 2013) | 1 line
-Changed paths:
-   M /pkg/sprof/00sprofworksheet.R
-   M /pkg/sprof/DESCRIPTION
-   M /pkg/sprof/R/adjacency.R
-   A /pkg/sprof/R/barplot_s.R
-   M /pkg/sprof/R/list.as.matrix.R
-   A /pkg/sprof/R/nodei.R
-   M /pkg/sprof/R/nodescloud.R
-   M /pkg/sprof/R/plot.sprof.R
-   M /pkg/sprof/R/print.sprof.R
-   M /pkg/sprof/R/profiles_matrix.R
-   M /pkg/sprof/R/readRprof.R
-   M /pkg/sprof/R/rrle.R
-   M /pkg/sprof/R/sampleRprof.R
-   M /pkg/sprof/R/shownodes.R
-   M /pkg/sprof/R/summary.sprof.R
-   M /pkg/sprof/R/updateRprof.R
-   M /pkg/sprof/man/adjacency.Rd
-   A /pkg/sprof/man/barplot_s.Rd
-   A /pkg/sprof/man/figures/barplots.pdf
-   A /pkg/sprof/man/figures/barplots.png
-   M /pkg/sprof/man/list.as.matrix.Rd
-   M /pkg/sprof/man/nodescloud.Rd
-   M /pkg/sprof/man/plot.sprof.Rd
-   M /pkg/sprof/man/plot_nodes.Rd
-   M /pkg/sprof/man/plot_profiles.Rd
-   M /pkg/sprof/man/plot_stacks.Rd
-   M /pkg/sprof/man/print.sprof.Rd
-   M /pkg/sprof/man/print_profiles.Rd
-   M /pkg/sprof/man/profiles_matrix.Rd
-   M /pkg/sprof/man/readRprof.Rd
-   M /pkg/sprof/man/rrle.Rd
-   M /pkg/sprof/man/rrleb.Rd
-   M /pkg/sprof/man/sampleRprof.Rd
-   M /pkg/sprof/man/shownodes.Rd
-   M /pkg/sprof/man/sprof-package.Rd
-   M /pkg/sprof/man/sprof01lm.Rd
-   M /pkg/sprof/man/stackstoadj.Rd
-   M /pkg/sprof/man/str_prof.Rd
-   M /pkg/sprof/man/summary.sprof.Rd
-   M /pkg/sprof/man/summary_terminals.Rd
-   M /pkg/sprof/man/updateRprof.Rd
-   M /pkg/sprof/man/writeRprof.Rd
-   A /pkg/sprof/tests/barplot_s.R
-   M /pkg/sprof/tests/list.as.matrix.R
-   M /pkg/sprof/tests/rrle.R
-   M /pkg/sprof/vignettes/sprofiling.Rnw
-   M /pkg/sprof/vignettes/sprofiling.pdf
-
-barplot_s added
 ------------------------------------------------------------------------
 r166 | gsawitzki | 2013-07-09 23:40:31 +0200 (Tue, 09 Jul 2013) | 1 line
 Changed paths:
