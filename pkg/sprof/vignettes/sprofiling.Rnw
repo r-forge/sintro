@@ -732,24 +732,30 @@ See \vref{fig:shownodes01rb}.
 @
 The obvious message is that if seen by stack level, there are different structures. Profiling usually takes place in a framework. So at the base of the stacks, we find entries that are (almost) persistent. Then usually we have some few steps where the algorithm splits, and then we have the finer details. These can be identified using information on the stack level, but of course they are not visible on the node or edge level in a graph representation. On the stack level, we see a socket. If we want a statistic, we can look at number of different nodes by level.
 @
-%: floating figure
-\begin{figure}[htbp]
-\begin{center}
-<<fig = TRUE, echo = TRUE, print = FALSE, label=nrunique, width=3, height=6>>= 
+<<>>=
 stacks_nodes <- list.as.matrix(sprof01$stacks$nodes)
 nrnodes <- apply(stacks_nodes,1,function(x) {length(unique(x))})
 cat("nr unique nodes per stack level\n")
 nrnodes
+@
+<<fig = TRUE, echo = TRUE, print = FALSE, label=nrunique, width=3, height=6, include = FALSE>>= 
 plot(x=nrnodes, y= 1:length(nrnodes), xlab="nr of unique nodes", ylab="stack level")
-abline(h=3.5,col="yellow")
+abline(h=2.5,col="yellow")
 abline(h=12.5,col="yellow")
 @
+
+%: floating figure
+\begin{figure}[htbp]
+\begin{center}
+%\includegraphics[width = 1in]{S01base-needle40}%
+\includegraphics[width = 2in]{sprofiling-nrunique}%
 \caption{Nr of unique nodes by stack level.}
 \label{fig:nrunique}
 \end{center}
 \end{figure}
-
-Nr of unique nodes by stack level: See \vref{ig:nrunique}. We will come to finer tools in \vref{sec:rle} but for the moment the rough information should suffice to take a decision, with a matter of taste as to go for two levels to cut off, or three. Level three leaves us to start with five roots on the next level in our example.
+\todo{check and synchronize}
+Nr of unique nodes by stack level: See \vref{ig:nrunique}. We will come to finer tools in \vref{sec:rle} but for the moment the rough information should suffice to take a decision.
+%, with a matter of taste as to go for two levels to cut off, or three. Level three leaves us to start with five roots on the next level in our example.
 
 % floating figure end
 Not so often, but a frequent phenomenon is to have some ``burn in'' or ``fade out''. To identify this, we need to look at the profile level. The indicator to check is to whether we have very low frequency stacks at the beginning or the end of our recording.
@@ -1230,9 +1236,25 @@ library(graph)
 a04<-adjacency(sprof04)
 rnames <- rownames(a04)
 rnames[1]<-"noop";rownames(a04) <- rnames; colnames(a04) <- rnames; 
-plot(as(a04,"graphNEL"),  main="graph layout sprof01", cex.main=2)
-@
+a04NEL <- as(a04,"graphNEL")
+nodeRenderInfo(a04NEL) <- list(shape="ellipse")
+nodeRenderInfo(a04NEL) <- list(cex=0.4, shape="ellipse")
+a04NEL <- layoutGraph(a04NEL)
 
+renderGraph(a04NEL)
+
+#plot(a04NEL,  main="graph layout sprof01", 
+#attrs=list(node=list(cex=4,fontsize=40)), cex.main=2)
+@
+%edge.lwd<-sprofadj
+%edge.lwd[edge.lwd>0]<- rank(edge.lwd[edge.lwd>0], ties.method="min")
+%#edge.lwd <- trunc(sprofadj/max(sprofadj)*10)+1
+%edge.lwd <- round(edge.lwd/max(edge.lwd)*12)
+%
+%
+%a04NEL <- layoutGraph(a04NEL,  edgeAttrs=list(lwd=edge.lwd))
+
+%plot(ag, attrs=list(node=list(cex=2,fontsize=40), edge=list(lwd=2,color=c("red","yellow"))), sub="xx", cex=2)
 \section{Standard output}
 
 For a reference, here are complete outputs of the standard function.
