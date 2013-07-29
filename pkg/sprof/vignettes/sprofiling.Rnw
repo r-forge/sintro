@@ -105,13 +105,14 @@
 \section*{Pending changes}
 Warning: this is under construction.
 
-This vignette contains experimental which may sink down to the package implementation, or vanish.
+This vignette contains experimental material which may sink down to the package implementation, or vanish.
 
 Known issues:
 \begin{itemize}
 \item {Control information may be included as special stack in raw format.}
 \item {A list of profiles may become default. Only one profiling interval value per profile.}
-\item {Nodes may be implemented as \ircode{factor}.}
+\item {Nodes may be implemented as \ircode{factor}. Work-around for the \R{} factor handling needs to be added, i.e. \ircode{factor} as a data structure.}
+\item {changing timing interval is too expensive, as rle is not transparent to data frames. Implement profiles as a list, with a time interval attribute per list element.}
 \end{itemize}
 \bigskip
 
@@ -256,6 +257,15 @@ prxt <- function (x, digits=2, cut=TRUE, caption=NULL,
 		
 This is to be used with
 \verb+<<print=FALSE, results =tex, label=tab:prxx>>=+
+
+The graph visualisation family is not friendly. We try to get control by using a wrapper which is at least used to the members of the \ircode{graphviz} clan. This will be used in later sections.
+<<>>=
+plotviz <- function(x,...)
+{
+plot(x,  
+	attrs=list(node=list(cex=4, fontsize=40,  shape="ellipse")), 
+	cex.main=2, ...)
+}
 
 @
 \section{Profiling}
@@ -754,21 +764,26 @@ abline(h=12.5,col="yellow")
 \end{center}
 \end{figure}
 \todo{check and synchronize}
-Nr of unique nodes by stack level: See \vref{ig:nrunique}. We will come to finer tools in \vref{sec:rle} but for the moment the rough information should suffice to take a decision.
+Nr of unique nodes by stack level: See \vref{fig:nrunique}. 
+
+We will come to finer tools in \vref{sec:rle} but for the moment the rough information should suffice to take a decision. In our example, it is only a matter of taste whether we cut off 12 levels, or we want to work with five components afte cuttung 13 levels
 %, with a matter of taste as to go for two levels to cut off, or three. Level three leaves us to start with five roots on the next level in our example.
 
 % floating figure end
-Not so often, but a frequent phenomenon is to have some ``burn in'' or ``fade out''. To identify this, we need to look at the profile level. The indicator to check is to whether we have very low frequency stacks at the beginning or the end of our recording.
+Not so often, but a frequent phenomenon is to have some ``burn in'' or ``fade out''. To identify this, we need to look at the profile level. The indicator to check is to whether we have very low frequency stacks at the beginning or the end of our recording. The counts to be takes as reference can be seen from the summary.
 <<>>=
-# reference
-summary(sprof01$stacks$freq)
+summary(sprof01$stacks$refcount)
 #
+<<>>=
 df <- data.frame(stack=sprof01$profiles$data, count=sprof01$stacks$refcount[sprof01$profiles$data])
-xcutdata.frame(df, margin=10)
+#df <- xcutdata.frame(df, margin=10)
+<<print = FALSE, results = tex, label=tab:margin>>=
+prxt(df, caption="Marginal stacks",
+	label="tab:margin" )
 @
-Here at least two recordings on either side are candidates to be off.
+Here at least one recording on either side is a candidate to be off. We may have a look at the next recordings and decide to go beyond and cut off events $1:3$ and $519:522$.
 
-At a closer look, we may find stack patterns (maybe marked by specific nodes) that indicate administrative intervention and rather should be handled as separators between distinct profiles rather than as part of the general dynamics.
+At a closer look, we may find stack patterns (maybe marked by specific nodes) that indicate administrative intervention and rather should be handled as separators between distinct profiles rather than as part of the general dynamics. Again we may use some indicator nodes to be used as marker for special stacks.
 \todo{example}
 
 Stable framework effects sometimes are obvious and can be detected automatically. ``burn in'' or ``fade out' may need a closer look, and special stacks need and individual inspection on low frequency stacks.  Tools for trimming are in \vref{sec:trimming}.
@@ -792,8 +807,8 @@ If your want to wrap up the information and look at it from a graph point of vie
 #6 sprofadjNEL
 library(graph)
 sprof01adjNEL <- as(adjacency(sprof01),"graphNEL")
-plot(sprof01adjNEL,  main="sprof01: graph layout example", 
-	sub=sprof01$info$id, cex.main=2)
+plotviz(sprof01adjNEL,  main="sprof01: graph layout example", 
+	sub=sprof01$info$id)
 rm(sprof01adjNEL); 
 # detach("package:graph") 
 #! sorry. still needed by Rgraphviz -- clean up
@@ -801,20 +816,26 @@ rm(sprof01adjNEL);
 
 \subsection{Cheap thrills}
 
-Before starting additional inspection, the data better be trimmed. 
+Before starting additional inspection, the data better be trimmed. Trimming routines are in \vref{sec:trimming},
+but the data structure is robust enough to allow manual intervention as used here.
+\todo{updateRprof need careful checking. For now, we are including long listings here to provide the necessary information}
+
 <<>>=
 sprof02 <- sprof01; sprof02$info$id <- "sprof02: trimmed"
 @
-
+On the stack level, we take brute force to cut off the basic stacks.
 <<>>=
 basetrim <- 13
 sprof02$stacks$nodes <- sapply(sprof02$stacks$nodes, 
 	function (x){if (length(x)> basetrim) x[-(1:basetrim)] })
-
-
+@
+We have noted burn in/fade out. This is on the profile level. Taking the big knife is not advisable, since time information and stack data must be synchronized. So we are more cautious.
+<<>>=
+sprof02$profiles$data[1:3] <- NA
+sprof02$profiles$data[519:522] <- NA
 @
 \todo{handle empty stacks and zero counts gracefully}
-At this point, it is a decision whether to adapt the timing information, or keep the original information. Since this decision does affect the structural information, it is not critical. But analysis is easier if unused nodes are eliminated.\todo{add ?? function}
+At this point, it is a decision whether to adapt the timing information, or keep the original information. Since this decision does affect the structural information, it is not critical. But analysis is easier if unused nodes are eliminated.\todo{add a purge function} The \ircode{info} section is inconsistent at this point. Another reason to call \ircode{updateRprof}().
 <<>>=
 strx(sprof02$info)
 <<print=FALSE,  results=tex, label=tab:sprof02info1>>=
@@ -948,8 +969,9 @@ First find the candidates.
 <<>>=
 targeti <- match("lapply", sprof03$nodes$name, nomatch=0)
 found <- lapply(sprof03$stacks$nodes, function(X) match(targeti,X))
-str(found)
-# sas.factor(sprof03$stacks$nodes[!is.na(found)], levels=1: length(sprof03$nodes$name), labels=sprof03$nodes$name)
+found <- data.frame(stack=1:length(found), position=as.matrix(found))
+found[!is.na(found$position),]
+# as.factor(sprof03$stacks$nodes[!is.na(found)], levels=1: length(sprof03$nodes$name), labels=sprof03$nodes$name)
 @
 For now, these are just candidates.
 \todo{implement replacement on the stack level.}
@@ -992,6 +1014,17 @@ profile_nodes <- profiles_matrix(sprof02)
 profile_nodes_rle<- rrle(profile_nodes)
 
 strx(profile_nodes_rle)
+<<>>=
+collapseNA0 <- function(x) 
+{xv <- is.na(x$values)
+xve <- rle(xv)
+xve$values[xve$lengths==1] <- FALSE # ignore single NAns
+xve$pos <- cumsum(xve$lengths) # pos is end position
+xve
+### start replacement here
+}
+c0 <- collapseNA0(profile_nodes_rle[[10]])
+str(c0)
 @
 %<<>>=
 %# can we trust factor handling? For now, let us play it safe.
@@ -1055,11 +1088,11 @@ for (lev in (1:maxlevel) ) {
 This allows us to extract marginal from \ircode{provlev[ node, level, run length]}.
 <<>>=
 node=41
-cat(sprof02$nodes$name[node],"\n")
+cat(as.character(sprof02$nodes$name[node]),"\n")
 
 nn <- profile_nodes_rlearray[node, , ]
 #dimnames(nn)<- list( "level", "run_length")
-nn
+#nn
 print.table(addmargins(nn), zero.print = ".")
 @
 \todo{rescale to application scale}
@@ -1101,9 +1134,8 @@ function(x) print.table(t(x),zero.print = ".") ))
 \todo{add time per call information: add marginals statistics run time by node}
 
 \todo{table:  node \#runs  min  median run length  max}
+
 \section{xxx  -- lost \& found}
-<<fig=TRUE, label=barplot>>=
-barplot_s(runif(10))
 << label=tab:prSREinfo>>=
 # xtable cannot handle posix, so we use print output here
 #  str(profile_nodes_rle, max.level=2, vec.len=3, nchar.max=40, list.len=6)
@@ -1138,10 +1170,7 @@ barplot(sp,
 \filledpagebreak
 On the first look, information on the profile level is not informative. Profile records are just recordings of some step, taken at regular intervals. We get a minimal information, if we encode the stacks in colour.
 \todo{use stack colours}
-<<fig=TRUE, label=sREplotprofiles242, width=12, height=12>>=
-oldpar<-par(mfrow=c(2,2))
-plot_profiles(sprof01)
-par(oldpar)
+
 @
 We now do a step down analysis. Aggregating the information from the profiling events, we have the frequency of stack references. On the stack level, we encode the frequency in color, and linking propagates this to the profile level.
 <<fig=TRUE, label=sREplotstacks4col>>=
@@ -1152,11 +1181,6 @@ stackfreqscore4<- stackfreqscore[stacksperm][stacksnrobsok[stacksperm]]
 barplot(sp[stacksnrobsok[stacksperm]], 
 	main="Stacks, by reference count (4 obs. minimum)", ylab="count > 4",
 	col=rainbow(80)[stackfreqscore4], sub=sprof01$info$id)
-@
-<<fig=TRUE, label=sREplotprofiles4, width=12, height=12>>=
-oldpar<- par(mfrow=c(2,2))
-plot_profiles(sprof01)
-par(oldpar)
 @
 %<<>>=
 %nodesnrobsok <- sprof01$nodes$total.time > 4
@@ -1214,10 +1238,10 @@ Cheap statistics are collected as the come by. For example, from the stacks tabl
 #12 6
 oldpar <- par(mfrow=c(1,2))
 library(graph)
-plot(as(adjacency(sprof01),"graphNEL"),  
-	main="graph layout sprof01", cex.main=2, sub=sprof01$info$id)
-plot(as(adjacency(sprof02),"graphNEL"),  
-	main="graph layout sprof02", cex.main=2, sub=sprof02$info$id)
+plotviz(as(adjacency(sprof01),"graphNEL"),  
+	main="graph layout sprof01", sub=sprof01$info$id)
+plotviz(as(adjacency(sprof02),"graphNEL"),  
+	main="graph layout sprof02", sub=sprof02$info$id)
 par(oldpar)
 @
 \R{} is function based, and control structures in general are implemented as functions. In a graph representation, they appear as nodes, concentrating and seeding to unrelated paths. We can detect these on the stack level and replace them by surrogates, introducing new nodes.
@@ -1231,7 +1255,8 @@ sprof04 <- readRprof("RprofsRegressionExpl03.out"); sprof04$info$id <- "sprof04"
 #sprof04$nodes$name[1]<-"<noop>"??
 @
 \todo{cut top levels}
-<<fig=TRUE, label=sprofadj04NEL, width=24, height=12>>=
+<<fig=TRUE, label=sprofadj04NEL0, width=24, height=12>>=
+#24 12
 library(graph)
 a04<-adjacency(sprof04)
 rnames <- rownames(a04)
@@ -1242,9 +1267,9 @@ nodeRenderInfo(a04NEL) <- list(cex=0.4, shape="ellipse")
 a04NEL <- layoutGraph(a04NEL)
 
 renderGraph(a04NEL)
-
-#plot(a04NEL,  main="graph layout sprof01", 
-#attrs=list(node=list(cex=4,fontsize=40)), cex.main=2)
+<<fig=TRUE, label=sprofadj04NEL1, width=24, height=12>>=
+#24 12 --ellipses are lost?? needs to be recovered
+plotviz(a04NEL,  main="graph layout sprof04 plot")
 @
 %edge.lwd<-sprofadj
 %edge.lwd[edge.lwd>0]<- rank(edge.lwd[edge.lwd>0], ties.method="min")
@@ -1267,22 +1292,22 @@ We omit the (lenghty) print output here and just give the commands as a referenc
 \todo{Clarify:"print prints its argument and returns it invisibly (via invisible(x))." Return the argument, or some print represntation?}
 \todo{is there a print=FALSE variant to postpone printing to e.g. xtable?}
 %<<print=FALSE, results =tex, label=rpoprintnodes>>=
-<<label=rpoprintnodes>>=
+<<label=rpoprintnodes, print=FALSE, eval=FALSE>>=
 print_nodes(sprof)
-<<label=rpoprintstacks>>=
+<<label=rpoprintstacks, print=FALSE, eval=FALSE>>=
 print_stacks(sprof)
-<<label=rpoprintprofiles>>=
+<<label=rpoprintprofiles, print=FALSE, eval=FALSE>>=
 print_profiles(sprof)
 @
 The \irfunx{misc}{print} method for \ircode{sprof} objects concatenates 
 these three functions.
 
 \subsection{Summary}
-<<label=rposumnodes>>=
+<<label=rposumnodes, print=FALSE, eval=FALSE>>=
 summary_nodes(sprof)
-<<label=rposumstacks>>=
+<<label=rposumstacks, print=FALSE, eval=FALSE>>=
 summary_stacks(sprof)
-<<label=rposumprofiles>>=
+<<label=rposumprofiles, print=FALSE, eval=FALSE>>=
 summary_profiles(sprof)
 @
 The \irfunx{misc}{summary} method for \ircode{sprof} objects concatenates 
@@ -1290,20 +1315,20 @@ these three functions.
 
 \filledpagebreak
 \subsection{Plot}
-Looking at lists of numbers is not too informative. We get a first impression 
-by plotting the data. 
-Examples of the plot output is not given here. Please run the examples, or 
-see the \ircode{sprof} package reference.
-%use 
-%	fig=TRUE,  
-%when widht/heifht are fixed.
-<<fig=TRUE, label=sREplotnodes, width=12, height=12>>=
-
-#plot_nodes(sprof01, col=nodescol[nodescore])
-oldpar <- par(mfrow=c(2,2))
-plot_nodes(sprof01)
-par(oldpar)
-@
+%Looking at lists of numbers is not too informative. We get a first impression 
+%by plotting the data. 
+%Examples of the plot output is not given here. Please run the examples, or 
+%see the \ircode{sprof} package reference.
+%%use 
+%%	fig=TRUE,  
+%%when widht/heifht are fixed.
+%<<fig=TRUE, label=sREplotnodes, width=12, height=12>>=
+%
+%#plot_nodes(sprof01, col=nodescol[nodescore])
+%oldpar <- par(mfrow=c(2,2))
+%plot_nodes(sprof01)
+%par(oldpar)
+%@
 %<<fig=TRUE, label=sREplotnodes>>=
 %
 %nodescore <- 
@@ -1313,39 +1338,39 @@ par(oldpar)
 %sprof01$nodes <- cbind(sprof01$nodes,nodescore,nodescol[nodescore])
 %
 %plot_nodes(sprof01, col=nodescol[nodescore])
-<<fig=TRUE,  label=sREplotstacks, width=12, height=6>>=
-oldpar <- par(mfrow=c(1,2))
-plot_stacks(sprof01)
-par(oldpar)
-
-<<fig=TRUE,  label=sREplotprofiles323, width=12, height=12>>=
-oldpar <-par(mfrow=c(2,2))
-plot_profiles(sprof01)
-par(oldpar)
-@
-The \irfunx{misc}{plot} method for \ircode{sprof} objects concatenates 
-these three functions.
-
-<<fig=TRUE,  label=rpoplotnodes, width=12, height=12>>=
-oldpar<- par(mfrow=c(2,2))
-plot_nodes(sprof)
-par(oldpar)
-@
-\filledpagebreak
-<<fig=TRUE,  label=rpoplotstacks, width=12, height=6>>=
-oldpar<- par(mfrow=c(1,2))
-plot_stacks(sprof)
-par(oldpar)
-@
-\filledpagebreak
-<<fig=TRUE,  label=rpoplotprofiles, width=12, height=12>>=
-oldpar<- par(mfrow=c(2,2))
-plot_profiles(sprof)
-par(oldpar)
-@
-The \irfunx{misc}{plot} method for \ircode{sprof} objects concatenates these three functions.
-\filledpagebreak
-
+%<<fig=TRUE,  label=sREplotstacks, width=12, height=6>>=
+%oldpar <- par(mfrow=c(1,2))
+%plot_stacks(sprof01)
+%par(oldpar)
+%
+%<<fig=TRUE,  label=sREplotprofiles323, width=12, height=12>>=
+%oldpar <-par(mfrow=c(2,2))
+%plot_profiles(sprof01)
+%par(oldpar)
+%@
+%The \irfunx{misc}{plot} method for \ircode{sprof} objects concatenates 
+%these three functions.
+%
+%<<fig=TRUE,  label=rpoplotnodes, width=12, height=12>>=
+%oldpar<- par(mfrow=c(2,2))
+%plot_nodes(sprof)
+%par(oldpar)
+%@
+%\filledpagebreak
+%<<fig=TRUE,  label=rpoplotstacks, width=12, height=6>>=
+%oldpar<- par(mfrow=c(1,2))
+%plot_stacks(sprof)
+%par(oldpar)
+%@
+%\filledpagebreak
+%<<fig=TRUE,  label=rpoplotprofiles, width=12, height=12>>=
+%oldpar<- par(mfrow=c(2,2))
+%plot_profiles(sprof)
+%par(oldpar)
+%@
+%The \irfunx{misc}{plot} method for \ircode{sprof} objects concatenates these three functions.
+%\filledpagebreak
+%
 \section{Graph}
 \label{sec:graph}
 Graph layout is a theme of its own. Proposals are readily available, as are their implementation. For some of them, there are \R{} interfaces or re-implementations in \R{}. Their usefulness in our context has to be explored, and the answers will vary with personal preferences. 
@@ -1356,6 +1381,7 @@ For some graph layout packages we illustrate an interface here and show a sample
 \todo{use attributes. Edge with should be easy.}
 \todo{include information from stack connectivity.}
 
+@
 \subsection{Example: regression}
 \label{subsec:graphre}
 
@@ -1383,7 +1409,7 @@ This is  a format any graph package can handle (maybe).
 library(graph)
 sprofadjNEL <- as(sprofadj,"graphNEL")
 <<fig=TRUE, label=sprofadjNEL,width=8, height=8>>=
-plot(sprofadjNEL,  main="sprof01: graph layout", cex.main=2)
+plotviz(sprofadjNEL,  main=paste("graph layout\n",sprof$info$id))
 #detach("package:graph")
 @
 \filledpagebreak
@@ -1392,8 +1418,9 @@ plot(sprofadjNEL,  main="sprof01: graph layout", cex.main=2)
 library(igraph)
 sprofig <- graph.adjacency(sprofadj)
 <<fig=TRUE, label=sprofig,width=8, height=8>>=
-#plot(sprofig, main="sprof01: igraph layout", cex.main=2)
 plot(sprofig, main="sprof01: igraph layout")
+#plot(sprofig, main="sprof01: igraph layout", cex.main=2)
+#plotviz(sprofig, main="sprof01: igraph layout")
 
 detach("package:igraph")
 @
@@ -1421,7 +1448,8 @@ detach("package:network")
 library(Rgraphviz)
 sprofadjRag <- agopen(sprofadjNEL, name="Rprof Example")
 <<fig=TRUE, label=sprofadjvizdot,width=8, height=8>>=
-plot(sprofadjRag, main="sprof01: Graphviz dot layout", cex.main=2)
+# 8 8
+plotviz(sprofadjRag, main="sprof01: Graphviz dot layout")
 @
 %agopen(graph, name, nodes, edges, kind = NULL, layout = TRUE,
 %layoutType = "dot",
@@ -1433,20 +1461,20 @@ plot(sprofadjRag, main="sprof01: Graphviz dot layout", cex.main=2)
 \filledpagebreak
 <<fig=TRUE, label=sprofadjvizneato,width=8, height=8>>=
 #8
-plot(sprofadjRag,"neato", main="sprof01: Graphviz neato layout", cex.main=2)
+plot(sprofadjRag,"neato", main="sprof01: Graphviz neato layout",)
 @
 \filledpagebreak
-<<fig=TRUE, label=sprofadjviztwopi,width=8, height=8>>=
+<<fig=TRUE, label=sprofadjviztwopi,width=6, height=6>>=
 #6
-plot(sprofadjRag,"twopi", main="sprof01: Graphviz twopi layout", cex.main=2)
+plot(sprofadjRag,"twopi", main="sprof01: Graphviz twopi layout")
 @
 \filledpagebreak
 <<fig=TRUE, label=sprofadjvizcirco,width=8, height=8>>=
-plot(sprofadjRag,"circo", main="sprof01: Graphviz circo layout", cex.main=2)
+plot(sprofadjRag,"circo", main="sprof01: Graphviz circo layout")
 @
 \filledpagebreak
 <<fig=TRUE, label=sprofadjvizfdp,width=8, height=8>>=
-plot(sprofadjRag,"fdp", main="sprof01: Graphviz fdp layout", cex.main=2)
+plot(sprofadjRag,"fdp", main="sprof01: Graphviz fdp layout")
 @
 \filledpagebreak
 \subsection{Trimmed example: regression}
@@ -1480,16 +1508,16 @@ This is  a format any graph package can handle (maybe).
 library(graph)
 sprofadjNEL <- as(sprofadj,"graphNEL")
 <<fig=TRUE, label=s04adjNEL,width=8, height=8>>=
-#24
-plot(sprofadjNEL,  main="sprof04: graph layout", cex.main=2)
+#8
+plot(sprofadjNEL,  main="sprof04: graph layout",)
 #detach("package:graph")
 <<fig=TRUE, label=s0418adjNEL, width=18, height=18>>=
 #18
-plot(sprofadjNEL,  main="sprof04: graph layout", cex.main=2)
+plot(sprofadjNEL,  main="sprof04: graph layout",)
 #detach("package:graph")
 <<fig=TRUE, label=s0412adjNEL, width=12, height=12>>=
 #12
-plot(sprofadjNEL,  main="sprof04: graph layout", cex.main=2)
+plot(sprofadjNEL,  main="sprof04: graph layout")
 #detach("package:graph")
 
 @
@@ -1554,7 +1582,7 @@ library(Rgraphviz)
 sprofadjRag <- agopen(sprofadjNEL, name="Rprof Example")
 <<fig=TRUE, label=s04adjvizdot, width=6, height=6>>=
 #6
-plot(sprofadjRag, main="sprof04: Graphviz dot layout", cex.main=2)
+plotviz(sprofadjRag, main="sprof04: Graphviz dot layout")
 @
 %agopen(graph, name, nodes, edges, kind = NULL, layout = TRUE,
 %layoutType = "dot",
@@ -1566,23 +1594,22 @@ plot(sprofadjRag, main="sprof04: Graphviz dot layout", cex.main=2)
 \filledpagebreak
 <<fig=TRUE, label=s04adjvizneato,width=6, height=6>>=
 #6
-plot(sprofadjRag,"neato", main="sprof04: Graphviz neato layout", 
-	cex.main=2)
+plotviz(sprofadjRag,"neato", main="sprof04: Graphviz neato layout")
 @
 \filledpagebreak
 <<fig=TRUE, label=s04adjviztwopi,width=6, height=6>>=
 #6
-plot(sprofadjRag,"twopi", main="sprof04: Graphviz twopi layout")
+plotviz(sprofadjRag,"twopi", main="sprof04: Graphviz twopi layout")
 @
 \filledpagebreak
 <<fig=TRUE, label=sprofadjvizcirco,width=6, height=6>>=
 #6
-plot(sprofadjRag,"circo", main="sprof04: Graphviz circo layout", cex.main=2)
+plotviz(sprofadjRag,"circo", main="sprof04: Graphviz circo layout")
 @
 \filledpagebreak
 <<fig=TRUE, label=s04adjvizfdp,width=6, height=6>>=
 #6
-plot(sprofadjRag,"fdp", main="sprof04: Graphviz fdp layout", cex.main=2)
+plotviz(sprofadjRag,"fdp", main="sprof04: Graphviz fdp layout")
 @
 \index{Index01}
 %:Sweave examples

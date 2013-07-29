@@ -154,6 +154,7 @@ vignette <- function(){
 options(width=72); setwd("/Users/gs/projects/rforge/sintro/pkg/sprof/work/vignettes/" )
 Sweave(file= "../../vignettes/sprofiling.Rnw", output="sprofiling.tex", keep.source=TRUE)
 # debug=TRUE, eps=FALSE, pdf=TRUE, keep.source=TRUE
+tools::compactPDF("sprofiling.pdf", gs_quality = "ebook")
 }
 ##
 
