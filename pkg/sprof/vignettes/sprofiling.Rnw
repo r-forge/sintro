@@ -1109,12 +1109,22 @@ amt <- amt[order(amt[,"total_time"], decreasing=TRUE),]
 print.table(as.table(amt[,1:9]), zero.print = ".") ## ??? print.table changes format when col.10 is present.
 @
 %????????? tex error in table.
-%<<print = FALSE, results = tex, label=tab:pramt>>=
+%cannot handle [. Needs to be replaced by $[$.
+%
 %prxt(amt,
 %	caption="marginal statistics on nodes, sorted by total time used", 
 %	label="tab:pramt")
-@
 
+<<print = FALSE, results = tex, label=tab:pramt1>>=
+xr <- rownames(amt)
+#for (i in (1:length(xr))) {xr[i] <- sub(xr[i],"\\[","$[$", fixed=TRUE)}
+ xr <- paste("$",xr,"$")
+rownames(amt)<- xr
+prxt(amt[amt[,"count"]>1,],
+	caption="marginal statistics on nodes, sorted by total time used, count > 1 only", 
+	label="tab:pramt1")
+@
+See \vref{tab:pramt1}
 %<<>>=
 %prop.table(profile_nodes_rlearray, margin = c(1,3))
 @
