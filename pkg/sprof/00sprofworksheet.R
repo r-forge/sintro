@@ -18,8 +18,16 @@ reduce str, summary output
 
 weighted nodes for graphviz
 
+barplot_s: add cumulative plot/concentration curve
+
+sort stacks
 
 nodei wants to modify sprof argument
+? $R_HOME/etc/Renviron
+
+eapply
+
+packages Matrix, SparseMatrix
 #
 str(profile_nodes_rle, max.level=2, vec.len=3, nchar.max=40, list.len=6 ,width=70, strict.width="wrap")
 
@@ -120,6 +128,7 @@ cd ~/projects/rforge/sintro/pkg/sprof/
 
 lapply(sprofRegressionExpl$stacks$nodes, function(x) {x[-(1:level)]}
 
+cd ~/projects/rforge/sintro/pkg
 svn propset svn:keywords "Date Author Id Revision HeadURL Name" sprof/man/*.Rd
 svn propset svn:keywords "Date Author Id Revision HeadURL  Name" sprof/R/*.R
 svn propset svn:keywords "Date Author Id Revision HeadURL Name" sprof/vignettes/*.Rnw

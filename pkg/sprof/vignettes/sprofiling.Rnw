@@ -122,9 +122,9 @@ Known issues:
 }
 \section*{Profiling facilities in \R{}}
 \R{} provides the basic instruments for profiling, both for time based samplers as for 
-event based instrumentation. Information on \R{} profiling is in Section 3.2 ``Profiling R code for speed'' and section ``3.3 Profiling R code for memory use''. of  Writing R Extensions \url{http://cran.r-project.org/doc/manuals/R-exts.html}. Specific information an memory profiling is in \url{http://developer.r-project.org/memory-profiling.html}.
+event based instrumentation. Information on \R{} profiling is in Section 3.2 ``Profiling R code for speed'' and section ``3.3 Profiling R code for memory use''. of  Writing R Extensions \url{http://cran.r-project.org/doc/manuals/R-exts.html}. Specific information on memory profiling is in \url{http://developer.r-project.org/memory-profiling.html}.
 
-However this source of information seem to be rarely
+However this source of information seems to be rarely
 used.
 
 Maybe the supporting tools are not adequate. The summaries provided by \R{}  reduce the 
@@ -284,7 +284,7 @@ It is only half of the truth that the control graph can serve as a base for the 
 \item[memory management] Allocation of memory, and garbage collection, may interfere and leave their traces in the stack. While allocation is closely related to the visible control flow, garbage collection is a collective effect largely out of control of the code to execute.
 \item[primitives] Internal functions may escape the usual stack conventions and execute without leaving any identifiable trace on the stack.
 \item[control structures] In \R{}, many control structures are implemented as function.
-Most notably, the \irfunx{misc}{apply} family appear as function calls and lead to cliques in the graph representation that do not correspond to relevant structures. Since these functions are well know, they can have a special treatment.
+Most notably, the \irfunx{misc}{apply} family appears as function calls and can lead to cliques in the graph representation that do not correspond to relevant structures. Since these functions are well know, they can have a special treatment.
 \end{description}
 
 So while the stack follows an overall well known dynamics, in \R{} there are exceptions from regularity.
@@ -328,7 +328,7 @@ If we use repeated samples, the usual rules of statistics applies. So taking $10
 %So with $simruns <- 100$, the mean 
 %var mean = var n x / n^2
 
-Following the usal \R{} conventions, seconds are used as time base for parameters. However report will use ms as a time base.
+By the usual \R{} conventions, seconds are used as time base for parameters. However report will use ms as a time base.
 
 Here is an example how to take a profile, using basic \R{}. See \vref{subsec:sprof}
 how to use \ircode{sampleRprof} in package \ircode{sprof}  for an easier solution.
@@ -391,15 +391,13 @@ We keep this example and use the copy \ircode{sprof01} of it extensively for ill
 save(sprof01, file="sprof01lm.RData")
 @
 To run the vignette with a different profile, replace \ircode{sprof01} by your example. You still have the file for reference.
- d
-The data contain identification information for reference. This will be used in 
 
 Package \ircode{sprof} provides a function \irfunx{misc}{sampleRprof} to take a sample and create a profile on the fly, as in
 <<eval=FALSE>>=
 sprof01temp <- sampleRprof(runif(10000), runs=100)
 @
 The basic data structure consists of four data frames. The \ircode{info} section collects global information from the input file, such as an identification strings and various global matrix. The \ircode{nodes} section initially gives the same information marginal information as  \ircode{summaryRprof}. The \ircode{stacks} section puts the node information into their calling context as found in the input profile file. The \ircode{profiles} section gives the temporal context. It is implemented as a list, but conceptually it is a data frame. Implementing it as a list allows run length encoding of variables, which unfortunately is not allowed by \R{} in data frames.
-\todo{add sampling.interval, sampling.time for backward compability}
+\todo{add sampling.interval, sampling.time for backward compatibility}
 <<>>=
 strx(sprof01)
 @
@@ -420,11 +418,11 @@ caption="splot result: by.total, total time > 4ms",
 	label="tab:prspbt")
 @
 \todo{remove text vdots from string/name columns}
-Given the sampling structure of the profiles, two aspect are common. The sampling picks up scafffoling functions with a high, nearly constant frequency. And the sampling will pick up rare recordings that are near to detection range. The display functions hide these effects by default. In our example, about half of the nodes are cleared by this garbage collector.
+Given the sampling structure of the profiles, two aspect are common. The sampling picks up scaffold functions with a high, nearly constant frequency. And the sampling will pick up rare recordings that are near to detection range. The display functions hide these effects by default. In our example, about half of the nodes are cleared by this garbage collector.
 
 Common rearrangements as by total time and by self time are supplied by the display functions.
 
-irfunx{hplot}{plot\_nodes}, for example, currently gives a choice of four displays for nodes, and supports trimming by default. Our profile starts with 62 nodes. The defaults cut off 34 nodes as uninformative, either because they are to rare, or ubiquitous.
+\irfunx{hplot}{plot\_nodes}, for example, currently gives a choice of four displays for nodes, and supports trimming by default. Our profile starts with 62 nodes. The defaults cut off 34 nodes as uninformative, either because they are too rare, or ubiquitous.
  
 %: floating figure
 \begin{figure}[htbp]
@@ -578,7 +576,7 @@ nodeclass[sprof01$nodes$name =="<Anonymous>"] <- "x_Anon"
 <<>>=
 sprof01$nodes$icol <-as.factor(nodeclass)
 @
-adds a sticky color attribute. To interpret, you should choose your preferred color palette, for example \todo{add a reference to colorbrewer}
+adds a sticky colour attribute. To interpret, you should choose your preferred colour palette, for example \todo{add a reference to colorbrewer}
 <<>>=
 classcol <- c("red", "green", "blue", "yellow", "cyan", "magenta", "purple")
 @
@@ -654,7 +652,7 @@ common stumps (if the recording is on a coarser scale). We could exploit this in
 There have  always been interrupts, and these show up in profiles. In \R{}, there is a related 
 problem: garbage collection (GC) may interfere and  leave traces in the stack.
 
-Stack information is first  The call graph is a second instance that is (re)constructed from the stack recording. The graph represents cumulated one-step information. Longer scale information containted in the stacks ist lost in the graph.
+Stack information is first.  The call graph is a second instance that is (re)constructed from the stack recording. The graph represents cumulated one-step information. Longer scale information contained in the stacks is lost in the graph.
 
 Here is the way we represent the profile information:
 
@@ -711,7 +709,7 @@ Sometimes, it is more convenient to use a simple representation, such as a matri
 We now can go beyond node level.
 
 This is what we get for free from the node information on our three levels: node, stack, and profile.
-\todo{check and stabilize color linking}
+\todo{check and stabilise colour linking}
 @
 %<<fig=TRUE, label= shownodes01, width=12, height=12>>=
 %#12 freqrankcol01
@@ -763,10 +761,10 @@ abline(h=12.5,col="yellow")
 \label{fig:nrunique}
 \end{center}
 \end{figure}
-\todo{check and synchronize}
-Nr of unique nodes by stack level: See \vref{fig:nrunique}. 
+\todo{check and synchronise}
+Nr. of unique nodes by stack level: See \vref{fig:nrunique}. 
 
-We will come to finer tools in \vref{sec:rle} but for the moment the rough information should suffice to take a decision. In our example, it is only a matter of taste whether we cut off 12 levels, or we want to work with five components afte cuttung 13 levels
+We will come to finer tools in \vref{sec:rle} but for the moment the rough information should suffice to take a decision. In our example, it is only a matter of taste whether we cut off 12 levels, or we want to work with five components after cutting 13 levels
 %, with a matter of taste as to go for two levels to cut off, or three. Level three leaves us to start with five roots on the next level in our example.
 
 % floating figure end
@@ -792,8 +790,8 @@ Stable framework effects sometimes are obvious and can be detected automatically
 \subsection{The free lunch}
 What you have seen so far is what you get for free when using package \ircode{sprof}.
 \todo{colours. recolour. Propagate colour to graph.}
-@
-If your want to wrap up the information and look at it from a graph point of view, here is just one example. More are in \vref{sec:graph}. But before changing to the graph perspective, we recommend to see the next sections, not to skip them. The preview, at this point, taking package \ircode{graph} as an example:
+
+If you want to wrap up the information and look at it from a graph point of view, here is just one example. More are in \vref{sec:graph}. But before changing to the graph perspective, we recommend to see the next sections, not to skip them. The preview, at this point, taking package \ircode{graph} as an example:
 %<<fig=TRUE, label=sprofadjNEL8, width=8, height=8>>=
 %#8 sprofadjNEL
 %library(graph)
@@ -818,7 +816,7 @@ rm(sprof01adjNEL);
 
 Before starting additional inspection, the data better be trimmed. Trimming routines are in \vref{sec:trimming},
 but the data structure is robust enough to allow manual intervention as used here.
-\todo{updateRprof need careful checking. For now, we are including long listings here to provide the necessary information}
+\todo{updateRprof needs careful checking. For now, we are including long listings here to provide the necessary information}
 
 <<>>=
 sprof02 <- sprof01; sprof02$info$id <- "sprof02: trimmed"
@@ -829,7 +827,7 @@ basetrim <- 13
 sprof02$stacks$nodes <- sapply(sprof02$stacks$nodes, 
 	function (x){if (length(x)> basetrim) x[-(1:basetrim)] })
 @
-We have noted burn in/fade out. This is on the profile level. Taking the big knife is not advisable, since time information and stack data must be synchronized. So we are more cautious.
+We have noted burn in/fade out. This is on the profile level. Taking the big knife is not advisable, since time information and stack data must be synchronised. So we are more cautious.
 <<>>=
 sprof02$profiles$data[1:3] <- NA
 sprof02$profiles$data[519:522] <- NA
@@ -928,9 +926,9 @@ barplot(stf[ostf])
 @
 There is no statistics on profiles. Profiling are our elementary data.
 However we can link to our derived data to get a more informative display.
-For example, going one step back we can encode stacks and use these color codes in the display of a profile.
+For example, going one step back we can encode stacks and use these colour codes in the display of a profile.
 
-Or going two steps back, we can encode nodes in color, giving colored stacks, and use these in the display of profile data.
+Or going two steps back, we can encode nodes in colour, giving coloured stacks, and use these in the display of profile data.
 
 \subsubsection{Surgery}
 Looking at nodes gives you a point-wise horizon. Looking at edges gives you a one step horizon. The stacks give a wider horizon, typically a step size of 10 or more. The stacks we get from \R{} have peculiarities, and we can handle with this broader perspective. These are not relevant if we look point-wise, but may become dominating if we try to get a global picture. We take a look ahead (details to come in \vref{sec:graph} and have a preview how our example is represented as a graph. Left is the original graph as recovered from the edge information,  right the graph after we have cut off the scaffold effects.
@@ -1005,9 +1003,9 @@ return(x)
 For a visual inspection, runs of the same node and level in the profile 
 are easily perceived. For
 an analytical inspection, we have to reconstruct the runs from the data. In stacks, runs 
-are organized hierarchically. On the root level, runs are just ordinary runs. On the next levels, runs have to be defined given (within) the previous runs. So we need a recursive version of \ircode{rle}, applied to the profile information.
+are organised hierarchically. On the root level, runs are just ordinary runs. On the next levels, runs have to be defined given (within) the previous runs. So we need a recursive version of \ircode{rle}, applied to the profile information.
 This gives a detailed information about the presence time of each node, by stack level.
-\todo{use sprof02 or sprof03}
+\todo{use sprof02 or sprof03?}
 <<>>=
 profile_nodes <- profiles_matrix(sprof02)
 
@@ -1034,7 +1032,7 @@ str(c0)
 
 @
 On a given stack level, the run length is the best information on the time used per call, and the run count of a node is the best information on the number of calls. So this is a prime starting point for in-depth analysis.
-\todo{keep as factor. This is a saprse cube with margins node, stack level, run length. Nodes are mostly concentrated on few levels.}
+\todo{keep as factor. This is a sparse cube with margins node, stack level, run length. Nodes are mostly concentrated on few levels.}
 \todo{Warning: data structure still under discussion}
 <<>>=
 # side effect: NAs are removed
@@ -1100,10 +1098,23 @@ print.table(addmargins(nn), zero.print = ".")
 \todo{allow sorting, e.g. by marginals}
 <<>>=
 mt <- margin.table(profile_nodes_rlearray, margin = c(1,3))
-amt <- addmargins(mt)
-amt <- amt[amt[,"Sum"]>0,]
-print.table(amt, zero.print = ".")
+#amt <- addmargins(mt)
+mts <- apply(mt,1,sum)
+mtt <- apply(mt,1,function (x) {sum(x*seq(along.with=x))})
+mtav <- mtt/mts
+amt=cbind(mt,count=mts, total_time=mtt, avg=mtav)
+amt <- amt[amt[,"count"]>0,]
+amt <- amt[order(amt[,"total_time"], decreasing=TRUE),]
+
+print.table(as.table(amt[,1:9]), zero.print = ".") ## ??? print.table changes format when col.10 is present.
 @
+%????????? tex error in table.
+%<<print = FALSE, results = tex, label=tab:pramt>>=
+%prxt(amt,
+%	caption="marginal statistics on nodes, sorted by total time used", 
+%	label="tab:pramt")
+@
+
 %<<>>=
 %prop.table(profile_nodes_rlearray, margin = c(1,3))
 @
@@ -1172,7 +1183,7 @@ On the first look, information on the profile level is not informative. Profile 
 \todo{use stack colours}
 
 @
-We now do a step down analysis. Aggregating the information from the profiling events, we have the frequency of stack references. On the stack level, we encode the frequency in color, and linking propagates this to the profile level.
+We now do a step down analysis. Aggregating the information from the profiling events, we have the frequency of stack references. On the stack level, we encode the frequency in colour, and linking propagates this to the profile level.
 <<fig=TRUE, label=sREplotstacks4col>>=
 stackfreqscore <- rank(sprof01$stacks$refcount,ties.method="random")
 stacksperm <- order(sprof01$stacks$refcount,decreasing=TRUE)
@@ -1226,8 +1237,7 @@ The profile data have 8456 words in 524 lines.
 
 In our approach, we break down the information. Two lines of control information are split 
 off. We have 522 lines of profile with 50 unique stacks, referencing 62 nodes. Instead of 
-reducing it to a summary, we keep the full information. Information is always kept on i
-ts original level. 
+reducing it to a summary, we keep the full information. Information is always kept on its original level. 
 
 On the profiles level, we know the sample interval length, and the id of the stack recorded. On the stack level, for  each stack we have a reference count, with the sample interval lengths used as weights. This reference count is added up for each node in the stack to give the node timings.
 
@@ -1247,29 +1257,96 @@ par(oldpar)
 \R{} is function based, and control structures in general are implemented as functions. In a graph representation, they appear as nodes, concentrating and seeding to unrelated paths. We can detect these on the stack level and replace them by surrogates, introducing new nodes.
 @
 
-@
 \todo{fix null name}
 <<>>=
 sprof04 <- readRprof("RprofsRegressionExpl03.out"); sprof04$info$id <- "sprof04"
 #sprof04$nodes$name[1] <-  sprof04$nodes$name[2]
 #sprof04$nodes$name[1]<-"<noop>"??
 @
+\todo{move to package}
+<<>>=
+# from reshape2
+#' Melt an array.
+#'
+#' This code is conceptually similar to \code{\link{as.data.frame.table}}
+#'
+#' @param data array to melt
+#' @param varnames variable names to use in molten data.frame
+#' @param ... further arguments passed to or from other methods.
+#' @param value.name name of variable used to store values
+#' @param na.rm Should NA values be removed from the data set? This will
+#'   convert explicit missings to implicit missings.
+#' @keywords manip
+#' @S3method melt table
+#' @S3method melt matrix
+#' @S3method melt array
+#' @method melt array
+#' @examples
+#' a <- array(c(1:23, NA), c(2,3,4))
+#' melt(a)
+#' melt(a, na.rm = TRUE)
+#' melt(a, varnames=c("X","Y","Z"))
+#' dimnames(a) <- lapply(dim(a), function(x) LETTERS[1:x])
+#' melt(a)
+#' melt(a, varnames=c("X","Y","Z"))
+#' dimnames(a)[1] <- list(NULL)
+#' melt(a)
+melt.array <- function(data, varnames = names(dimnames(data)), ..., na.rm = FALSE, value.name = "count") {
+  var.convert <- function(x) if(is.character(x)) type.convert(x) else x
+
+  #dn <- amv_dimnames(data)
+  dn <- dimnames(data)
+  names(dn) <- varnames
+  labels <- expand.grid(lapply(dn, var.convert), KEEP.OUT.ATTRS = FALSE,
+    stringsAsFactors = FALSE)
+
+  if (na.rm) {
+    missing <- is.na(data)
+    data <- data[!missing]
+    labels <- labels[!missing, ]
+  }
+
+  value_df <- setNames(data.frame(as.vector(data)), value.name)
+  cbind(labels, value_df)
+}
+@
 \todo{cut top levels}
 <<fig=TRUE, label=sprofadj04NEL0, width=24, height=12>>=
 #24 12
 library(graph)
-a04<-adjacency(sprof04)
+
+asNEL_sprof <- function(sprof){
+a04<-adjacency(sprof)
 rnames <- rownames(a04)
-rnames[1]<-"noop";rownames(a04) <- rnames; colnames(a04) <- rnames; 
+rnames[1]<-"noop"; rownames(a04) <- rnames; colnames(a04) <- rnames; 
+
+el04 <- melt.array(a04)
+el04 <- el04[el04$count !=0,]
+
+el04.lwd <- rank(el04$count, ties.method="min")
+el04$lwd  <- ceiling(el04.lwd /max(el04.lwd )*6)
+
 a04NEL <- as(a04,"graphNEL")
 nodeRenderInfo(a04NEL) <- list(shape="ellipse")
 nodeRenderInfo(a04NEL) <- list(cex=0.4, shape="ellipse")
-a04NEL <- layoutGraph(a04NEL)
 
+#edgeRenderInfo(a04NEL) <- list(lwd=el04$lwd)
+for (i in 1:length(el04$lwd))
+{edgeRenderInfo(a04NEL)$lwd[i] <- el04$lwd[i]}
+a04NEL
+}
+
+a04NEL <- asNEL_sprof(sprof04)
+
+a04NEL <- layoutGraph(a04NEL)
 renderGraph(a04NEL)
-<<fig=TRUE, label=sprofadj04NEL1, width=24, height=12>>=
+<<fig=TRUE, label=sprofadj04NEL1, width=12, height=12>>=
+#12 12 --ellipses are lost!! needs to be recovered
+plot(a04NEL,  main="graph layout sprof04 plot" ,sub="xxx")
+
+<<fig=TRUE, label=sprofadj04NEL1plotviz, width=24, height=12>>=
 #24 12 --ellipses are lost?? needs to be recovered
-plotviz(a04NEL,  main="graph layout sprof04 plot")
+plotviz(a04NEL,  main="graph layout sprof04 plotviz",sub="xxx")
 @
 %edge.lwd<-sprofadj
 %edge.lwd[edge.lwd>0]<- rank(edge.lwd[edge.lwd>0], ties.method="min")
@@ -1282,13 +1359,13 @@ plotviz(a04NEL,  main="graph layout sprof04 plot")
 %plot(ag, attrs=list(node=list(cex=2,fontsize=40), edge=list(lwd=2,color=c("red","yellow"))), sub="xx", cex=2)
 \section{Standard output}
 
-For a reference, here are complete outputs of the standard function.
+For a reference, here are complete outputs of the standard functions.
 
 <<>>=
 sprof <- sprof01
 @
 \subsection{Print}
-We omit the (lenghty) print output here and just give the commands as a reference.
+We omit the (lengthy) print output here and just give the commands as a reference.
 \todo{Clarify:"print prints its argument and returns it invisibly (via invisible(x))." Return the argument, or some print represntation?}
 \todo{is there a print=FALSE variant to postpone printing to e.g. xtable?}
 %<<print=FALSE, results =tex, label=rpoprintnodes>>=
@@ -1375,7 +1452,7 @@ these three functions.
 \label{sec:graph}
 Graph layout is a theme of its own. Proposals are readily available, as are their implementation. For some of them, there are \R{} interfaces or re-implementations in \R{}. Their usefulness in our context has to be explored, and the answers will vary with personal preferences. 
 
-For some graph layout packages we illustrate an interface here and show a sample result. We use the original profile data here. This is a nasty graph with some \R{} stack peculiarites. The corresponding results for the trimmed profile data are shown in the next section \vref{subsec:graphtre}. This is a more realistic example of the kind of graphs you will have to work with.
+For some graph layout packages we illustrate an interface here and show a sample result. We use the original profile data here. This is a nasty graph with some \R{} stack peculiarities. The corresponding results for the trimmed profile data are shown in the next section \vref{subsec:graphtre}. This is a more realistic example of the kind of graphs you will have to work with.
 
 \todo{by graph package: preferred input format?}
 \todo{use attributes. Edge with should be easy.}
@@ -1400,8 +1477,61 @@ There are various packages for finding a graph layout, and the choice is open to
 
 <<>>=
 sprofadj <- adjacency(sprof)
+
+
 @
-This is  a format any graph package can handle (maybe).
+This is  a format any graph package can handle (maybe). To be on the save side, we provide an (extended) edge list. The added component \ircode{lwd} is a proposal for the line width in the graph rendering.
+<<>>=
+# from reshape2
+#' Melt an array.
+#'
+#' This code is conceptually similar to \code{\link{as.data.frame.table}}
+#'
+#' @param data array to melt
+#' @param varnames variable names to use in molten data.frame
+#' @param ... further arguments passed to or from other methods.
+#' @param value.name name of variable used to store values
+#' @param na.rm Should NA values be removed from the data set? This will
+#'   convert explicit missings to implicit missings.
+#' @keywords manip
+#' @S3method melt table
+#' @S3method melt matrix
+#' @S3method melt array
+#' @method melt array
+#' @examples
+#' a <- array(c(1:23, NA), c(2,3,4))
+#' melt(a)
+#' melt(a, na.rm = TRUE)
+#' melt(a, varnames=c("X","Y","Z"))
+#' dimnames(a) <- lapply(dim(a), function(x) LETTERS[1:x])
+#' melt(a)
+#' melt(a, varnames=c("X","Y","Z"))
+#' dimnames(a)[1] <- list(NULL)
+#' melt(a)
+melt.array <- function(data, varnames = names(dimnames(data)), ..., na.rm = FALSE, value.name = "count") {
+  var.convert <- function(x) if(is.character(x)) type.convert(x) else x
+
+  #dn <- amv_dimnames(data)
+  dn <- dimnames(data)
+  names(dn) <- varnames
+  labels <- expand.grid(lapply(dn, var.convert), KEEP.OUT.ATTRS = FALSE,
+    stringsAsFactors = FALSE)
+
+  if (na.rm) {
+    missing <- is.na(data)
+    data <- data[!missing]
+    labels <- labels[!missing, ]
+  }
+
+  value_df <- setNames(data.frame(as.vector(data)), value.name)
+  cbind(labels, value_df)
+}
+sprofedgel <- melt.array(sprofadj)
+sprofedgel <- sprofedgel[sprofedgel$count !=0,]
+
+sprofedgel.lwd <- rank(sprofedgel$count, ties.method="min")
+sprofedgel$lwd  <- ceiling(sprofedgel.lwd /max(sprofedgel.lwd )*12)
+
 @
 \filledpagebreak
 \subsubsection{graph package}
@@ -1438,7 +1568,7 @@ Experiments to include weight. \todo{maximum edge.lwd?}
 edge.lwd<-sprofadj
 edge.lwd[edge.lwd>0]<- rank(edge.lwd[edge.lwd>0], ties.method="min")
 #edge.lwd <- trunc(sprofadj/max(sprofadj)*10)+1
-edge.lwd <- round(edge.lwd/max(edge.lwd)*12)
+edge.lwd <- ceiling(edge.lwd/max(edge.lwd)*12)
 plot(nwsprofadj, label=rownames(sprofadj), main="sprof01: network layout", cex.main=2, edge.lwd=edge.lwd)
 detach("package:network")
 @
