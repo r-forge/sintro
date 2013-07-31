@@ -12,7 +12,7 @@ Profiling, timing and optimization utilitites}
 Package: \tab sprof\cr
 Type: \tab Package\cr
 Version: \tab 0.0-5\cr
-Date: \tab 2013-07-23\cr
+Date: \tab 2013-07-30\cr
 License: \tab GPL-2 | GPL-3\cr
 }
 \code{\link{readRprof}()} reads a profile file from \code{\link{Rprof}()} or other profilers and 
@@ -21,7 +21,8 @@ returns a composite structure of class \code{sprof}. The basic components of \co
 \code{info} \tab general information and summaries\cr
 \code{nodes} \tab node specific information\cr
 \code{stacks} \tab node specific information. Stacks are random snapshots from
-the program execution, possibly including side information such as traces of the memory management\cr
+the program execution, possibly including side 
+information such as traces of the memory management.\cr
 \code{profiles} \tab collected records of a profile, encoded as references to stacks
 }
 
@@ -33,11 +34,12 @@ use \code{\link{readRprof}}.
 For  \code{sprof}, the usual access functions are supported.
 }
 
-\author{Günther Sawitzki <gsawitzki@r-forge.r-project.org>}
+\author{Günther Sawitzki}
 %\references{
 %~~ Literature or other references for background information ~~
 %}
 \keyword{utilities}
+%\keyword{internal}
 %\seealso{
 %\code{\link[proftools:proftools-package]{proftools}}.
  
