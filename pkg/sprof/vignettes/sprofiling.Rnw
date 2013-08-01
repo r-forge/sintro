@@ -171,6 +171,7 @@ You may want to skip this section, unless you want to modify the vignette for yo
 This is the main library we are going to use.
 <<>>=
 library(sprof)
+search()
 @
 
 We want immediate warnings, if necessary. Set to level 2 to handle warnings as error.
@@ -190,10 +191,17 @@ options(digits = 6)
 @
 For \ircode{str} output, we generally use these settings:
 <<>>=
-strx <- function(x, ...){
-	str(x, max.level=2, vec.len=3, nchar.max=40, 
+strx <- function(x, 
+	max.level=2, vec.len=3, 
+	nchar.max=40, 
 	list.len=12,
-	width=70, strict.width="wrap",...)
+	width=70, strict.width="wrap",...){
+	cat(paste("##strx:",deparse(substitute(x)),"\n"))
+	str(x, max.level=max.level, 
+		vec.len=vec.len, 
+		nchar.max=nchar.max, 
+		list.len=list.len,
+		width=width, strict.width=strict.width,...)
 }
 @
 %This is just a hack to get a nicer output from args:
@@ -801,9 +809,11 @@ If you want to wrap up the information and look at it from a graph point of view
 %# detach("package:graph") 
 %#! sorry. still needed by Rgraphviz -- clean up
 @
+<<>>=
+library(graph)
+search() 
 <<fig=TRUE, label=sprofadjNEL6, width=6, height=6>>=
 #6 sprofadjNEL
-library(graph)
 sprof01adjNEL <- as(adjacency(sprof01),"graphNEL")
 plotviz(sprof01adjNEL,  main="sprof01: graph layout example", 
 	sub=sprof01$info$id)
@@ -1106,7 +1116,8 @@ amt=cbind(mt,count=mts, total_time=mtt, avg=mtav)
 amt <- amt[amt[,"count"]>0,]
 amt <- amt[order(amt[,"total_time"], decreasing=TRUE),]
 
-print.table(as.table(amt[,1:9]), zero.print = ".") ## ??? print.table changes format when col.10 is present.
+print.table(as.table(amt[,1:9]), zero.print = ".") 
+## ??? print.table changes format when col.10 is present.
 @
 %????????? tex error in table.
 %cannot handle [. Needs to be replaced by $[$.
@@ -1115,14 +1126,31 @@ print.table(as.table(amt[,1:9]), zero.print = ".") ## ??? print.table changes fo
 %	caption="marginal statistics on nodes, sorted by total time used", 
 %	label="tab:pramt")
 
-<<print = FALSE, results = tex, label=tab:pramt1>>=
+%<<print = FALSE, results = tex, label=tab:pramt1>>=
+%xr <- rownames(amt)
+%#for (i in (1:length(xr))) {xr[i] <- sub(xr[i],"\\[","$[$", fixed=TRUE)}
+% xr <- paste("$",xr,"$")
+%rownames(amt)<- xr
+%amtx <- xtable(amt[amt[,"count"]>1,], digits=c(0,0,0,0,0,0,0,0,0,0 ,2))
+%print(amtx)
+%<<print = FALSE, results = tex, label=tab:pramt2>>=
+%prxt(amtx)
+%<<print = FALSE, results = tex, label=tab:pramt3>>=
+%prxt(amt[amt[,"count"]>1,],
+%	caption="marginal statistics on nodes, sorted by total time used, count > 1 only", 
+%	label="tab:pramt1")
+But \ircode{print.xtable} has no \ircode{zero.print} \ldots
+\typeout{ $[$ needs to be hidden}
+<<print = FALSE, results = tex, label=tab:pramt4>>=
 xr <- rownames(amt)
 #for (i in (1:length(xr))) {xr[i] <- sub(xr[i],"\\[","$[$", fixed=TRUE)}
  xr <- paste("$",xr,"$")
 rownames(amt)<- xr
+
 prxt(amt[amt[,"count"]>1,],
-	caption="marginal statistics on nodes, sorted by total time used, count > 1 only", 
-	label="tab:pramt1")
+	caption="marginal statistics on nodes, \n sorted by total time used,  \n count > 1 only", 
+	label="tab:pramt1", digits=c(0,0,0,0,0,0,0,0,0,0 ,2))
+
 @
 See \vref{tab:pramt1}
 %<<>>=
@@ -1254,10 +1282,12 @@ On the profiles level, we know the sample interval length, and the id of the sta
 Cheap statistics are collected as the come by. For example, from the stacks table it is cheap to identify root and leaf nodes, and this mark is propagated to the nodes table.
 
 \subsection{Graph package}
+<<>>=
+library(graph)
+search() 
 <<fig=TRUE, label=sprofadj01NEL, width=12, height=6>>=
 #12 6
 oldpar <- par(mfrow=c(1,2))
-library(graph)
 plotviz(as(adjacency(sprof01),"graphNEL"),  
 	main="graph layout sprof01", sub=sprof01$info$id)
 plotviz(as(adjacency(sprof02),"graphNEL"),  
@@ -1272,84 +1302,48 @@ par(oldpar)
 sprof04 <- readRprof("RprofsRegressionExpl03.out"); sprof04$info$id <- "sprof04"
 #sprof04$nodes$name[1] <-  sprof04$nodes$name[2]
 #sprof04$nodes$name[1]<-"<noop>"??
-@
-\todo{move to package}
-<<>>=
-# from reshape2
-#' Melt an array.
-#'
-#' This code is conceptually similar to \code{\link{as.data.frame.table}}
-#'
-#' @param data array to melt
-#' @param varnames variable names to use in molten data.frame
-#' @param ... further arguments passed to or from other methods.
-#' @param value.name name of variable used to store values
-#' @param na.rm Should NA values be removed from the data set? This will
-#'   convert explicit missings to implicit missings.
-#' @keywords manip
-#' @S3method melt table
-#' @S3method melt matrix
-#' @S3method melt array
-#' @method melt array
-#' @examples
-#' a <- array(c(1:23, NA), c(2,3,4))
-#' melt(a)
-#' melt(a, na.rm = TRUE)
-#' melt(a, varnames=c("X","Y","Z"))
-#' dimnames(a) <- lapply(dim(a), function(x) LETTERS[1:x])
-#' melt(a)
-#' melt(a, varnames=c("X","Y","Z"))
-#' dimnames(a)[1] <- list(NULL)
-#' melt(a)
-melt.array <- function(data, varnames = names(dimnames(data)), ..., na.rm = FALSE, value.name = "count") {
-  var.convert <- function(x) if(is.character(x)) type.convert(x) else x
 
-  #dn <- amv_dimnames(data)
-  dn <- dimnames(data)
-  names(dn) <- varnames
-  labels <- expand.grid(lapply(dn, var.convert), KEEP.OUT.ATTRS = FALSE,
-    stringsAsFactors = FALSE)
-
-  if (na.rm) {
-    missing <- is.na(data)
-    data <- data[!missing]
-    labels <- labels[!missing, ]
-  }
-
-  value_df <- setNames(data.frame(as.vector(data)), value.name)
-  cbind(labels, value_df)
-}
 @
 \todo{cut top levels}
-<<fig=TRUE, label=sprofadj04NEL0, width=24, height=12>>=
-#24 12
+<<>>=
 library(graph)
+search() 
+<<>>=
 
-asNEL_sprof <- function(sprof){
+asNEL_sprof <- function(sprof, weight=TRUE){
+
 a04<-adjacency(sprof)
+
+
 rnames <- rownames(a04)
-rnames[1]<-"noop"; rownames(a04) <- rnames; colnames(a04) <- rnames; 
+rnames[1]<-"noop"; 
+dimold <- dim(a04)
+if (!weight) {a04 <- as.numeric(a04); dim(a04) <- dimold} #! define lwd first
+rownames(a04) <- rnames; colnames(a04) <- rnames; 
 
-el04 <- melt.array(a04)
-el04 <- el04[el04$count !=0,]
-
+el04 <- edgematrix(a04)
 el04.lwd <- rank(el04$count, ties.method="min")
 el04$lwd  <- ceiling(el04.lwd /max(el04.lwd )*6)
 
+
 a04NEL <- as(a04,"graphNEL")
 nodeRenderInfo(a04NEL) <- list(shape="ellipse")
-nodeRenderInfo(a04NEL) <- list(cex=0.4, shape="ellipse")
+nodeRenderInfo(a04NEL) <- list(cex=0.6, shape="ellipse")
+nodeRenderInfo(a04NEL) <- list(weight=1)
+nodeRenderInfo(a04NEL) <- list(color="yellow")
+
+#nodeRenderInfo(a04NEL) <- list(weight=1)
 
 #edgeRenderInfo(a04NEL) <- list(lwd=el04$lwd)
+#edgeRenderInfo(a04NEL)$lwd <- el04$lwd
 for (i in 1:length(el04$lwd))
 {edgeRenderInfo(a04NEL)$lwd[i] <- el04$lwd[i]}
 a04NEL
 }
 
+<<>>=
 a04NEL <- asNEL_sprof(sprof04)
 
-a04NEL <- layoutGraph(a04NEL)
-renderGraph(a04NEL)
 <<fig=TRUE, label=sprofadj04NEL1, width=12, height=12>>=
 #12 12 --ellipses are lost!! needs to be recovered
 plot(a04NEL,  main="graph layout sprof04 plot" ,sub="xxx")
@@ -1357,6 +1351,23 @@ plot(a04NEL,  main="graph layout sprof04 plot" ,sub="xxx")
 <<fig=TRUE, label=sprofadj04NEL1plotviz, width=24, height=12>>=
 #24 12 --ellipses are lost?? needs to be recovered
 plotviz(a04NEL,  main="graph layout sprof04 plotviz",sub="xxx")
+@
+To  use attributes on nodes and edges, we need \ircode{Rgraphviz}.
+<<>>=
+library(Rgraphviz)
+search()
+<<fig=TRUE, label=sprofadj04NEL00, width=12, height=12>>=
+#12 12
+a04NEL <- layoutGraph(a04NEL)
+renderGraph(a04NEL)
+<<fig=TRUE, label=sprofadj04NEL0, width=10, height=10>>=
+#10 10
+a04NEL0 <- asNEL_sprof(sprof04, weight=FALSE)
+
+a04NEL0 <- layoutGraph(a04NEL0)
+renderGraph(a04NEL0)
+detach(package:Rgraphviz)
+
 @
 %edge.lwd<-sprofadj
 %edge.lwd[edge.lwd>0]<- rank(edge.lwd[edge.lwd>0], ties.method="min")
@@ -1488,56 +1499,10 @@ There are various packages for finding a graph layout, and the choice is open to
 <<>>=
 sprofadj <- adjacency(sprof)
 
-
 @
 This is  a format any graph package can handle (maybe). To be on the save side, we provide an (extended) edge list. The added component \ircode{lwd} is a proposal for the line width in the graph rendering.
 <<>>=
-# from reshape2
-#' Melt an array.
-#'
-#' This code is conceptually similar to \code{\link{as.data.frame.table}}
-#'
-#' @param data array to melt
-#' @param varnames variable names to use in molten data.frame
-#' @param ... further arguments passed to or from other methods.
-#' @param value.name name of variable used to store values
-#' @param na.rm Should NA values be removed from the data set? This will
-#'   convert explicit missings to implicit missings.
-#' @keywords manip
-#' @S3method melt table
-#' @S3method melt matrix
-#' @S3method melt array
-#' @method melt array
-#' @examples
-#' a <- array(c(1:23, NA), c(2,3,4))
-#' melt(a)
-#' melt(a, na.rm = TRUE)
-#' melt(a, varnames=c("X","Y","Z"))
-#' dimnames(a) <- lapply(dim(a), function(x) LETTERS[1:x])
-#' melt(a)
-#' melt(a, varnames=c("X","Y","Z"))
-#' dimnames(a)[1] <- list(NULL)
-#' melt(a)
-melt.array <- function(data, varnames = names(dimnames(data)), ..., na.rm = FALSE, value.name = "count") {
-  var.convert <- function(x) if(is.character(x)) type.convert(x) else x
-
-  #dn <- amv_dimnames(data)
-  dn <- dimnames(data)
-  names(dn) <- varnames
-  labels <- expand.grid(lapply(dn, var.convert), KEEP.OUT.ATTRS = FALSE,
-    stringsAsFactors = FALSE)
-
-  if (na.rm) {
-    missing <- is.na(data)
-    data <- data[!missing]
-    labels <- labels[!missing, ]
-  }
-
-  value_df <- setNames(data.frame(as.vector(data)), value.name)
-  cbind(labels, value_df)
-}
-sprofedgel <- melt.array(sprofadj)
-sprofedgel <- sprofedgel[sprofedgel$count !=0,]
+sprofedgel <- edgematrix(sprofadj)
 
 sprofedgel.lwd <- rank(sprofedgel$count, ties.method="min")
 sprofedgel$lwd  <- ceiling(sprofedgel.lwd /max(sprofedgel.lwd )*12)
@@ -1547,15 +1512,21 @@ sprofedgel$lwd  <- ceiling(sprofedgel.lwd /max(sprofedgel.lwd )*12)
 \subsubsection{graph package}
 <<>>=
 library(graph)
+search() 
+<<>>=
 sprofadjNEL <- as(sprofadj,"graphNEL")
 <<fig=TRUE, label=sprofadjNEL,width=8, height=8>>=
 plotviz(sprofadjNEL,  main=paste("graph layout\n",sprof$info$id))
-#detach("package:graph")
+@
+<<>>=
+detach("package:graph")
 @
 \filledpagebreak
 \subsubsection{igraph package}
 <<>>=
 library(igraph)
+search() 
+<<>>=
 sprofig <- graph.adjacency(sprofadj)
 <<fig=TRUE, label=sprofig,width=8, height=8>>=
 plot(sprofig, main="sprof01: igraph layout")
@@ -1566,8 +1537,10 @@ detach("package:igraph")
 @
 \filledpagebreak
 \subsubsection{network package}
-<<fig=TRUE, label=nwsprofadj,width=8, height=8>>=
+<<>>=
 library(network)
+search()
+<<fig=TRUE, label=nwsprofadj,width=8, height=8>>=
 nwsprofadj <- as.network(sprofadj) # names is not imported 
 network.vertex.names(nwsprofadj) <- rownames(sprofadj) # not honoured by plot
 plot(nwsprofadj, label=rownames(sprofadj), main="sprof01: network layout", cex.main=2)
@@ -1586,8 +1559,11 @@ detach("package:network")
 \subsubsection{Rgraphviz package}
 <<>>=
 library(Rgraphviz)
+search()
+<<>>=
 sprofadjRag <- agopen(sprofadjNEL, name="Rprof Example")
 <<fig=TRUE, label=sprofadjvizdot,width=8, height=8>>=
+
 # 8 8
 plotviz(sprofadjRag, main="sprof01: Graphviz dot layout")
 @
@@ -1600,20 +1576,22 @@ plotviz(sprofadjRag, main="sprof01: Graphviz dot layout")
 %dot, neato, twopi, circo, and fdp.
 \filledpagebreak
 <<fig=TRUE, label=sprofadjvizneato,width=8, height=8>>=
-#8
+#8 8
 plot(sprofadjRag,"neato", main="sprof01: Graphviz neato layout",)
 @
 \filledpagebreak
 <<fig=TRUE, label=sprofadjviztwopi,width=6, height=6>>=
-#6
+#6 6
 plot(sprofadjRag,"twopi", main="sprof01: Graphviz twopi layout")
 @
 \filledpagebreak
 <<fig=TRUE, label=sprofadjvizcirco,width=8, height=8>>=
+#8 8
 plot(sprofadjRag,"circo", main="sprof01: Graphviz circo layout")
 @
 \filledpagebreak
 <<fig=TRUE, label=sprofadjvizfdp,width=8, height=8>>=
+#8 8
 plot(sprofadjRag,"fdp", main="sprof01: Graphviz fdp layout")
 @
 \filledpagebreak
@@ -1646,6 +1624,10 @@ This is  a format any graph package can handle (maybe).
 \subsubsection{graph package}
 <<>>=
 library(graph)
+search()
+@
+Some tests for scaling \ldots
+<<>>=
 sprofadjNEL <- as(sprofadj,"graphNEL")
 <<fig=TRUE, label=s04adjNEL,width=8, height=8>>=
 #8
@@ -1665,6 +1647,8 @@ plot(sprofadjNEL,  main="sprof04: graph layout")
 \subsubsection{igraph package}
 <<>>=
 library(igraph)
+search()
+<<>>=
 sprofig <- graph.adjacency(sprofadj)
 <<fig=TRUE, label=s04ig,width=6, height=6>>=
 #6
@@ -1674,9 +1658,11 @@ detach("package:igraph")
 @
 \filledpagebreak
 \subsubsection{network package}
+<<>>=
+library(network)
+search()
 <<fig=TRUE, label=s04nwsprofadj,width=6, height=6>>=
 #6
-library(network)
 nwsprofadj <- as.network(sprofadj) # names is not imported 
 network.vertex.names(nwsprofadj) <- rownames(sprofadj) # not honoured by plot
 plot(nwsprofadj, label=rownames(sprofadj), 
@@ -1719,9 +1705,11 @@ detach("package:network")
 \subsubsection{Rgraphviz package}
 <<>>=
 library(Rgraphviz)
+search()
+<<>>=
 sprofadjRag <- agopen(sprofadjNEL, name="Rprof Example")
 <<fig=TRUE, label=s04adjvizdot, width=6, height=6>>=
-#6
+#6 6
 plotviz(sprofadjRag, main="sprof04: Graphviz dot layout")
 @
 %agopen(graph, name, nodes, edges, kind = NULL, layout = TRUE,
@@ -1744,7 +1732,7 @@ plotviz(sprofadjRag,"twopi", main="sprof04: Graphviz twopi layout")
 \filledpagebreak
 <<fig=TRUE, label=sprofadjvizcirco,width=6, height=6>>=
 #6
-plotviz(sprofadjRag,"circo", main="sprof04: Graphviz circo layout")
+plotviz(sprofadjRag,"circo", main="sprof04: Graphviz circo layout 6")
 @
 \filledpagebreak
 <<fig=TRUE, label=s04adjvizfdp,width=6, height=6>>=
