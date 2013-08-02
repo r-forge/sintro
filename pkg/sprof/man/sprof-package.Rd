@@ -11,8 +11,8 @@ Profiling, timing and optimization utilitites}
 \tabular{ll}{
 Package: \tab sprof\cr
 Type: \tab Package\cr
-Version: \tab 0.0-5\cr
-Date: \tab 2013-07-30\cr
+Version: \tab 0.0-6\cr
+Date: \tab 2013-08-02\cr
 License: \tab GPL-2 | GPL-3\cr
 }
 \code{\link{readRprof}()} reads a profile file from \code{\link{Rprof}()} or other profilers and 
@@ -34,6 +34,8 @@ use \code{\link{readRprof}}.
 For  \code{sprof}, the usual access functions are supported.
 }
 
+\note{Version 0.0-6 is a clean-up version. Recommendations/requests for the interface 
+definition are requested at this point.}
 \author{Günther Sawitzki <gsawitzki@users.r-forge.r-project.org>}
 %\references{
 %~~ Literature or other references for background information ~~

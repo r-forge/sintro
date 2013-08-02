@@ -9,7 +9,8 @@
 
 \usage{
 barplot_s(height, 
-	sort_by, decreasing = TRUE, 
+	sort_by, 
+	decreasing = TRUE, 
 	lowtrim, hightrim, trimlegend = TRUE, 
 	col, coli, colfun, 
 	main, ...)

@@ -178,8 +178,10 @@ plot_stacks <- function(x,which=c(1L, 2L),ask = prod(par("mfcol")) < length(whic
 
  	for (ip in which){
 		switch(ip,
+		#1
 		plot(xstacks$refcount, xstacks$stacklength, xlab="refcount", ylab="stack length", sub=src), 
-		{ ordercnt  <- order(xstacks$refcount, decreasing=TRUE); id <-seq(along.with=xstacks$refcount)
+		{ ordercnt  <- order(xstacks$refcount, 
+			decreasing=TRUE); id <-seq(along.with=xstacks$refcount)
 			xstacks$id <-  id
 			barplot(xstacks[ordercnt,]$refcount, 
 			names.arg= xstacks[ordercnt,]$id,

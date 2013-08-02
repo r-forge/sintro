@@ -35,9 +35,7 @@ list of run length encoded lines
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 
-\seealso{
- \code{\link{rle}}, ~~~
-}
+\seealso{ \code{\link{rle}}, }
 \examples{
 x <- matrix(c(
 	3,3,4,4,4,

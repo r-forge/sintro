@@ -18,9 +18,15 @@ plot a plot for the output of class \code{scode}.
   \item{x}{A data structure as returned by  \code{\link{readRprof}}.}
   \item{\dots}{further arguments passed to or from other methods.}
 }
-%\details{
-%%  ~~ If necessary, more details than the description above ~~
-%}
+\details{
+%\if{html}{\figure{logo.jpg}{Our logo}}
+%\if{latex}{\figure{logo.jpg}{options: width=0.5in}}
+These displays may be outdated. Please run the examples. Plots are from this collection:
+
+\if{html}{\figure{plotsprof.png}}
+\if{latex}{\figure{plotsprof.pdf}}
+
+}
 \value{subject to change}
 \references{  \url{http://sintro.r-forge.r-project.org/} }
 \note{
@@ -44,22 +50,12 @@ Displays of the graph structure are given in the vignette.
 \examples{
 data(sprof01lm)
 
+oldpar <- par(mfrow=c(3,4))
 plot.sprof(sprof01lm)
-
-%oldpar <- par(mfrow=c(2,2))
-%plot_nodes(sprof01lm)
-%par(oldpar)
-%
-%oldpar <- par(mfrow=c(2,2))
-%plot_stacks(sprof01lm)
-%par(oldpar)
-%
-%oldpar <- par(mfrow=c(2,2))
-%plot_profiles(sprof01lm)
-%par(oldpar)
+par(oldpar)
 
 }
 
 
-\keyword{methods}
+\keyword{hplot}
 \keyword{utilities}

@@ -24,8 +24,8 @@ Note: these figures may be outdated. Please run the examples.
 
 Plots are from this collection:
 
-\if{html}{\figure{rpoplotstacks.png}}
-\if{latex}{\figure{rpoplotstacks.pdf}}
+\if{html}{\figure{sprofiling-shownodes02.png}}
+\if{latex}{\figure{sprofiling-shownodes02.pdf}}
 }
 \value{
 	Used for the side effect of showing the plots.
