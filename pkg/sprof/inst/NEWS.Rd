@@ -11,8 +11,13 @@
 %
 %under construction
 %}
+\section{Changes in version 0.0-6}{
+  \itemize{
+    \item {general clean up. The interface is abotu to be fixed.}
+  }
+}
 
-\section{Changes in version 0.1-5}{
+\section{Changes in version 0.0-5}{
   \itemize{
     \item rle support started
   }

@@ -1,3 +1,34 @@
+-------------------------------------------------------------------------
+r192 | gsawitzki | 2013-08-02 11:59:03 +0200 (Fri, 02 Aug 2013) | 1 line
+
+users added to man email addrs.
+------------------------------------------------------------------------
+r190 | gsawitzki | 2013-08-01 20:06:20 +0200 (Thu, 01 Aug 2013) | 1 line
+Changed paths:
+   A /pkg/sprof/R/edgematrix.R
+   A /pkg/sprof/man/edgematrix.Rd
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+
+edgematrix added, graph sanitizing started
+-----------------------------------------------------------------------
+r188 | gsawitzki | 2013-07-31 18:07:01 +0200 (Wed, 31 Jul 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/00sprofworksheet.R
+   M /pkg/sprof/man/sprof-package.Rd
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+   M /pkg/sprof/vignettes/sprofiling.pdf
+   M /www/sprof/sprof_internal.pdf
+   M /www/sprof/sprofiling.pdf
+
+edge attributes added in graph
+------------------------------------------------------------------------
+r186 | gsawitzki | 2013-07-28 22:32:46 +0200 (Sun, 28 Jul 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/00sprofworksheet.R
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+   M /www/sprof/sprofiling.pdf
+
+working on Graphviz output
 ------------------------------------------------------------------------
 r184 | gsawitzki | 2013-07-28 13:18:38 +0200 (Sun, 28 Jul 2013) | 1 line
 Changed paths:
@@ -6,26 +37,6 @@ Changed paths:
    M /pkg/sprof/vignettes/sprofiling.Rnw
 
 package retrieval for nodes added
-------------------------------------------------------------------------
-r183 | gsawitzki | 2013-07-27 18:58:03 +0200 (Sat, 27 Jul 2013) | 1 line
-Changed paths:
-   M /pkg/sprof/00sprofworksheet.R
-   M /pkg/sprof/vignettes/sprofiling.Rnw
-   M /pkg/sprof/vignettes/sprofiling.pdf
-   M /www/sprof/sprof_internal.pdf
-   M /www/sprof/sprofiling.pdf
-
-sync
-------------------------------------------------------------------------
-r182 | gsawitzki | 2013-07-27 17:52:16 +0200 (Sat, 27 Jul 2013) | 1 line
-Changed paths:
-   M /pkg/sprof/R/nodescloud.R
-   M /pkg/sprof/R/plot.sprof.R
-   M /pkg/sprof/man/plot_nodes.Rd
-   M /pkg/sprof/man/plot_stacks.Rd
-   M /pkg/sprof/vignettes/sprofiling.Rnw
-
-sync
 ------------------------------------------------------------------------
 r181 | gsawitzki | 2013-07-26 18:15:13 +0200 (Fri, 26 Jul 2013) | 1 line
 Changed paths:

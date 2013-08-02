@@ -4,12 +4,32 @@
 #!
 
 # recursive run length encoding of a matrix by row, top down
-rrle <- function(x){
-	collapseNA <- function(xline){
-		
-	}
+rrle <- function(x, collapseNA =FALSE){
+	docollapseNA <- function(x){
+
+# still clumsy. move to R style.
+xv <- is.na(x$values)
+xve <- rle(xv)
+xve$values[xve$lengths==1] <- FALSE # ignore single NAns
+xve$endpos <- cumsum(xve$lengths) # pos is end position
+xve <- as.data.frame(as.list(unclass(xve)))
+xve <- xve[xve$values,]
+xve <- xve[xve[,1]>1,]
+#xve
+if (length(xve)>0)
+for (i in (dim(xve)[1]:1)) {
+xold <- unclass(x);print(xold)
+x$lengths[xve$endpos[i]] <- xve$lengths[i]
+#x <- x[-(xve$endpos[i]- xve$lengths[i]-1) : -(xve$endpos[i]-1)]
+x$lengths <- x$lengths[-((xve$endpos[i]- xve$lengths[i]+1) : (xve$endpos[i]-1))]
+x$values <- x$values[-((xve$endpos[i]- xve$lengths[i]+1) : (xve$endpos[i]-1))]
+}
+return(x)
+}	
+	
 	prevrle <- rle(x[1,])
-	collrle <- list(prevrle)
+	if (collapseNA) collrle <- list(docollapseNA(prevrle)) else
+		collrle <- list(prevrle)
 	#browser()
 	if (nrow(x)>1) {for  (i in (2: nrow(x))) {
 		ni <- length(prevrle$lengths)
@@ -22,7 +42,8 @@ rrle <- function(x){
 		 	thisrle$values <- c(thisrle$values, newrle$values)
 		  }# j
 		  }
-		collrle <-c(collrle,list(thisrle))
+		 if (collapseNA) collrle <- c(collrle,list(docollapseNA(prevrle))) else
+		collrle <- c(collrle,list(thisrle))
 		prevrle <- thisrle
 	} # i
 	}

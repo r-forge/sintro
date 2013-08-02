@@ -16,14 +16,11 @@ src = NULL, mincount = 5, horiz=FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-	  \item{x}{preferably a \code{sprof} object. Other data structures may be extended}
+  \item{x}{preferably a \code{sprof} object. Other data structures may be extended}
   \item{which}{Selector of plots to show.}
-  \item{col}{
-Colour table
-}
+  \item{col}{Colour table}
   \item{ask}{boolean. Ask for a new page?}
-  \item{src}{
-String to be used as source identifier.}
+  \item{src}{String to be used as source identifier.}
   \item{mincount}{minimum total frequency count for node to be shown in barcharts.}
   \item{horiz}{draw horizontal bar plots.}
   \item{\dots}{passed.}
@@ -33,10 +30,10 @@ String to be used as source identifier.}
 \details{
 %\if{html}{\figure{logo.jpg}{Our logo}}
 %\if{latex}{\figure{logo.jpg}{options: width=0.5in}}
-Plots are from this collection:
+These displays may be outdated. Please run the examples. Plots are from this collection:
 
-\if{html}{\figure{rpoplotnodes.png}}
-\if{latex}{\figure{rpoplotnodes.pdf}}
+\if{html}{\figure{sprofiling-sREplotnodes01packcol1.png}}
+\if{latex}{\figure{sprofiling-sREplotnodes01packcol1.pdf}}
 
 }
 \value{

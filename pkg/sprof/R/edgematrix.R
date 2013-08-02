@@ -1,8 +1,8 @@
-#$HeadURL: svn+ssh://gsawitzki@svn.r-forge.r-project.org/svnroot/sintro/pkg/sprof/R/shownodes.R $
-#$Id: shownodes.R 178 2013-07-23 19:13:13Z gsawitzki $
-#$Date: 2013-07-23 21:13:13 +0200 (Tue, 23 Jul 2013) $
-#$Author: gsawitzki $
-#$Revision: 178 $
+#$HeadURL$
+#$Id$
+#$Date$
+#$Author$
+#$Revision$
 #\encoding{utf8}
 # setwd("")
 # source('~/Documents/lectures/src/insider/profile/sprof/pkg/R/edgematrix.R', chdir = TRUE)

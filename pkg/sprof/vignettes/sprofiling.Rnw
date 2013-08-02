@@ -248,17 +248,20 @@ We use the \R{} function \ircode{xtable()} for output and \LaTeX \ \ircode{longt
 <<>>= 
 library(xtable)
 prxt <- function (x, digits=2, cut=TRUE, caption=NULL, 
-	label=NULL, ...)  {
+	label=NULL, zero.print=NULL, print.results=TRUE,...)  {
 	if (cut) {margin <- 10
 	if (nrow(x)> 2*margin+3) x <-xcutdata.frame(x, margin=margin)}
-	print(
+	pr <- print(
 		xtable(x, digits=digits, caption=caption, 
 				label=label, ...), 
 		floating=FALSE, 
 		tabular.environment="longtable", 
 		caption.placement="top",
 		zero.print = ".",
-		NA.string="\\vdots")
+		NA.string="\\vdots", print.results=FALSE)
+		if(!is.null(zero.print)) pr <- gsub( " 0 ",zero.print, x=pr)
+		if (print.results) cat(pr)
+		invisible(pr)
 	}
 @
 %#sanitize.text.function = function(x) { if (x=="\\vdots") " " else if (x=="$") "\\$" else x},
@@ -534,7 +537,7 @@ sprof01$nodes$icol <-as.factor(nodepackges)
 %: floating figure
 \begin{figure}[htbp]
 \begin{center}
-<<fig = TRUE, echo = FALSE, print = FALSE, label=sREplotnodes01packcol1, width=10, height=15>>= 
+<<fig = TRUE, echo = FALSE, print = FALSE, label=sREplotnodes01packcol1, png=TRUE,width=10, height=15>>= 
 oldpar <- par(mfrow=c(3,2))
 
 if (require(RColorBrewer)) colpack <- brewer.pal(length(levels(sprof01$nodes$icol)), "Paired") else 
@@ -756,8 +759,8 @@ nrnodes
 @
 <<fig = TRUE, echo = TRUE, print = FALSE, label=nrunique, width=3, height=6, include = FALSE>>= 
 plot(x=nrnodes, y= 1:length(nrnodes), xlab="nr of unique nodes", ylab="stack level")
-abline(h=2.5,col="yellow")
-abline(h=12.5,col="yellow")
+abline(h=2.5,col="green")
+abline(h=12.5,col="green")
 @
 
 %: floating figure
@@ -781,11 +784,13 @@ Not so often, but a frequent phenomenon is to have some ``burn in'' or ``fade ou
 summary(sprof01$stacks$refcount)
 #
 <<>>=
-df <- data.frame(stack=sprof01$profiles$data, count=sprof01$stacks$refcount[sprof01$profiles$data])
+df <- data.frame(stack=sprof01$profiles$data, 
+	count=sprof01$stacks$refcount[sprof01$profiles$data])
 #df <- xcutdata.frame(df, margin=10)
 <<print = FALSE, results = tex, label=tab:margin>>=
-prxt(df, caption="Marginal stacks",
-	label="tab:margin" )
+prxt(df, caption="Stacks by event: burn in/fade out",
+	label="tab:margin",
+	digits=c(0,0,0) )
 @
 Here at least one recording on either side is a candidate to be off. We may have a look at the next recordings and decide to go beyond and cut off events $1:3$ and $519:522$.
 
@@ -848,7 +853,11 @@ At this point, it is a decision whether to adapt the timing information, or keep
 strx(sprof02$info)
 <<print=FALSE,  results=tex, label=tab:sprof02info1>>=
 prxt(sprof02$nodes,cut=FALSE,  
-	caption="sprof02, before update",label="tab:sprof02info1")
+	caption="sprof02, before update",
+	label="tab:sprof02info1",
+	digits=c(0,0,0,2,0,2,0),
+	zero.print=" . "
+	)
 << label=sprof02Upd>>=
 sprof02 <- updateRprof(sprof02)
 sprof02$info$id <- "sprof02 updated"
@@ -860,19 +869,21 @@ sprof02$info$id <- "sprof02 updated"
 %		NA.string="\\vdots")
 %#str(sprof02)
 <<>>=
-#xtable(summary(sprof02))
-#summary(sprof02)
 strx(sprof02$info)
 <<print=FALSE, results=tex, label=tab:sprof02info2>>=
 prxt(sprof02$nodes, cut=FALSE, caption="sprof02, after update", 
-	label="tab:sprof02info2")
+	label="tab:sprof02info2",
+	digits=c(0,0,0,2,0,2,0),
+	zero.print=" . "
+)
 	
 @
 %: floating figure
 \begin{figure}[htbp]
 \begin{center}
-<<fig = TRUE, echo = TRUE, print = FALSE, label=shownodes02, width=8, height=8>>= 
-#8
+<<fig = TRUE, echo = TRUE, print = FALSE, label=shownodes02, png=TRUE, width=8, height=8>>= 
+
+#8 8
 shownodes(sprof02)
 @
 \caption{Nodes by stack and profile}
@@ -965,8 +976,8 @@ node <- "<.getXlevels_[>"
 		sprof03$nodes <- rbind(sprof03$nodes,NA)
 		i <- length(sprof03$nodes$name)
 		sprof03$nodes$name[i] <- node
-		if (as.logical(options("warn"))) 
-			message("node added. An updateRprof() may be necessary.")
+	if (as.logical(options("warn"))) 
+		message("node added. An updateRprof() may be necessary.")
 	}
 	nodei <- i
 }
@@ -979,14 +990,15 @@ targeti <- match("lapply", sprof03$nodes$name, nomatch=0)
 found <- lapply(sprof03$stacks$nodes, function(X) match(targeti,X))
 found <- data.frame(stack=1:length(found), position=as.matrix(found))
 found[!is.na(found$position),]
-# as.factor(sprof03$stacks$nodes[!is.na(found)], levels=1: length(sprof03$nodes$name), labels=sprof03$nodes$name)
+# as.factor(sprof03$stacks$nodes[!is.na(found)], 
+#		levels=1: length(sprof03$nodes$name), labels=sprof03$nodes$name)
 @
 For now, these are just candidates.
 \todo{implement replacement on the stack level.}
 
-Other candidates are:
-\ircode{"as.list" "vapply" "model.frame.default" -> "<model\_as.list>"}
-or
+Other candidates are:\\
+\ircode{"as.list" "vapply" "model.frame.default" -> "<model\_as.list>"}\\
+or\\
 \ircode{"as.list" "vapply" "model.matrix.default" -> "<model\_matrix\_as.list>"}
 
 \todo{implement}
@@ -1009,30 +1021,21 @@ return(x)
 \subsection{Run length}
 \label{sec:rle}
 \todo{needs serious revision}
-\todo{support na removal in rrle}
+\todo{test na removal in rrle}
 For a visual inspection, runs of the same node and level in the profile 
 are easily perceived. For
 an analytical inspection, we have to reconstruct the runs from the data. In stacks, runs 
-are organised hierarchically. On the root level, runs are just ordinary runs. On the next levels, runs have to be defined given (within) the previous runs. So we need a recursive version of \ircode{rle}, applied to the profile information.
+are organised hierarchically. On the root level, runs are just ordinary runs. On the next levels, runs have to be defined given (within) the previous runs. So we need \irfunx{manip}{rrle}, a recursive version of \ircode{rle}, applied to the profile information.
 This gives a detailed information about the presence time of each node, by stack level.
 \todo{use sprof02 or sprof03?}
+\todo{handle NA as special case}
 <<>>=
 profile_nodes <- profiles_matrix(sprof02)
 
-profile_nodes_rle<- rrle(profile_nodes)
+profile_nodes_rle<- rrle(profile_nodes, collapseNA=FALSE) #!NA needs special case in run length handling.
 
 strx(profile_nodes_rle)
-<<>>=
-collapseNA0 <- function(x) 
-{xv <- is.na(x$values)
-xve <- rle(xv)
-xve$values[xve$lengths==1] <- FALSE # ignore single NAns
-xve$pos <- cumsum(xve$lengths) # pos is end position
-xve
-### start replacement here
-}
-c0 <- collapseNA0(profile_nodes_rle[[10]])
-str(c0)
+
 @
 %<<>>=
 %# can we trust factor handling? For now, let us play it safe.
@@ -1048,8 +1051,9 @@ On a given stack level, the run length is the best information on the time used 
 # side effect: NAs are removed
 profile_nodes_rlet <- lapply(profile_nodes_rle, 
 	function(x) table(x,dnn=c("run length","node")) )
+	
 invisible(lapply(profile_nodes_rlet, 
-function(x) print.table(x,zero.print = ".") ))
+	function(x) print.table(x,zero.print = ".") ))
 @
 This is a poor first attempt to tame \ircode{profile\_nodes\_rlet}.
 \todo{some mess in the code below -- not working}
@@ -1060,11 +1064,11 @@ maxnode <-0
 maxlen <-0
 maxlevel <-length(profile_nodes_rle)
 for (lev in (1:maxlevel) ) {
-	proflev <- profile_nodes_rle[[lev]]
-	if (!is.null(proflev)) {
-		maxn <- max(proflev$values, na.rm=TRUE)
+	prlv <- profile_nodes_rle[[lev]]
+	if (!is.null(prlv)) {
+		maxn <- max(prlv$values, na.rm=TRUE)
 		if (maxn>maxnode) maxnode <- maxn
-		maxl <- max(proflev$lengths, na.rm=TRUE)
+		maxl <- max(prlv$lengths, na.rm=TRUE)
 		if (maxl>maxlen) maxlen <- maxl
 		# cat("Level ",lev,maxn," Length:",maxl,"\n")
 	}
@@ -1079,13 +1083,13 @@ profile_nodes_rlearray <- array(0,
 strx(profile_nodes_rlearray)
 
 for (lev in (1:maxlevel) ) {
-	proflev <- profile_nodes_rle[[lev]]
-	if (!is.null(proflev)) {
-	  for (j in (1: length(proflev$lengths))){
-		 if (!is.na(proflev$values[j])){
-			profile_nodes_rlearray[proflev$values[j],lev,proflev$lengths[j]] <-
-			profile_nodes_rlearray[proflev$values[j],lev,proflev$lengths[j]] +1
-			#cat(lev,j,":",proflev$values[j],lev,proflev$lengths[j],"\n")
+	prlv <- profile_nodes_rle[[lev]]
+	if (!is.null(prlv)) {
+	  for (j in (1: length(prlv$lengths))){
+		 if (!is.na(prlv$values[j])){
+			profile_nodes_rlearray[prlv$values[j],lev,prlv$lengths[j]] <-
+			profile_nodes_rlearray[prlv$values[j],lev,prlv$lengths[j]] +1
+			#cat(lev,j,":",prlv$values[j],lev,prlv$lengths[j],"\n")
 		 }#if (!is.na
 	   }#for j
 	}
@@ -1140,7 +1144,9 @@ print.table(as.table(amt[,1:9]), zero.print = ".")
 %	caption="marginal statistics on nodes, sorted by total time used, count > 1 only", 
 %	label="tab:pramt1")
 But \ircode{print.xtable} has no \ircode{zero.print} \ldots
-\typeout{ $[$ needs to be hidden}
+\typeout{ $[$ needs to be hidden for print.table}
+\todo{ $[$ needs to be hidden for print.table}
+\todo handle gaps in run length
 <<print = FALSE, results = tex, label=tab:pramt4>>=
 xr <- rownames(amt)
 #for (i in (1:length(xr))) {xr[i] <- sub(xr[i],"\\[","$[$", fixed=TRUE)}
@@ -1148,8 +1154,9 @@ xr <- rownames(amt)
 rownames(amt)<- xr
 
 prxt(amt[amt[,"count"]>1,],
-	caption="marginal statistics on nodes, \n sorted by total time used,  \n count > 1 only", 
-	label="tab:pramt1", digits=c(0,0,0,0,0,0,0,0,0,0 ,2))
+ caption="marginal statistics on nodes by run length, \newline sorted by total time used,  \nenwline count > 1 only", 
+ #	label="tab:pramt1",  zero.print=" . ")  #for NA
+	label="tab:pramt1", digits=c(0,0,0,0,0,0,0,0,0,0 ,2), zero.print=" . ") # fixed max level
 
 @
 See \vref{tab:pramt1}
@@ -1247,7 +1254,8 @@ barplot(sp[stacksnrobsok[stacksperm]],
 prxt(sprof01$nodes,
 	caption="nodes", 
 	label="tab:prSREnodes", 
-	max.level=2, vec.len=3,nchar.max=40)
+	max.level=2, vec.len=3,nchar.max=40,
+	digits=c(0,0,0,2,0,2,0))
 @
 %<<print = FALSE, results = tex, label=tab:prSREstacks>>=
 %prxt(sprof01$stacks,
