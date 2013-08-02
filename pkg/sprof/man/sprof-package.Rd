@@ -34,7 +34,7 @@ use \code{\link{readRprof}}.
 For  \code{sprof}, the usual access functions are supported.
 }
 
-\author{Günther Sawitzki}
+\author{Günther Sawitzki <gsawitzki@users.r-forge.r-project.org>}
 %\references{
 %~~ Literature or other references for background information ~~
 %}

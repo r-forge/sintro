@@ -37,7 +37,7 @@ Plots are from this collection:
 %%  \item{comp2 }{Description of 'comp2'}
 %% ...
 }
-\author{Günther Sawitzki <gsawitzki@r-forge.r-project.org>}
+\author{Günther Sawitzki <gsawitzki@users.r-forge.r-project.org>}
 \note{See the vignette of package \code{sprof}.}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~

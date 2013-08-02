@@ -1,4 +1,4 @@
-%$URLHead:$
+%$HeadURL$
 \encoding{UTF-8}
 \name{readRprof}
 \alias{readRprof}
@@ -55,7 +55,7 @@ Temporarily: A list with components
 
 \references{  \url{http://sintro.r-forge.r-project.org/} }
 
-\author{Günther Sawitzki <gsawitzki@r-forge.r-project.org>, based on the code of \code{\link{summaryRprof}}
+\author{Günther Sawitzki <gsawitzki@users.r-forge.r-project.org>, based on the code of \code{\link{summaryRprof}}
 }
 %\note{
 %%  ~~further notes~~

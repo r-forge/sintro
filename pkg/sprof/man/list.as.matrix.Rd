@@ -1,3 +1,10 @@
+%$HeadURL$
+%$Id$
+%$Revision$
+%$Date$
+%$Author$
+%$Name:$
+\encoding{utf8}
 \name{list.as.matrix}
 \alias{list.as.matrix}
 %- Also NEED an '\alias' for EACH other topic documented here.
@@ -24,7 +31,7 @@ A matrix with the values from x, filled to matrix shape.}
 %\references{
 %% ~put references to the literature/web site here ~
 %}
-\author{Günther Sawitzki <gsawitzki@r-forge.r-project.org>}
+\author{Günther Sawitzki <gsawitzki@users.r-forge.r-project.org>}
 %\note{
 %%  ~~further notes~~
 %}

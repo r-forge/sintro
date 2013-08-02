@@ -29,6 +29,7 @@ A List of 4
 %%  ~~ reference to a publication or URL from which the data were obtained ~~
 %}
 \references{See the vignette of package \code{sprof}.}
+\author{Günther Sawitzki <gsawitzki@users.r-forge.r-project.org>}
 \examples{
  data(sprof01lm)
  str(sprof01lm) 

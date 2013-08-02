@@ -1,3 +1,10 @@
+%$HeadURL: svn+ssh://gsawitzki@svn.r-forge.r-project.org/svnroot/sintro/pkg/sprof/man/adjacency.Rd $
+%$Id: adjacency.Rd 178 2013-07-23 19:13:13Z gsawitzki $
+%$Revision: 178 $
+%$Date: 2013-07-23 21:13:13 +0200 (Tue, 23 Jul 2013) $
+%$Author: gsawitzki $
+%$Name:$
+\encoding{utf8}
 \name{edgematrix}
 \alias{edgematrix}
 %- Also NEED an '\alias' for EACH other topic documented here.
@@ -24,5 +31,5 @@ A data frame.
 \item{to}{Name of from node.}
 \item{count}{optional. Frequency of edge.}
 }
-\author{G. Sawitzki}
+\author{Günther Sawitzki <gsawitzki@users.r-forge.r-project.org>}
 \keyword{manip}
