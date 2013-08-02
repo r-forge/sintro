@@ -1,4 +1,9 @@
 %$HeadURL$
+%$Id$
+%$Revision$
+%$Date$
+%$Author$
+%$Name:$
 \encoding{utf8}
 \name{sampleRprof}
 \alias{sampleRprof}
@@ -23,8 +28,7 @@ sampleRprof(expr, runs = NULL, gcFirst = TRUE, interval = 0.001, ...)
 \value{A list of type \code{sprof}
 }
 \references{  \url{http://sintro.r-forge.r-project.org/} }
-\author{Günther Sawitzki <gsawitzki@r-forge.r-project.org>
-}
+\author{Günther Sawitzki <gsawitzki@users.r-forge.r-project.org>}
 %\note{
 %%  ~~further notes~~
 %}

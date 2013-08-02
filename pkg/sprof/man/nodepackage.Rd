@@ -28,7 +28,7 @@ the object is taken from.
 See the help information for \code{\link{getAnywhere}}() for more warnings.
 }
 \value{a character string or a vector of strings with the package names.}
-\author{Günther Sawitzki <gsawitzki@r-forge.r-project.org>}
+\author{Günther Sawitzki <gsawitzki@users.r-forge.r-project.org>}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 

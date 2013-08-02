@@ -68,9 +68,7 @@ Sawitzki, G.: Computational Statistics/Introduction to R.
         ISBN: 978-1-4200-8678-2.
 	 \url{http://sintro.r-forge.r-project.org/}
 }
-\author{
-G. Sawitzki \email{gs@statlab.uni-heidelberg.de}
-}
+\author{G. Sawitzki <gsawitzki@users.r-forge.r-project.org>}
 %\note{
 %%%  ~~further notes~~
 %}

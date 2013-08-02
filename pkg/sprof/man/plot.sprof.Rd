@@ -28,6 +28,7 @@ See the vignette for in-context explanations.
 
 Displays of the graph structure are given in the vignette.
 }
+\author{Günther Sawitzki <gsawitzki@users.r-forge.r-project.org>}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 

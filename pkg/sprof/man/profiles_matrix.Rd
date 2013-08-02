@@ -27,7 +27,7 @@ an \code{sprof} data structure.
 % \references{
 % %% ~put references to the literature/web site here ~
 % }
-\author{Günther Sawitzki <gsawitzki@r-forge.r-project.org>}
+\author{Günther Sawitzki <gsawitzki@users.r-forge.r-project.org>}
 % \note{
 % %%  ~~further notes~~
 % }

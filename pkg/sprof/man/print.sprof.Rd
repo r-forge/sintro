@@ -28,6 +28,7 @@ Print a print for the output of class \code{scode}.
 %}
 \value{None.}
 \references{  \url{http://sintro.r-forge.r-project.org/} }
+\author{Günther Sawitzki <gsawitzki@users.r-forge.r-project.org>}
 %\note{
 %%  ~~further notes~~
 %}

@@ -14,9 +14,9 @@ Date: \tab 2012-01-21\cr
 License: \tab LGPL\cr
 }
 }
-\author{G. Sawitzki
+\author{Günther Sawitzki <gsawitzki@users.r-forge.r-project.org>}
 
-Maintainer: G. Sawitzki \email{gs@statlab.uni-heidelberg.de}}
+Maintainer: G. Sawitzki \email{gsawitzki@users.r-forge.r-project.org}}
 \references{
 Sawitzki, G.: Computational Statistics/Introduction to R.
 	Chapman & Hall/CRC Press, Boca Raton (FL), 2009.

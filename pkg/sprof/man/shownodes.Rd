@@ -36,7 +36,7 @@ Plots are from this collection:
 %% ...
 }
 
-\author{Günther Sawitzki <gsawitzki@r-forge.r-project.org>}
+\author{Günther Sawitzki <gsawitzki@users.r-forge.r-project.org>}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 

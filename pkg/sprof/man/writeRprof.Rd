@@ -29,7 +29,7 @@ some package designed for \code{Rprof} output.
 \value{
 An invisble list with the profile entries, headers removed.
 }
-\author{Günther Sawitzki <gsawitzki@r-forge.r-project.org>}
+\author{Günther Sawitzki <gsawitzki@users.r-forge.r-project.org>}
 \references{  \url{http://sintro.r-forge.r-project.org/} }
 \note{
 See the vignette for in-context explanations.
