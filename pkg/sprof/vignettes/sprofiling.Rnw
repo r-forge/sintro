@@ -1117,16 +1117,21 @@ print.table(addmargins(nn), zero.print = ".")
 \todo{rescale to application scale}
 \todo{replace sum by weighted sum}
 \todo{allow sorting, e.g. by marginals}
-<<>>=
-mt <- margin.table(profile_nodes_rlearray, margin = c(1,3))
-#amt <- addmargins(mt)
-mts <- apply(mt,1,sum)
-mtt <- apply(mt,1,function (x) {sum(x*seq(along.with=x))})
-mtav <- mtt/mts
-amt=cbind(mt,count=mts, total_time=mtt, avg=mtav)
-amt <- amt[amt[,"count"]>0,]
-amt <- amt[order(amt[,"total_time"], decreasing=TRUE),]
 
+%nodesrunlength <- function(sprof){
+%profile_nodes_rlearray <- nodesprofile(sprof)
+%mt <- margin.table(profile_nodes_rlearray, margin = c(1,3))
+%#amt <- addmargins(mt)
+%mts <- apply(mt,1,sum)
+%mtt <- apply(mt,1,function (x) {sum(x*seq(along.with=x))})
+%mtav <- mtt/mts
+%amt=cbind(mt,count=mts, total_time=mtt, avg=mtav)
+%amt <- amt[amt[,"count"]>0,]
+%amt <- amt[order(amt[,"total_time"], decreasing=TRUE),]
+%return(amt)
+%}
+<<>>=
+amt <- nodesrunlength(sprof02)
 #   print.table(as.table(amt[,1:9]), zero.print = ".") 
 ## ??? print.table changes format when col.10 is present.
 @
@@ -1137,6 +1142,7 @@ But \ircode{print.xtable} has no \ircode{zero.print} \ldots
 \todo{ $[$ needs to be hidden for print.xtable}
 \todo{handle gaps in run length = NA counts}
 <<print = FALSE, results = tex, label=tab:pramt4>>=
+#special sanitizing for xtable
 xr <- rownames(amt)
 #for (i in (1:length(xr))) {xr[i] <- sub(xr[i],"\\[","$[$", fixed=TRUE)}
  #xr <- paste("$",xr,"$")
