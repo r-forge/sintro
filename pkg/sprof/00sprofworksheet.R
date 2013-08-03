@@ -157,7 +157,7 @@ R CMD Rd2pdf -o sprof_internal.pdf  --internals --no-clean --title="sprof intern
 setwd("/Users/gs/projects/rforge/sintro/pkg/sprof/")
 
 remove.packages("sprof")
-install.packages("/Users/gs/projects/rforge/sintro/pkg/sprof_0.0-5.tar.gz", repos=NULL, type="source")
+install.packages("/Users/gs/projects/rforge/sintro/pkg/sprof_0.0-6.tar.gz", repos=NULL, type="source")
 ##
 vignette <- function(){ 
 options(width=72); setwd("/Users/gs/projects/rforge/sintro/pkg/sprof/work/vignettes/" )
