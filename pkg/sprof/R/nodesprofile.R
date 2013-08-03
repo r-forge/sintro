@@ -1,8 +1,8 @@
-#$HeadURL: svn+ssh://gsawitzki@svn.r-forge.r-project.org/svnroot/sintro/pkg/sprof/R/nodescloud.R $
-#$Id: nodescloud.R 185 2013-07-28 17:41:50Z gsawitzki $
-#$Date: 2013-07-28 19:41:50 +0200 (Sun, 28 Jul 2013) $
-#$Author: gsawitzki $
-#$Revision: 185 $
+#$HeadURL$
+#$Id$
+#$Date$
+#$Author$
+#$Revision$
 #\encoding{utf8}
 # setwd("")
 # source('~/Documents/lectures/src/insider/profile/sprof/pkg/R/nodesprofile.R', chdir = TRUE)
