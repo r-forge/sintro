@@ -1032,9 +1032,10 @@ This gives a detailed information about the presence time of each node, by stack
 <<>>=
 profile_nodes <- profiles_matrix(sprof02)
 
-profile_nodes_rle<- rrle(profile_nodes, collapseNA=FALSE) #!NA needs special case in run length handling.
+profile_nodes_rle<- rrle(profile_nodes, collapseNA=FALSE) 
+#!NA needs special case in run length handling.
 
-strx(profile_nodes_rle)
+strx(profile_nodes_rle, list.len=5)
 
 @
 %<<>>=
@@ -1047,64 +1048,70 @@ strx(profile_nodes_rle)
 On a given stack level, the run length is the best information on the time used per call, and the run count of a node is the best information on the number of calls. So this is a prime starting point for in-depth analysis.
 \todo{keep as factor. This is a sparse cube with margins node, stack level, run length. Nodes are mostly concentrated on few levels.}
 \todo{Warning: data structure still under discussion}
-<<>>=
-# side effect: NAs are removed
-profile_nodes_rlet <- lapply(profile_nodes_rle, 
-	function(x) table(x,dnn=c("run length","node")) )
-	
-invisible(lapply(profile_nodes_rlet, 
-	function(x) print.table(x,zero.print = ".") ))
+%<<>>=
+%# side effect: NAs are removed
+%profile_nodes_rlet <- lapply(profile_nodes_rle, 
+%	function(x) table(x,dnn=c("run length","node")) )
+%	
+%invisible(lapply(profile_nodes_rlet, 
+%	function(x) print.table(x,zero.print = ".") ))
 @
-This is a poor first attempt to tame \ircode{profile\_nodes\_rlet}.
-\todo{some mess in the code below -- not working}
-\todo{replace by decent vector/array based implementation}
+\todo{hack. replace by decent vector/array based implementation}
 \todo{add names for node dimension}
-<<>>=
-maxnode <-0
-maxlen <-0
-maxlevel <-length(profile_nodes_rle)
-for (lev in (1:maxlevel) ) {
-	prlv <- profile_nodes_rle[[lev]]
-	if (!is.null(prlv)) {
-		maxn <- max(prlv$values, na.rm=TRUE)
-		if (maxn>maxnode) maxnode <- maxn
-		maxl <- max(prlv$lengths, na.rm=TRUE)
-		if (maxl>maxlen) maxlen <- maxl
-		# cat("Level ",lev,maxn," Length:",maxl,"\n")
-	}
-}
-## collapse profile_nodes_rle to 3d array. Allocate memory first.
-profile_nodes_rlearray <- array(0, 
-	dim=c(maxnode,length(profile_nodes_rle), maxlen), 
-	dimnames= list("node"=sprof02$nodes$name[1:maxnode], 
-		"level"=1:length(profile_nodes_rle), 
-		"run_length"=1:maxlen))
-
-strx(profile_nodes_rlearray)
-
-for (lev in (1:maxlevel) ) {
-	prlv <- profile_nodes_rle[[lev]]
-	if (!is.null(prlv)) {
-	  for (j in (1: length(prlv$lengths))){
-		 if (!is.na(prlv$values[j])){
-			profile_nodes_rlearray[prlv$values[j],lev,prlv$lengths[j]] <-
-			profile_nodes_rlearray[prlv$values[j],lev,prlv$lengths[j]] +1
-			#cat(lev,j,":",prlv$values[j],lev,prlv$lengths[j],"\n")
-		 }#if (!is.na
-	   }#for j
-	}
-}
-	
+%<<>>=
+%nodesprofile <- function(sprof){
+%profile_nodes <- profiles_matrix(sprof02)
+%profile_nodes_rle<- rrle(profile_nodes, collapseNA=FALSE) 
+%
+%maxnode <-0
+%maxlen <-0
+%maxlevel <-length(profile_nodes_rle)
+%for (lev in (1:maxlevel) ) {
+%	prlv <- profile_nodes_rle[[lev]]
+%	if (!is.null(prlv)) {
+%		maxn <- max(prlv$values, na.rm=TRUE)
+%		if (maxn>maxnode) maxnode <- maxn
+%		maxl <- max(prlv$lengths, na.rm=TRUE)
+%		if (maxl>maxlen) maxlen <- maxl
+%		# cat("Level ",lev,maxn," Length:",maxl,"\n")
+%	}
+%}
+%## collapse profile_nodes_rle to 3d array. Allocate memory first.
+%profile_nodes_rlearray <- array(0, 
+%	dim=c(maxnode,length(profile_nodes_rle), maxlen), 
+%	dimnames= list("node"=sprof02$nodes$name[1:maxnode], 
+%		"level"=1:length(profile_nodes_rle), 
+%		"run_length"=1:maxlen))
+%		
+%		for (lev in (1:maxlevel) ) {
+%	prlv <- profile_nodes_rle[[lev]]
+%	if (!is.null(prlv)) {
+%	  for (j in (1: length(prlv$lengths))){
+%		 if (!is.na(prlv$values[j])){
+%			profile_nodes_rlearray[prlv$values[j],lev,prlv$lengths[j]] <-
+%			profile_nodes_rlearray[prlv$values[j],lev,prlv$lengths[j]] +1
+%			#cat(lev,j,":",prlv$values[j],lev,prlv$lengths[j],"\n")
+%		 }#if (!is.na
+%	   }#for j
+%	}
+%}
+%
+%return(profile_nodes_rlearray)
+%} # nodesprofile
 @
+If you need it, you can represent the run lenght information by level as a matrix. 
+This is expanding a sparse matrix to full and should be avoided.
+ 
+<<>>=
+profile_nodes_rlearray <- nodesprofile(sprof02)
+strx(profile_nodes_rlearray)
+@
+\todo{add summary for NA}	
+
 \todo{add marginals and conditionals. Provide function node\_summary.}
 This allows us to extract marginal from \ircode{provlev[ node, level, run length]}.
 <<>>=
-node=41
-cat(as.character(sprof02$nodes$name[node]),"\n")
-
-nn <- profile_nodes_rlearray[node, , ]
-#dimnames(nn)<- list( "level", "run_length")
-#nn
+nn <- profile_nodes_rlearray["model.frame", , ]
 print.table(addmargins(nn), zero.print = ".")
 @
 \todo{rescale to application scale}
@@ -1120,69 +1127,32 @@ amt=cbind(mt,count=mts, total_time=mtt, avg=mtav)
 amt <- amt[amt[,"count"]>0,]
 amt <- amt[order(amt[,"total_time"], decreasing=TRUE),]
 
-print.table(as.table(amt[,1:9]), zero.print = ".") 
+#   print.table(as.table(amt[,1:9]), zero.print = ".") 
 ## ??? print.table changes format when col.10 is present.
 @
 %????????? tex error in table.
 %cannot handle [. Needs to be replaced by $[$.
-%
-%prxt(amt,
-%	caption="marginal statistics on nodes, sorted by total time used", 
-%	label="tab:pramt")
 
-%<<print = FALSE, results = tex, label=tab:pramt1>>=
-%xr <- rownames(amt)
-%#for (i in (1:length(xr))) {xr[i] <- sub(xr[i],"\\[","$[$", fixed=TRUE)}
-% xr <- paste("$",xr,"$")
-%rownames(amt)<- xr
-%amtx <- xtable(amt[amt[,"count"]>1,], digits=c(0,0,0,0,0,0,0,0,0,0 ,2))
-%print(amtx)
-%<<print = FALSE, results = tex, label=tab:pramt2>>=
-%prxt(amtx)
-%<<print = FALSE, results = tex, label=tab:pramt3>>=
-%prxt(amt[amt[,"count"]>1,],
-%	caption="marginal statistics on nodes, sorted by total time used, count > 1 only", 
-%	label="tab:pramt1")
 But \ircode{print.xtable} has no \ircode{zero.print} \ldots
-\typeout{ $[$ needs to be hidden for print.table}
-\todo{ $[$ needs to be hidden for print.table}
-\todo handle gaps in run length
+\todo{ $[$ needs to be hidden for print.xtable}
+\todo{handle gaps in run length = NA counts}
 <<print = FALSE, results = tex, label=tab:pramt4>>=
 xr <- rownames(amt)
 #for (i in (1:length(xr))) {xr[i] <- sub(xr[i],"\\[","$[$", fixed=TRUE)}
- xr <- paste("$",xr,"$")
+ #xr <- paste("$",xr,"$")
+xr <- gsub("[","{[}",xr, fixed=TRUE)
+xr <- gsub("_","\\_",xr, fixed=TRUE)
+xr <- gsub("^","\\^",xr, fixed=TRUE)
 rownames(amt)<- xr
 
 prxt(amt[amt[,"count"]>1,],
- caption="marginal statistics on nodes by run length, \newline sorted by total time used,  \nenwline count > 1 only", 
- #	label="tab:pramt1",  zero.print=" . ")  #for NA
-	label="tab:pramt1", digits=c(0,0,0,0,0,0,0,0,0,0 ,2), zero.print=" . ") # fixed max level
-
+ caption="Marginal statistics on nodes by run length, sorted by total time used,  count > 1 only", 
+	label="tab:pramt1", 
+	digits=c(rep(0,dim(amt)[2]) ,2), zero.print=" . ") #dim(amt)[2]-1, +1 for rownames
 @
 See \vref{tab:pramt1}
 %<<>>=
 %prop.table(profile_nodes_rlearray, margin = c(1,3))
-@
-These are some attempts to recover the factor structures.
-<<>>=
-xfi <- levels(sprof02$nodes$name)
-profile_nodes_rlefac <- lapply(profile_nodes_rle, 
-	function(xl) {xl$values <- factor(xl$values, 
-		levels=1:62, 
-		labels=xfi); xl}) # seems ok
-profile_nodes_rletfac <- lapply(profile_nodes_rle, 
-	function(x) table(x,dnn=c("run length","node")) ) #factors lost again
-	colnames(profile_nodes_rletfac[[1]]) <- 
-		sprof02$nodes$name[ as.integer(colnames(profile_nodes_rletfac[[1]]))] 
-
-profile_nodes_rletfac1 <- lapply(profile_nodes_rletfac,
-	function(xl) {colnames(xl) <- 
-		sprof02$nodes$name[ as.integer(colnames(xl))];
-	xl} )
-
-invisible(lapply(profile_nodes_rletfac1, 
-function(x) print.table(t(x),zero.print = ".") ))
-
 @
 \todo{add current level}
 
@@ -1191,103 +1161,6 @@ function(x) print.table(t(x),zero.print = ".") ))
 
 \todo{table:  node \#runs  min  median run length  max}
 
-\section{xxx  -- lost \& found}
-<< label=tab:prSREinfo>>=
-# xtable cannot handle posix, so we use print output here
-#  str(profile_nodes_rle, max.level=2, vec.len=3, nchar.max=40, list.len=6)
-strx(sprof01$info)
-@
-
-%As a convention, we do not re-arrange items for ad-hoc choices, but use a permutation 
-%vector instead. 
-%
-%<<fig=TRUE, label= barplotNodes>>=
-%rownames(sprof01$nodes) <- sprof01$nodes$names
-%nodesperm <- order(sprof01$nodes$total.time,decreasing=TRUE)
-%barplot(sprof01$nodes$total.time[nodesperm])
-@
-Selections are recorded as selection vectors, with reference to the original order.
-This needs some caution to align them with the order choices.
-<<fig=TRUE, label= barplotNodes4>>=
-rownames(sprof01$nodes) <- sprof01$nodes$names
-nodesperm <- order(sprof01$nodes$total.time,decreasing=TRUE)
-nodesnrobsok <- sprof01$nodes$total.time > 4
-sp <- sprof01$nodes$total.time[nodesperm][nodesnrobsok[nodesperm]]
-names(sp) <- sprof01$nodes$name[nodesperm][nodesnrobsok[nodesperm]]
-barplot(sp,
- main="Nodes, by total time", ylab="total time")
-@
-%<<fig=TRUE, label= barplotStacks>>=
-%#rownames(sprof01$nodes) <- sprof01$nodes$names
-%stacksperm <- order(sprof01$stacks$refcount,decreasing=TRUE)
-%barplot(sprof01$stacks$refcount[stacksperm],main="Stacks, by reference count", ylab="count")
-
-@
-\filledpagebreak
-On the first look, information on the profile level is not informative. Profile records are just recordings of some step, taken at regular intervals. We get a minimal information, if we encode the stacks in colour.
-\todo{use stack colours}
-
-@
-We now do a step down analysis. Aggregating the information from the profiling events, we have the frequency of stack references. On the stack level, we encode the frequency in colour, and linking propagates this to the profile level.
-<<fig=TRUE, label=sREplotstacks4col>>=
-stackfreqscore <- rank(sprof01$stacks$refcount,ties.method="random")
-stacksperm <- order(sprof01$stacks$refcount,decreasing=TRUE)
-stacksnrobsok <- sprof01$stacks$refcount > 4
-stackfreqscore4<- stackfreqscore[stacksperm][stacksnrobsok[stacksperm]]
-barplot(sp[stacksnrobsok[stacksperm]], 
-	main="Stacks, by reference count (4 obs. minimum)", ylab="count > 4",
-	col=rainbow(80)[stackfreqscore4], sub=sprof01$info$id)
-@
-%<<>>=
-%nodesnrobsok <- sprof01$nodes$total.time > 4
-%sp1 <- as.matrix(sprof01$nodes$total.time)
-%rownames(sp1) <- sprof01$nodes$name
-%sp1 <-  as.matrix(sp1[nodesperm])
-%rownames(sp1) <- sprof01$nodes$name[nodesperm]
-%sp1 <- as.matrix(sp1[nodesnrobsok[nodesperm]])
-%rownames(sp1)<- sprof01$nodes$name[nodesnrobsok[nodesperm]]
-%barplot(t(sp1))
-@
-\filledpagebreak
-
-<<print = FALSE, results = tex, label=tab:prSREnodes>>=
-prxt(sprof01$nodes,
-	caption="nodes", 
-	label="tab:prSREnodes", 
-	max.level=2, vec.len=3,nchar.max=40,
-	digits=c(0,0,0,2,0,2,0))
-@
-%<<print = FALSE, results = tex, label=tab:prSREstacks>>=
-%prxt(sprof01$stacks,
-%	caption="stacks", 
-%	label="tab:prSREstacks")
-\filledpagebreak
-<<label=tab:prSREstacks>>=
-#str(sprof01$stacks,  max.level=2, vec.len=6,
-#	nchar.max=40, list.len=20,width=70, strict.width="wrap"
-strx(sprof01$stacks)
-@
-A summary is provided on request.
-<<label=sumsprof01>>=
-sumsprof01 <- summary.sprof(sprof01)
-#str(profile_nodes_rle, max.level=2, vec.len=3, nchar.max=40, list.len=6)
-strx(sumsprof01)
-#str(sumsprof01, max.level=2, vec.len=3, 
-#	nchar.max=40,  list.len=6,
-#	width=70, strict.width="wrap")
-@
-
-The classical approach hides the work that has been done. Actually it breaks down the data 
-to record items. This figure is not reported anywhere. In our case, it can be reconstructed. 
-The profile data have 8456 words in 524 lines.
-
-In our approach, we break down the information. Two lines of control information are split 
-off. We have 522 lines of profile with 50 unique stacks, referencing 62 nodes. Instead of 
-reducing it to a summary, we keep the full information. Information is always kept on its original level. 
-
-On the profiles level, we know the sample interval length, and the id of the stack recorded. On the stack level, for  each stack we have a reference count, with the sample interval lengths used as weights. This reference count is added up for each node in the stack to give the node timings.
-
-Cheap statistics are collected as the come by. For example, from the stacks table it is cheap to identify root and leaf nodes, and this mark is propagated to the nodes table.
 
 \subsection{Graph package}
 <<>>=
@@ -1805,6 +1678,127 @@ Svn repository information:
 \verb+$Author$+
 }
 \typeout{**** $Id$ done ****}
+\filledpagebreak
+\section{xxx  -- lost \& found}
+<< label=tab:prSREinfo>>=
+# xtable cannot handle posix, so we use print output here
+#  str(profile_nodes_rle, max.level=2, vec.len=3, nchar.max=40, list.len=6)
+strx(sprof01$info)
+@
+
+%As a convention, we do not re-arrange items for ad-hoc choices, but use a permutation 
+%vector instead. 
+%
+%<<fig=TRUE, label= barplotNodes>>=
+%rownames(sprof01$nodes) <- sprof01$nodes$names
+%nodesperm <- order(sprof01$nodes$total.time,decreasing=TRUE)
+%barplot(sprof01$nodes$total.time[nodesperm])
+@
+Selections are recorded as selection vectors, with reference to the original order.
+This needs some caution to align them with the order choices.
+<<fig=TRUE, label= barplotNodes4>>=
+rownames(sprof01$nodes) <- sprof01$nodes$names
+nodesperm <- order(sprof01$nodes$total.time,decreasing=TRUE)
+nodesnrobsok <- sprof01$nodes$total.time > 4
+sp <- sprof01$nodes$total.time[nodesperm][nodesnrobsok[nodesperm]]
+names(sp) <- sprof01$nodes$name[nodesperm][nodesnrobsok[nodesperm]]
+barplot(sp,
+ main="Nodes, by total time", ylab="total time")
+@
+%<<fig=TRUE, label= barplotStacks>>=
+%#rownames(sprof01$nodes) <- sprof01$nodes$names
+%stacksperm <- order(sprof01$stacks$refcount,decreasing=TRUE)
+%barplot(sprof01$stacks$refcount[stacksperm],main="Stacks, by reference count", ylab="count")
+
+@
+\filledpagebreak
+On the first look, information on the profile level is not informative. Profile records are just recordings of some step, taken at regular intervals. We get a minimal information, if we encode the stacks in colour.
+\todo{use stack colours}
+
+@
+We now do a step down analysis. Aggregating the information from the profiling events, we have the frequency of stack references. On the stack level, we encode the frequency in colour, and linking propagates this to the profile level.
+<<fig=TRUE, label=sREplotstacks4col>>=
+stackfreqscore <- rank(sprof01$stacks$refcount,ties.method="random")
+stacksperm <- order(sprof01$stacks$refcount,decreasing=TRUE)
+stacksnrobsok <- sprof01$stacks$refcount > 4
+stackfreqscore4<- stackfreqscore[stacksperm][stacksnrobsok[stacksperm]]
+barplot(sp[stacksnrobsok[stacksperm]], 
+	main="Stacks, by reference count (4 obs. minimum)", ylab="count > 4",
+	col=rainbow(80)[stackfreqscore4], sub=sprof01$info$id)
+@
+%<<>>=
+%nodesnrobsok <- sprof01$nodes$total.time > 4
+%sp1 <- as.matrix(sprof01$nodes$total.time)
+%rownames(sp1) <- sprof01$nodes$name
+%sp1 <-  as.matrix(sp1[nodesperm])
+%rownames(sp1) <- sprof01$nodes$name[nodesperm]
+%sp1 <- as.matrix(sp1[nodesnrobsok[nodesperm]])
+%rownames(sp1)<- sprof01$nodes$name[nodesnrobsok[nodesperm]]
+%barplot(t(sp1))
+@
+\filledpagebreak
+
+<<print = FALSE, results = tex, label=tab:prSREnodes>>=
+prxt(sprof01$nodes,
+	caption="nodes", 
+	label="tab:prSREnodes", 
+	max.level=2, vec.len=3,nchar.max=40,
+	digits=c(0,0,0,2,0,2,0))
+@
+%<<print = FALSE, results = tex, label=tab:prSREstacks>>=
+%prxt(sprof01$stacks,
+%	caption="stacks", 
+%	label="tab:prSREstacks")
+\filledpagebreak
+<<label=tab:prSREstacks>>=
+#str(sprof01$stacks,  max.level=2, vec.len=6,
+#	nchar.max=40, list.len=20,width=70, strict.width="wrap"
+strx(sprof01$stacks)
+@
+A summary is provided on request.
+<<label=sumsprof01>>=
+sumsprof01 <- summary.sprof(sprof01)
+#str(profile_nodes_rle, max.level=2, vec.len=3, nchar.max=40, list.len=6)
+strx(sumsprof01)
+#str(sumsprof01, max.level=2, vec.len=3, 
+#	nchar.max=40,  list.len=6,
+#	width=70, strict.width="wrap")
+@
+
+The classical approach hides the work that has been done. Actually it breaks down the data 
+to record items. This figure is not reported anywhere. In our case, it can be reconstructed. 
+The profile data have 8456 words in 524 lines.
+
+In our approach, we break down the information. Two lines of control information are split 
+off. We have 522 lines of profile with 50 unique stacks, referencing 62 nodes. Instead of 
+reducing it to a summary, we keep the full information. Information is always kept on its original level. 
+
+On the profiles level, we know the sample interval length, and the id of the stack recorded. On the stack level, for  each stack we have a reference count, with the sample interval lengths used as weights. This reference count is added up for each node in the stack to give the node timings.
+
+Cheap statistics are collected as the come by. For example, from the stacks table it is cheap to identify root and leaf nodes, and this mark is propagated to the nodes table.
+@
+These are some attempts to recover the factor structures.
+<<>>=
+xfi <- levels(sprof02$nodes$name)
+profile_nodes_rlefac <- lapply(profile_nodes_rle, 
+	function(xl) {xl$values <- factor(xl$values, 
+		levels=1:62, 
+		labels=xfi); xl}) # seems ok
+profile_nodes_rletfac <- lapply(profile_nodes_rle, 
+	function(x) table(x,dnn=c("run length","node")) ) #factors lost again
+	colnames(profile_nodes_rletfac[[1]]) <- 
+		sprof02$nodes$name[ as.integer(colnames(profile_nodes_rletfac[[1]]))] 
+
+profile_nodes_rletfac1 <- lapply(profile_nodes_rletfac,
+	function(xl) {colnames(xl) <- 
+		sprof02$nodes$name[ as.integer(colnames(xl))];
+	xl} )
+
+invisible(lapply(profile_nodes_rletfac1, 
+function(x) print.table(t(x),zero.print = ".") ))
+@
+
+
 \end{document}
 
 
