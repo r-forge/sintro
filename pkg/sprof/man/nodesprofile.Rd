@@ -1,8 +1,8 @@
-%$HeadURL: svn+ssh://gsawitzki@svn.r-forge.r-project.org/svnroot/sintro/pkg/sprof/man/nodescloud.Rd $
-%$Id: nodescloud.Rd 192 2013-08-02 09:59:03Z gsawitzki $
-%$Date: 2013-08-02 11:59:03 +0200 (Fri, 02 Aug 2013) $
-%$Author: gsawitzki $
-%$Revision: 192 $
+%$HeadURL$
+%$Id$
+%$Date$
+%$Author$
+%$Revision$
 \encoding{utf8}
 \name{nodesprofile}
 \alias{nodesprofile}
