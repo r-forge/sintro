@@ -1,5 +1,6 @@
-updateRprof <- function(sprof){
+updateRprof <- function(sprof, id){
 	sprof$info$date_updated <- Sys.time()
+	if (!missing(id)) sprof$info$id <- id
 	
 	nrstacks <- length(sprof$stacks$nodes)
 	nrnodes <- length(sprof$nodes$name)

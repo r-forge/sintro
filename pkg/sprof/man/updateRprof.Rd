@@ -10,10 +10,11 @@
 \description{
 Synchronize information from profiles and stack tables, and update statistics.}
 \usage{
-updateRprof(sprof)
+updateRprof(sprof, id)
 }
 \arguments{
   \item{sprof}{A data structure as returned by  \code{\link{readRprof}}.}
+  \item{id}{optional. A replacement for the \code{info$id} string .}
 }
 %\details{
 %%  ~~ If necessary, more details than the description above ~~
