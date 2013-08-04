@@ -274,7 +274,8 @@ The graph visualisation family is not friendly. We try to get control by using a
 plotviz <- function(x,...)
 {
 plot(x,  
-	attrs=list(node=list(cex=4, fontsize=40,  shape="ellipse")), 
+	attrs=list(node=list(cex=4, fontsize=40,  
+	shape="ellipse")), 
 	cex.main=2, ...)
 }
 
@@ -727,20 +728,22 @@ This is what we get for free from the node information on our three levels: node
 %sprof01$nodes$icol <- freqrank
 %shownodes(sprof01, col=freqrankcol01)
 @
+\todo{clean up colour handling}
 %: floating figure
+<<fig = TRUE, echo = TRUE, print = FALSE, label=shownodes01rb, width=8, height=8, include=FALSE>>= 
+#8 rainbow
+sprof01$nodes$icol <- freqrank01; freqrankcol <- rainbow(62)
+shownodes(sprof01, col=freqrankcol)
+@
 \begin{figure}[htbp]
 \begin{center}
-<<fig = TRUE, echo = TRUE, print = FALSE, label=shownodes01rb, width=8, height=8>>= 
-#8 rainbow
-sprof01$nodes$icol <- freqrank01
-shownodes(sprof01, col=rainbow(62))
-@
+\includegraphics{sprofiling-shownodes01rb}
 \caption{Nodes by stack and profile}
 \label{fig:shownodes01rb}
 \end{center}
 \end{figure}
 
-See \vref{fig:shownodes01rb}.
+See \vref{fig:shownodes01rb} for a summary by nodes.
 
 % floating figure end
 
@@ -782,12 +785,15 @@ We will come to finer tools in \vref{sec:rle} but for the moment the rough infor
 Not so often, but a frequent phenomenon is to have some ``burn in'' or ``fade out''. To identify this, we need to look at the profile level. The indicator to check is to whether we have very low frequency stacks at the beginning or the end of our recording. The counts to be takes as reference can be seen from the summary.
 <<>>=
 summary(sprof01$stacks$refcount)
-#
+@
+\todo{we could do smart smoothng of the stacks here}
+This summary has to be taken with caution. As the program runs, the stacks are build up und teared down, and we only take random samples. So in dynamic parts, we see images with some fluctuation, as one stack may be a snapshot of an other under construction. A better information is to cut off fluctuations and use this summary as a reference.
 <<>>=
+summary(sprof01$stacks$refcount[sprof01$stacks$refcount>2])
+
+<<print = FALSE, results = tex, label=tab:margin>>=
 df <- data.frame(stack=sprof01$profiles$data, 
 	count=sprof01$stacks$refcount[sprof01$profiles$data])
-#df <- xcutdata.frame(df, margin=10)
-<<print = FALSE, results = tex, label=tab:margin>>=
 prxt(df, caption="Stacks by event: burn in/fade out",
 	label="tab:margin",
 	digits=c(0,0,0) )
@@ -801,10 +807,16 @@ Stable framework effects sometimes are obvious and can be detected automatically
 
 
 \subsection{The free lunch}
-What you have seen so far is what you get for free when using package \ircode{sprof}.
+What you have seen so far is what you get for free when using package \ircode{sprof}. 
+
 \todo{colours. recolour. Propagate colour to graph.}
 
-If you want to wrap up the information and look at it from a graph point of view, here is just one example. More are in \vref{sec:graph}. But before changing to the graph perspective, we recommend to see the next sections, not to skip them. The preview, at this point, taking package \ircode{graph} as an example:
+If you want to wrap up the information and look at it from a graph point of view, here is just one example. More are in \vref{sec:graph} and vref{sec:moregraph}. But before changing to the graph perspective, we recommend to see the next sections, not to skip them. 
+
+The preview, at this point, taking package \ircode{graph} as an example. \ircode{graph} on its side has an undocumented feature: it needs  \ircode{Rgraphviz} to handle graph attributes. We have to take two steps. 
+we  extract the graph information from \ircode{sprof}, using and adjacency matrix here as a simple solution. 
+This is then converted to the \ircode{"graphNEL"} format which is shared by  \ircode{graph} and \ircode{Rgraphviz}.
+\ircode{Rgraphviz} is hidden in the use of  \ircode{plot}(). So here is a bare foot approach. A more sophisticated function implementation is in \vref{sec:graph}.
 %<<fig=TRUE, label=sprofadjNEL8, width=8, height=8>>=
 %#8 sprofadjNEL
 %library(graph)
@@ -813,18 +825,21 @@ If you want to wrap up the information and look at it from a graph point of view
 %rm(sprof01adjNEL); 
 %# detach("package:graph") 
 %#! sorry. still needed by Rgraphviz -- clean up
-@
-<<>>=
-library(graph)
-search() 
+
 <<fig=TRUE, label=sprofadjNEL6, width=6, height=6>>=
+
 #6 sprofadjNEL
+library(graph)
 sprof01adjNEL <- as(adjacency(sprof01),"graphNEL")
-plotviz(sprof01adjNEL,  main="sprof01: graph layout example", 
-	sub=sprof01$info$id)
-rm(sprof01adjNEL); 
-# detach("package:graph") 
-#! sorry. still needed by Rgraphviz -- clean up
+
+plot(sprof01adjNEL,  main="sprof01: graph layout example", 
+	sub=sprof01$info$id,  
+	attrs=list(node=list(cex=4, fontsize=40,  shape="ellipse")), 
+	cex.main=2)
+
+	
+rm(sprof01adjNEL)
+detach("package:Rgraphviz") ; detach("package:graph")
 @
 
 \subsection{Cheap thrills}
@@ -852,12 +867,13 @@ At this point, it is a decision whether to adapt the timing information, or keep
 <<>>=
 strx(sprof02$info)
 <<print=FALSE,  results=tex, label=tab:sprof02info1>>=
-prxt(sprof02$nodes,cut=FALSE,  
+prxt(sprof02$nodes,  
 	caption="sprof02, before update",
 	label="tab:sprof02info1",
 	digits=c(0,0,0,2,0,2,0),
 	zero.print=" . "
 	)
+	
 << label=sprof02Upd>>=
 sprof02 <- updateRprof(sprof02)
 sprof02$info$id <- "sprof02 updated"
@@ -871,7 +887,8 @@ sprof02$info$id <- "sprof02 updated"
 <<>>=
 strx(sprof02$info)
 <<print=FALSE, results=tex, label=tab:sprof02info2>>=
-prxt(sprof02$nodes, cut=FALSE, caption="sprof02, after update", 
+prxt(sprof02$nodes, 
+	caption="sprof02, after update", 
 	label="tab:sprof02info2",
 	digits=c(0,0,0,2,0,2,0),
 	zero.print=" . "
@@ -879,14 +896,16 @@ prxt(sprof02$nodes, cut=FALSE, caption="sprof02, after update",
 	
 @
 %: floating figure
-\begin{figure}[htbp]
-\begin{center}
 <<fig = TRUE, echo = TRUE, print = FALSE, label=shownodes02, png=TRUE, width=8, height=8>>= 
 
 #8 8
 shownodes(sprof02)
 @
-\caption{Nodes by stack and profile}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics{sprofiling-shownodes02}
+\caption{SProf02: Nodes by stack and profile}
 \label{fig:shownodes02}
 \end{center}
 \end{figure}
@@ -897,6 +916,8 @@ See \vref{fig:shownodes02}.
 
 \subsubsection{Trimming}
 \label{sec:trimming}
+
+Note: trimming may be supported by the graph packages.
 
 \todo{This section needs to be reworked}
 
@@ -915,43 +936,19 @@ sprof01Tr <- trimstacks(sprof01, 11)
 #profile_nodesTr <- profiles_matrix(sprof01Tr)
 #image(x=1:ncol(profile_nodesTr),y=1:nrow(profile_nodesTr), t(profile_nodesTr),xlab="event", ylab="depth", main="nodes by event")
 
-<<>>=
-nodefreq <- rep(0,length(sprof01$nodes$name))
-for (i in (1:length(sprof01$stacks$nodes))){
-	nodefreq <- nodefreq +   
-		table( factor(sprof01$stacks$nodes[[i]], 
-			levels <- 1:length(sprof01$nodes$name), 
-			ordered=FALSE))
-	}
-names(nodefreq) <- sprof01$nodes$name
 @
-Top frequent nodes.
-<<fig=TRUE, label=sREplotnodefreq>>=
-ndf <- nodefreq[nodefreq>1]
-ondf <- order(ndf,decreasing=TRUE)
-barplot(ndf[ondf])
-<<fig=TRUE, label=sREplotnodefreq1>>=
-barplot(ndf[ondf], col=rainbow(length(ondf)))
-@ 
-Top frequent stacks.
-<<fig=TRUE, label=sREplotstackfreq>>=
-x <- sprof01
-xsrc <- as.matrix(x$stacks$refcount)
-rownames(xsrc) <- rownames(xsrc, do.NULL=FALSE, prefix="S")
-#stf <- x$stacks$refcount[x$stacks$refcount>1]
-#names(stf) <-  x$stacks$shortname[x$stacks$refcount>1]
-stf <- xsrc[xsrc>1]
-names(stf) <- rownames(xsrc)[xsrc>1]
-ostf <- order(stf,decreasing=TRUE)
-barplot(stf[ostf])
-@
-There is no statistics on profiles. Profiling are our elementary data.
+There is no statistics on profiles. Profiles are our elementary data.
 However we can link to our derived data to get a more informative display.
 For example, going one step back we can encode stacks and use these colour codes in the display of a profile.
 
 Or going two steps back, we can encode nodes in colour, giving coloured stacks, and use these in the display of profile data.
 
 \subsubsection{Surgery}
+\label{sec:surgery}
+
+Note: surgery may be supported by the graph packages.
+
+
 Looking at nodes gives you a point-wise horizon. Looking at edges gives you a one step horizon. The stacks give a wider horizon, typically a step size of 10 or more. The stacks we get from \R{} have peculiarities, and we can handle with this broader perspective. These are not relevant if we look point-wise, but may become dominating if we try to get a global picture. We take a look ahead (details to come in \vref{sec:graph} and have a preview how our example is represented as a graph. Left is the original graph as recovered from the edge information,  right the graph after we have cut off the scaffold effects.
 \todo{cut next level}
 
@@ -1168,11 +1165,15 @@ See \vref{tab:pramt1}
 \todo{table:  node \#runs  min  median run length  max}
 
 
-\subsection{Graph package}
+\section{Graph package}
+\label{sec:graph}
+What we have achieved so far can be seen from the graph representations.
 <<>>=
 library(graph)
 search() 
-<<fig=TRUE, label=sprofadj01NEL, width=12, height=6>>=
+@
+%: floating figure
+<<fig = TRUE, echo = TRUE, print = FALSE, label=sprofadj01NEL, width=12, height=6, include=FALSE>>= 
 #12 6
 oldpar <- par(mfrow=c(1,2))
 plotviz(as(adjacency(sprof01),"graphNEL"),  
@@ -1181,23 +1182,41 @@ plotviz(as(adjacency(sprof02),"graphNEL"),
 	main="graph layout sprof02", sub=sprof02$info$id)
 par(oldpar)
 @
-\R{} is function based, and control structures in general are implemented as functions. In a graph representation, they appear as nodes, concentrating and seeding to unrelated paths. We can detect these on the stack level and replace them by surrogates, introducing new nodes.
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics{sprofiling-sprofadj01NEL}
+\caption{Sprof graph, before and after trimming.}
+\label{fig:sprofadj01NEL}
+\end{center}
+\end{figure}
+
+See \vref{fig:sprofadj01NEL} for a comparison before and after trimming. The scaffold effect are now removed from the picture. You can do additional trimming, if you want.
+
+% floating figure end
+\R{} is function based, and control structures in general are implemented as functions. In a graph representation, they appear as nodes, concentrating and seeding to unrelated paths. We can detect these on the stack level and replace them by surrogates, introducing new nodes. This is a case for surgery.
+
+We used a prepared sanitized version of our data set.
 @
 
 \todo{fix null name}
 <<>>=
-sprof04 <- readRprof("RprofsRegressionExpl03.out"); sprof04$info$id <- "sprof04"
-#sprof04$nodes$name[1] <-  sprof04$nodes$name[2]
-#sprof04$nodes$name[1]<-"<noop>"??
+sprof04 <- readRprof("RprofsRegressionExpl03.out", id="sprof04")
 
 @
 \todo{cut top levels}
+
+We know ho to create standard graphh displays from this. The next step is to use additional information
+we have from the profiles as attribute to the graph. The derived edge frequency is the first bit of information Implicitely, it can be used as weight in the graph placement routines. We make this explicit by giving a choice whether to use  it or not. Irrespective of this choice, we encode it as line width of the edges.
+
+This function is not included in the package to avoid dependency of \ircode{sprof} on \ircode{graph} and other graph packages.
 <<>>=
 library(graph)
 search() 
+@
+%:Render_asNEL_sprof
 <<>>=
 
-asNEL_sprof <- function(sprof, weight=TRUE){
+Render_asNEL_sprof <- function(sprof, weight=TRUE){
 
 a04<-adjacency(sprof)
 
@@ -1229,13 +1248,17 @@ a04NEL
 }
 
 <<>>=
-a04NEL <- asNEL_sprof(sprof04)
-
+a04NEL <- Render_asNEL_sprof(sprof04)
+@
+We still are experimentign with the facilities to display this graph.
+This is the state of the current experiments.
 <<fig=TRUE, label=sprofadj04NEL1, width=12, height=12>>=
+
 #12 12 --ellipses are lost!! needs to be recovered
 plot(a04NEL,  main="graph layout sprof04 plot" ,sub="xxx")
 
 <<fig=TRUE, label=sprofadj04NEL1plotviz, width=24, height=12>>=
+
 #24 12 --ellipses are lost?? needs to be recovered
 plotviz(a04NEL,  main="graph layout sprof04 plotviz",sub="xxx")
 @
@@ -1244,12 +1267,14 @@ To  use attributes on nodes and edges, we need \ircode{Rgraphviz}.
 library(Rgraphviz)
 search()
 <<fig=TRUE, label=sprofadj04NEL00, width=12, height=12>>=
+
 #12 12
 a04NEL <- layoutGraph(a04NEL)
 renderGraph(a04NEL)
 <<fig=TRUE, label=sprofadj04NEL0, width=10, height=10>>=
 #10 10
-a04NEL0 <- asNEL_sprof(sprof04, weight=FALSE)
+
+a04NEL0 <- Render_asNEL_sprof(sprof04, weight=FALSE)
 
 a04NEL0 <- layoutGraph(a04NEL0)
 renderGraph(a04NEL0)
@@ -1356,8 +1381,10 @@ these three functions.
 %The \irfunx{misc}{plot} method for \ircode{sprof} objects concatenates these three functions.
 %\filledpagebreak
 %
-\section{Graph}
-\label{sec:graph}
+\section{More Graphs}
+\label{sec:moregraph}
+\emph{Note: This section is collecting experiments  with various graph packages}
+
 Graph layout is a theme of its own. Proposals are readily available, as are their implementation. For some of them, there are \R{} interfaces or re-implementations in \R{}. Their usefulness in our context has to be explored, and the answers will vary with personal preferences. 
 
 For some graph layout packages we illustrate an interface here and show a sample result. We use the original profile data here. This is a nasty graph with some \R{} stack peculiarities. The corresponding results for the trimmed profile data are shown in the next section \vref{subsec:graphtre}. This is a more realistic example of the kind of graphs you will have to work with.
@@ -1626,6 +1653,16 @@ plotviz(sprofadjRag,"circo", main="sprof04: Graphviz circo layout 6")
 #6
 plotviz(sprofadjRag,"fdp", main="sprof04: Graphviz fdp layout")
 @
+\section{Template}
+\begin{itemize}
+	\item{Run a profiling routine to prfoile your functions. You can do it on the fly}
+	\item{Read in the profile}
+	\item{Get a survey}
+	\item{Trim base level and burn-in/fade-out}
+	\item{Get a revised survey}
+	\item{Use a graph display}
+	\item{Think!}
+	\end{itemize}
 \index{Index01}
 %:Sweave examples
 %<<print=TRUE>>=
@@ -1659,8 +1696,10 @@ toLatex(sessionInfo())
 %\RequirePackage{layouts}
 \LaTeX{} information:
 {\tiny
-\currentpage textwidth: \printinunitsof{in}\prntlen{\textwidth} \qquad linewidth:\printinunitsof{in}\prntlen{\linewidth}\\
- textheight: \printinunitsof{in}\prntlen{\textheight}\\
+\currentpage 
+textwidth: \printinunitsof{in}\prntlen{\textwidth} \qquad 
+linewidth:\printinunitsof{in}\prntlen{\linewidth}\\
+textheight: \printinunitsof{in}\prntlen{\textheight}\\
 }
 @
 Svn repository information:
@@ -1686,6 +1725,36 @@ Svn repository information:
 \typeout{**** $Id$ done ****}
 \filledpagebreak
 \section{xxx  -- lost \& found}
+<<>>=
+nodefreq <- rep(0,length(sprof01$nodes$name))
+for (i in (1:length(sprof01$stacks$nodes))){
+	nodefreq <- nodefreq +   
+		table( factor(sprof01$stacks$nodes[[i]], 
+			levels <- 1:length(sprof01$nodes$name), 
+			ordered=FALSE))
+	}
+names(nodefreq) <- sprof01$nodes$name
+@
+Top frequent nodes.
+<<fig=TRUE, label=sREplotnodefreq>>=
+ndf <- nodefreq[nodefreq>1]
+ondf <- order(ndf,decreasing=TRUE)
+barplot(ndf[ondf])
+<<fig=TRUE, label=sREplotnodefreq1>>=
+barplot(ndf[ondf], col=rainbow(length(ondf)))
+@ 
+Top frequent stacks.
+<<fig=TRUE, label=sREplotstackfreq>>=
+x <- sprof01
+xsrc <- as.matrix(x$stacks$refcount)
+rownames(xsrc) <- rownames(xsrc, do.NULL=FALSE, prefix="S")
+#stf <- x$stacks$refcount[x$stacks$refcount>1]
+#names(stf) <-  x$stacks$shortname[x$stacks$refcount>1]
+stf <- xsrc[xsrc>1]
+names(stf) <- rownames(xsrc)[xsrc>1]
+ostf <- order(stf,decreasing=TRUE)
+barplot(stf[ostf])
+
 << label=tab:prSREinfo>>=
 # xtable cannot handle posix, so we use print output here
 #  str(profile_nodes_rle, max.level=2, vec.len=3, nchar.max=40, list.len=6)
