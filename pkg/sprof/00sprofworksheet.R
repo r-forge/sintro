@@ -9,7 +9,6 @@
 Build instructions and correction notes are placed here.
 Eventually, they will bubble down to other files.
 #####
-?? Seems that layoutGraph does not store renderinfo in a renderinfo slot.
 
 check index style
 utils::toLatex
