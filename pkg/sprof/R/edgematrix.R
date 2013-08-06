@@ -23,7 +23,7 @@
 #\title{edgematrix matrix}
 #\desciption{Build an edgematrix matrix from profile information}
 
-edgematrix <- function(data, counts=TRUE, na.rm=TRUE) {
+edgematrix <- function(data, counts=TRUE, na.rm=TRUE, no.name="<nn>") {
 # allow sprof as parameter
   if (inherits(data,"sprof"))   data <- adjacency(data)
   if (!is.matrix(data)) stop("edgematrix: data must be a matrix")
@@ -41,6 +41,11 @@ edgematrix <- function(data, counts=TRUE, na.rm=TRUE) {
     data <- data[!missing]
     labels <- labels[!missing, ]
  }
+ 
+ 	if (!is.null(no.name)){ 
+			labels[labels[]==""]  <- no.name
+			}
+
 if (counts) {
   count <- setNames(data.frame(as.vector(data)), "count")
   em <- cbind(labels, count)

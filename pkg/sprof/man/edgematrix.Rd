@@ -14,7 +14,7 @@
 Expand adjacency information from an adjacency matrix or a \code{sprof} data structure to an edge table
 }
 \usage{
-edgematrix(data, counts = TRUE, na.rm = TRUE)
+edgematrix(data, counts = TRUE, na.rm = TRUE,  no.name="<nn>")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -23,13 +23,15 @@ edgematrix(data, counts = TRUE, na.rm = TRUE)
   \item{counts}{include a column of counts
 }
   \item{na.rm}{remove lines with a count \code{NA}.}
+  \item{no.name}{If not null: replacement for empy strings as name.}
+
 }
 \details{The adjacency matrix is flattened. Lines with a count zero are eliminated.}
 \value{
 A data frame.
 \item{from}{Name of from node.}
-\item{to}{Name of from node.}
-\item{count}{optional. Frequency of edge.}
+\item{to}{Name of to node.}
+\item{count}{optional. Frequencies of edges.}
 }
 \author{Günther Sawitzki <gsawitzki@users.r-forge.r-project.org>}
 \keyword{manip}
