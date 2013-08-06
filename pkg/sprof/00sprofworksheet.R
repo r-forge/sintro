@@ -9,6 +9,8 @@
 Build instructions and correction notes are placed here.
 Eventually, they will bubble down to other files.
 #####
+?? Seems that layoutGraph does not store renderinfo in a renderinfo slot.
+
 check index style
 utils::toLatex
 add zero.print from print.table to xtable
@@ -152,14 +154,16 @@ pdf <- function(){
 cd ~/projects/rforge/sintro/pkg/
 rm sprof_internal.pdf
 R CMD Rd2pdf -o sprof_internal.pdf  --internals --no-clean --title="sprof internal" sprof
+cp sprof_internal.pdf ../www/sprof/
 }
+
 #### R cmds for ad hoc construction
 setwd("/Users/gs/projects/rforge/sintro/pkg/sprof/")
 
-remove.packages("sprof")
-install.packages("/Users/gs/projects/rforge/sintro/pkg/sprof_0.0-6.tar.gz", repos=NULL, type="source")
 ##
 vignette <- function(){ 
+remove.packages("sprof")
+install.packages("/Users/gs/projects/rforge/sintro/pkg/sprof_0.0-6.tar.gz", repos=NULL, type="source")
 options(width=72); setwd("/Users/gs/projects/rforge/sintro/pkg/sprof/work/vignettes/" )
 Sweave(file= "../../vignettes/sprofiling.Rnw", output="sprofiling.tex", keep.source=TRUE)
 # debug=TRUE, eps=FALSE, pdf=TRUE, keep.source=TRUE

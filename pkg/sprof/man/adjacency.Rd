@@ -12,13 +12,15 @@
 \description{
 convert node information from a \code{sprof} structure to adjacancy matrix.}
 \usage{
-adjacency(sprof, keep.names = TRUE, rmzero=TRUE)
+adjacency(sprof, keep.names = TRUE, rmzero=TRUE,  no.name="<nn>")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{sprof}{ a \code{sprof} structure.}
   \item{keep.names}{boolean. Copy node names as row- and column names.}
-  \item{rmzero}{boolean. Remove nodes with no edges.}}
+  \item{rmzero}{boolean. Remove nodes with no edges.}
+  \item{no.name}{If not null: replacement for empy strings as name.}
+  }
 % \details{
 % %%  ~~ If necessary, more details than the description above ~~
 % }
