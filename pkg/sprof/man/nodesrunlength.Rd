@@ -11,19 +11,24 @@
 \description{
 Run length count, by node and run lenght, from profile.}
 \usage{
-nodesrunlength(sprof)
+nodesrunlength(sprof, clean=TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{sprof}{a \code{sprof} data structure with profiling information.}
+  \item{clean}{boolean.}
 }
-%\details{
-%%  ~~ If necessary, more details than the description above ~~
-%}
-\value{A matrix \code{count[node, level|]} with additonal columns
- \item{count}{sum of counts over all run lengths.}
- \item{total\_time }{sum of \code{count*run length}}
- \item{tavg }{\code{total\_time / count}}
+\details{
+If \code{clean=TRUE}, zero results are removed and the nodes are sorted by average time.
+
+If \code{clean=TRUE}, zero results and sorting are preserved. Trailing zero count nodes 
+may have been lost in the process, and are  added.
+
+}
+\value{A matrix \code{count[node, run length]} with additonal columns
+ \item{nr_runs}{sum of counts over all run lengths.}
+ \item{total_time }{sum of \code{count*run length}}
+ \item{avg_time }{\code{total_time / count}}
  }
 %\references{
 %%% ~put references to the literature/web site here ~
@@ -35,6 +40,8 @@ nodesrunlength(sprof)
 \examples{
 		data(sprof01lm)
  		nodesrunlength(sprof01lm) 
+		
+		
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
