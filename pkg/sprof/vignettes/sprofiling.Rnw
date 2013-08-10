@@ -479,8 +479,22 @@ See \vref{fig:sREplotnodes01h}.
 We can add colour. To illustrate this, we encode the frequency of the nodes as colour. As a palette, we choose a heat map here. 
 \todo{apply colour to selection?}
 \todo{spread colour on displayed part}
+%:****as_rkindex
 <<>>=
-freqrank01 <- rank(-sprof01$nodes$total.time, ties.method="random")
+as_rkindex <- function(x, 
+	maxindex=length(x), 
+	pwr=1, 
+	ties.method="random" ) {
+		ix <- rank(x, ties.method=ties.method)
+		rg <- range(ix)
+		ix <- (ix/rg[2])^pwr
+		ix <- ix*(maxindex-1) +1
+		ix <- round(ix)
+		return(ix)
+}
+
+<<>>=
+freqrank01 <- as_rkindex(-sprof01$nodes$total.time, ties.method="random")
 freqrankcol01 <- heat.colors(length(freqrank01))
 @
 Here is the node view using these choices:
@@ -1116,24 +1130,12 @@ print.table(addmargins(nn), zero.print = ".")
 \todo{replace sum by weighted sum}
 \todo{allow sorting, e.g. by marginals}
 
-%nodesrunlength <- function(sprof){
-%profile_nodes_rlearray <- nodesprofile(sprof)
-%mt <- margin.table(profile_nodes_rlearray, margin = c(1,3))
-%#amt <- addmargins(mt)
-%mts <- apply(mt,1,sum)
-%mtt <- apply(mt,1,function (x) {sum(x*seq(along.with=x))})
-%mtav <- mtt/mts
-%amt=cbind(mt,count=mts, total_time=mtt, avg=mtav)
-%amt <- amt[amt[,"count"]>0,]
-%amt <- amt[order(amt[,"total_time"], decreasing=TRUE),]
-%return(amt)
-%}
 <<>>=
 amt <- nodesrunlength(sprof02)
 #   print.table(as.table(amt[,1:9]), zero.print = ".") 
 ## ??? print.table changes format when col.10 is present.
 @
-%????????? tex error in table.
+%????????? tex error in xtable.
 %cannot handle [. Needs to be replaced by $[$.
 
 But \ircode{print.xtable} has no \ircode{zero.print} \ldots
@@ -1149,10 +1151,11 @@ xr <- gsub("_","\\_",xr, fixed=TRUE)
 xr <- gsub("^","\\^",xr, fixed=TRUE)
 rownames(amt)<- xr
 
-prxt(amt[amt[,"count"]>1,],
+prxt(amt,
  caption="Marginal statistics on nodes by run length, sorted by total time used,  count > 1 only", 
 	label="tab:pramt1", 
-	digits=c(rep(0,dim(amt)[2]) ,2), zero.print=" . ") #dim(amt)[2]-1, +1 for rownames
+	digits=c(rep(0,dim(amt)[2]) ,2), 
+	zero.print=" . ") #dim(amt)[2]-1, +1 for rownames
 @
 See \vref{tab:pramt1}
 %<<>>=
@@ -1161,8 +1164,16 @@ See \vref{tab:pramt1}
 \todo{add current level}
 
 \todo{generate a coplot representation}
-\todo{add time per call information: add marginals statistics run time by node}
-
+\todo{remove counts per level?}
+\todo{hack. keep length in nodesrunlength}
+We can add this information to our base.
+<<>>=
+ nr <- nodesrunlength(sprof02, clean=FALSE)
+ nr <- rbind(nr,0) ## hack. keep length in nodesrunlength
+ sprof02$nodes <- cbind(sprof02$nodes, nr)
+ 
+ rownames(sprof02$nodes) <- sprof02$nodes$name
+@
 \todo{table:  node \#runs  min  median run length  max}
 
 
@@ -1191,33 +1202,54 @@ par(oldpar)
 \end{center}
 \end{figure}
 
-See \vref{fig:sprofadj01NEL} for a comparison before and after trimming. The scaffold effect are now removed from the picture. You can do additional trimming, if you want.
+See \vref{fig:sprofadj01NEL} for a comparison before and after trimming. The scaffold effect are removed from the picture on the right side. This cuts off tehe uninformative spine, and induces minor changes in the body of the graph. You can do additional trimming, if you want.
 
 % floating figure end
 \R{} is function based, and control structures in general are implemented as functions. In a graph representation, they appear as nodes, concentrating and seeding to unrelated paths. We can detect these on the stack level and replace them by surrogates, introducing new nodes. This is a case for surgery.
 
-We used a prepared sanitized version of our data set.
+We used a prepared sanitised version of our data set.
 @
 
 \todo{fix null name}
 <<>>=
 sprof04 <- readRprof("RprofsRegressionExpl03.out", id="sprof04")
+<<fig = TRUE, echo = TRUE, print = FALSE, label=sprofadj04NEL, width=12, height=6, include=FALSE>>= 
+#12 6
+oldpar <- par(mfrow=c(1,2))
+plotviz(as(adjacency(sprof02),"graphNEL"),  
+	main="graph layout sprof02", sub=sprof02$info$id)
+plotviz(as(adjacency(sprof04),"graphNEL"),  
+	main="graph layout sprof04", sub=as.character(sprof04$info$id))
+par(oldpar)
+@
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics{sprofiling-sprofadj04NEL}
+\caption{Sprof graph, after trimming, and after trimming and some sanitizing.}
+\label{fig:sprofadj04NEL}
+\end{center}
+\end{figure}
 
 @
 \todo{cut top levels}
+Now the structure becomes obvious. Cutting off may be taken two levels deeper. This would completely separate the \ircode{lm()} branch from the  \ircode{summary.lm()} In the  \ircode{lm()} branch, there are tree nodes (\ircode{lapply()}, \ircode{\%in\%} and \ircode{[.data.frame}) that are a cases for additional surgery to avoid focusing affects in the graph display. It is your choice to remove them, or live with them.
 
-We know ho to create standard graphh displays from this. The next step is to use additional information
-we have from the profiles as attribute to the graph. The derived edge frequency is the first bit of information Implicitely, it can be used as weight in the graph placement routines. We make this explicit by giving a choice whether to use  it or not. Irrespective of this choice, we encode it as line width of the edges.
+We know ho to create standard graph displays from this. The next step is to encode additional information
+we have from the profiles as attribute to the graph. 
+
+The derived edge frequency is the first bit of information Implicitly, it can be used as weight in the graph placement routines. We make this explicit by giving a choice whether to use  it or not. Irrespective of this choice, we encode referenc counts as line width of the edges.
 
 This function is not included in the package to avoid dependency of \ircode{sprof} on \ircode{graph} and other graph packages.
 <<>>=
 library(graph)
 search() 
+
 @
-%:Render_asNEL_sprof
+%:as_graphNEL_sprof
+This is a common routine for the \ircode{grpah} and \ircode{Rgraphviz} package.
 <<>>=
 
-Render_asNEL_sprof <- function(sprof, weight=TRUE){
+as_graphNEL_sprof <- function(sprof, weight=TRUE){
 
 a04<-adjacency(sprof)
 
@@ -1229,9 +1261,7 @@ rownames(a04)<- rnames; colnames(a04)<- rnames;
 } #! define lwd first
 
 el04 <- edgematrix(a04)
-el04.lwd <- rank(el04$count, ties.method="min")
-el04$lwd  <- ceiling(el04.lwd /max(el04.lwd )*6)
-
+el04$lwd  <- as_rkindex(el04$count, maxindex=6, ties.method="min")
 
 a04NEL <- as(a04,"graphNEL")
 nodeDataDefaults(a04NEL, "shape") <- "ellipse"
@@ -1239,6 +1269,9 @@ nodeDataDefaults(a04NEL, "cex") <- 0.6
 nodeDataDefaults(a04NEL, "weigth") <- 1
 nodeDataDefaults(a04NEL, "fill") <- "green"
 nodeDataDefaults(a04NEL, "col") <- "yellow"
+
+a04NEL <- layoutGraph(a04NEL)
+
 nodeRenderInfo(a04NEL) <- list(shape="ellipse")
 nodeRenderInfo(a04NEL) <- list(cex=0.6, shape="ellipse")
 nodeRenderInfo(a04NEL) <- list(weight=1)
@@ -1246,7 +1279,7 @@ nodeRenderInfo(a04NEL) <- list(weight=1)
 nodeRenderInfo(a04NEL) <- list(fill="yellow", col="blue")
 
 edgeDataDefaults(a04NEL,"lwd") <- 1
-edgeDataDefaults(a04NEL,"col") <- "black"
+edgeDataDefaults(a04NEL,"col") <- "grey"
 
 #nodeRenderInfo(a04NEL) <- list(weight=1)
 
@@ -1258,20 +1291,20 @@ a04NEL
 }
 
 <<>>=
-a04NEL <- Render_asNEL_sprof(sprof04)
+a04NEL <- as_graphNEL_sprof(sprof04)
 @
-We still are experimentign with the facilities to display this graph.
-This is the state of the current experiments.
-<<fig=TRUE, label=sprofadj04NEL1, width=12, height=12>>=
-
-#12 12 --ellipses are lost!! needs to be recovered
-plot(a04NEL,  main="graph layout sprof04 plot" ,sub="xxx")
-
-<<fig=TRUE, label=sprofadj04NEL1plotviz, width=24, height=12>>=
-
-#24 12 --ellipses are lost?? needs to be recovered
-plotviz(a04NEL,  main="graph layout sprof04 plotviz",sub="xxx")
-@
+%We still are experimenting with the facilities to display this graph.
+%This is the state of the current experiments.
+%<<fig=TRUE, label=sprofadj04NEL1, width=12, height=12>>=
+%
+%#12 12 --ellipses are lost!! needs to be recovered
+%plot(a04NEL,  main="graph layout sprof04 plot" ,sub="xxx")
+%
+%<<fig=TRUE, label=sprofadj04NEL1plotviz, width=24, height=12>>=
+%
+%#24 12 --ellipses are lost?? needs to be recovered
+%plotviz(a04NEL,  main="graph layout sprof04 plotviz",sub="xxx")
+%@
 To  use attributes on nodes and edges, we need \ircode{Rgraphviz}.
 %## This function will plot individual nodes on the plotting device.
 %## Update: This is now in a vectorized form (user can still
@@ -1304,72 +1337,150 @@ To  use attributes on nodes and edges, we need \ircode{Rgraphviz}.
 <<>>=
 library(Rgraphviz)
 search()
-<<fig=TRUE, label=sprofadj04NEL00, width=10, height=10>>=
-
-#12 12
-a04NEL <- layoutGraph(a04NEL)
-renderGraph(a04NEL)
-
 @
-\filledpagebreak
-
-Same data, but unweighted edges.
-<<fig=TRUE, label=sprofadj04NEL0, width=6, height=6>>=
-#6 6
-
-a04NEL0 <- Render_asNEL_sprof(sprof04, weight=FALSE)
-
-a04NEL0 <- layoutGraph(a04NEL0)
-renderGraph(a04NEL0)
-
-@
-\filledpagebreak
-
-Same data, unweighted edges, and colours.
-\todo{Seems that layoutGraph does not return renderinfo in a renderinfo slot. See help(layoutGraph). Too bad.}
-<<fig=TRUE, label=sprofadj04NEL01, width=6, height=6>>=
-#6 6
-a04NEL0 <- Render_asNEL_sprof(sprof04, weight=FALSE)
-
-nodeDataDefaults(a04NEL0, "shape") <- "ellipse"
-nodeDataDefaults(a04NEL0, "cex") <- 0.6
-nodeDataDefaults(a04NEL0, "weigth") <- 1
-nodeDataDefaults(a04NEL0, "fill") <- "green"
-nodeDataDefaults(a04NEL0, "col") <- "yellow"
-nodeRenderInfo(a04NEL0) <- list(shape="ellipse")
-nodeRenderInfo(a04NEL0) <- list(cex=0.6, shape="ellipse")
-nodeRenderInfo(a04NEL0) <- list(weight=1)
-#nodeRenderInfo(a04NEL0) <- list(color="yellow")
-nodeRenderInfo(a04NEL0) <- list(fill="yellow", col="blue")
-
-a04NEL0 <- layoutGraph(a04NEL0)
-renderGraph(a04NEL0)
-@
-\filledpagebreak
-
-Same data, unweighted edges, and colours, but attributes set after layout.
+%<<fig=TRUE, label=sprofadj04NEL00, width=10, height=10>>=
+%
+%#12 12
+%a04NEL <- layoutGraph(a04NEL)
+%renderGraph(a04NEL)
+%
+%@
+%\filledpagebreak
+%
+%Same data, but unweighted edges.
+%<<fig=TRUE, label=sprofadj04NEL0, width=6, height=6>>=
+%#6 6
+%
+%a04NEL0 <- as_graphNEL_sprof(sprof04, weight=FALSE)
+%
+%a04NEL0 <- layoutGraph(a04NEL0)
+%renderGraph(a04NEL0)
+%
+%@
+%\filledpagebreak
+%
+%Same data, unweighted edges, and colours.
+%\todo{Seems that layoutGraph does not return renderinfo in a renderinfo slot. See help(layoutGraph). Too bad.}
+%<<fig=TRUE, label=sprofadj04NEL01, width=6, height=6>>=
+%#6 6
+%a04NEL0 <- as_graphNEL_sprof(sprof04, weight=FALSE)
+%
+%nodeDataDefaults(a04NEL0, "shape") <- "ellipse"
+%nodeDataDefaults(a04NEL0, "cex") <- 0.6
+%nodeDataDefaults(a04NEL0, "weigth") <- 1
+%nodeDataDefaults(a04NEL0, "fill") <- "green"
+%nodeDataDefaults(a04NEL0, "col") <- "yellow"
+%nodeRenderInfo(a04NEL0) <- list(shape="ellipse")
+%nodeRenderInfo(a04NEL0) <- list(cex=0.6, shape="ellipse")
+%nodeRenderInfo(a04NEL0) <- list(weight=1)
+%#nodeRenderInfo(a04NEL0) <- list(color="yellow")
+%nodeRenderInfo(a04NEL0) <- list(fill="yellow", col="blue")
+%
+%a04NEL0 <- layoutGraph(a04NEL0)
+%renderGraph(a04NEL0)
+%@
+%\filledpagebreak
+%
+%\section{*** hot spot ***}
+%
+%@
+%%:************** very hot
+%{\huge very hot}
+%
+%Same data, unweighted edges, and colours, but attributes set after layout.
 
 <<fig=TRUE, label=sprofadj04NEL02, width=6, height=6>>=
+library(graph)
+# see help(nodeRenderInfo) for attributes.
 #6 6
-a04NEL0 <- Render_asNEL_sprof(sprof04, weight=FALSE)
-
-a04NEL0 <- layoutGraph(a04NEL0)
-
+a04NEL0 <- as_graphNEL_sprof(sprof04, weight=FALSE)
+#nDD0 <- (nodeRenderInfo(a04NEL0))
+#a04NEL0 <- layoutGraph(a04NEL0)
+#nDD1 <- (nodeRenderInfo(a04NEL0))# fill & col corrupted
 nodeDataDefaults(a04NEL0, "shape") <- "ellipse"
-nodeDataDefaults(a04NEL0, "cex") <- 0.6
-nodeDataDefaults(a04NEL0, "weigth") <- 1
-nodeDataDefaults(a04NEL0, "fill") <- "green"
-nodeDataDefaults(a04NEL0, "col") <- "yellow"
-nodeRenderInfo(a04NEL0) <- list(shape="ellipse")
-nodeRenderInfo(a04NEL0) <- list(cex=0.6, shape="ellipse")
-nodeRenderInfo(a04NEL0) <- list(weight=1)
-#nodeRenderInfo(a04NEL0) <- list(color="yellow")
-nodeRenderInfo(a04NEL0) <- list(fill="yellow", col="blue")
+#nodeDataDefaults(a04NEL0, "cex") <- 1.0
+#nodeDataDefaults(a04NEL0, "weigth") <- 1
+#nodeDataDefaults(a04NEL0, "fill") <- "green"
+#nodeDataDefaults(a04NEL0, "col") <- "yellow"
+nDD2 <- (nodeRenderInfo(a04NEL0))
+a04NEL0 <- layoutGraph(a04NEL0) 
+# node attributes
+#sprof04$nodes$self.time -> fill
+fill_list <- heat.colors(12)[as_rkindex(-sprof04$nodes$self.time, pwr=0.5, maxindex=12, ties.method="min")]
+names(fill_list) <- sprof04$nodes$name
+
+#sprof04$nodes$total.time -> lwd
+lwd_list  <-  as_rkindex(sprof04$nodes$total.time, pwr=0.5,maxindex=6, ties.method="min")
+names(lwd_list) <- sprof04$nodes$name
+
+#strx(nodeRenderInfo(a04NEL0))
+nodeRenderInfo(a04NEL0) <- list(lwd=lwd_list, 
+	fill=fill_list, 
+	col="#0000FF80", 
+	shape="ellipse",
+	weight=1)
+#strx(nodeRenderInfo(a04NEL0))
+	
+# edge attributes
+# strx(edgeRenderInfo(a04NEL0))
+edgeRenderInfo(a04NEL0) <- list(col= "#80808080")
+# strx(edgeRenderInfo(a04NEL0))
 
 renderGraph(a04NEL0)
-
+title(main="nodes time", sub=sprof04$info$id)
+legend("bottomright",legend= c("node color: self.time, pwr=0.5", "node lwd: total.time, pwr=0.5"), bty="n")
 detach(package:Rgraphviz)
+@
+We should not overload the plot. We could use colour encoding for the edges, but this would conflict visually with the colour encoding of the nodes. We could use different colours for classes of nodes, but then we would need an additional display to explain the shape information. 
 
+But within the choice of attributes used, we still can select the information shown. To close this round, instead of showing the node information from the rough summary, we can show the information from the run length discussed in \vref{sec:rle}.
+
+<<fig=TRUE, label=sprofadj04NEL02rle, width=6, height=6>>=
+
+amt04 <- nodesrunlength(sprof04)
+
+library(graph)
+library(Rgraphviz)
+
+# see help(nodeRenderInfo) for attributes.
+#6 6
+a04NEL0rle <- as_graphNEL_sprof(sprof04, weight=FALSE)
+#nDD0 <- (nodeRenderInfo(a04NEL0rle))
+#a04NEL0rle <- layoutGraph(a04NEL0rle)
+#nDD1 <- (nodeRenderInfo(a04NEL0rle))# fill & col corrupted
+nodeDataDefaults(a04NEL0rle, "shape") <- "ellipse"
+#nodeDataDefaults(a04NEL0rle, "cex") <- 1.0
+#nodeDataDefaults(a04NEL0rle, "weigth") <- 1
+#nodeDataDefaults(a04NEL0rle, "fill") <- "green"
+#nodeDataDefaults(a04NEL0rle, "col") <- "yellow"
+nDD2 <- (nodeRenderInfo(a04NEL0rle))
+a04NEL0rle <- layoutGraph(a04NEL0rle) 
+# node attributes
+#sprof04$nodes$self.time -> fill
+fill_list <- heat.colors(12)[as_rkindex(-amt04[,"avg_time"], pwr=0.5, maxindex=12, ties.method="min")]
+names(fill_list) <- sprof04$nodes$name
+
+#sprof04$nodes$total.time -> lwd
+lwd_list  <-  as_rkindex(amt04[,"nr_runs"], pwr=0.5,maxindex=6, ties.method="min")
+names(lwd_list) <- sprof04$nodes$name
+
+#strx(nodeRenderInfo(a04NEL0rle))
+nodeRenderInfo(a04NEL0rle) <- list(lwd=lwd_list, 
+	fill=fill_list, 
+	col="#0000FF80", 
+	shape="ellipse",
+	weight=1)
+#strx(nodeRenderInfo(a04NEL0rle))
+	
+# edge attributes
+# strx(edgeRenderInfo(a04NEL0rle))
+edgeRenderInfo(a04NEL0rle) <- list(col= "#80808080")
+# strx(edgeRenderInfo(a04NEL0rle))
+
+renderGraph(a04NEL0rle)
+title(main="nodes run length", sub=sprof04$info$id)
+legend("bottomright",legend= c("node color: avg time, pwr=0.5", "node lwd: nr runs, pwr=0.5"), bty="n")
+detach(package:Rgraphviz)
 @
 %edge.lwd<-sprofadj
 %edge.lwd[edge.lwd>0]<- rank(edge.lwd[edge.lwd>0], ties.method="min")
@@ -1382,7 +1493,7 @@ detach(package:Rgraphviz)
 %plot(ag, attrs=list(node=list(cex=2,fontsize=40), edge=list(lwd=2,color=c("red","yellow"))), sub="xx", cex=2)
 \section{Standard output}
 
-For a reference, here are complete outputs of the standard functions.
+For a reference, here are  the standard functions.
 
 <<>>=
 sprof <- sprof01
@@ -1473,7 +1584,7 @@ these three functions.
 %
 \section{More Graphs}
 \label{sec:moregraph}
-\emph{Note: This section is collecting experiments  with various graph packages}
+\emph{Note: This section is collecting experiments  with various graph packages. It is only of interest for you, if you prefer some graphic package and want to look up a wrapper here.}
 
 Graph layout is a theme of its own. Proposals are readily available, as are their implementation. For some of them, there are \R{} interfaces or re-implementations in \R{}. Their usefulness in our context has to be explored, and the answers will vary with personal preferences. 
 
@@ -1491,11 +1602,14 @@ For some graph layout packages we illustrate an interface here and show a sample
 %tests conditionally (e.g. via if(require(pkgname))) should be listed in ÔSuggestsÕ or
 %ÔEnhancesÕ.
 In this section, we use the recent version of our example, \ircode{sprof02} for demonstration.
-You can re-run it, using your  \ircode{sprof} data by modifying this instruction:
+You can re-run it, using your  \ircode{sprof} data by modifying this instruction by replacing
+\ircode{sprof02} with your profile information.
 
 <<>>=
 sprof <- sprof02
 @
+
+
 To interface \ircode{sprof} to a graph handling package,  \irfunx{util}{adjacency} can extract the adjacency matrix from the profile.
 
 There are various packages for finding a graph layout, and the choice is open to your preferences.  The \R{} packages for most of these are just wrapper
@@ -1508,9 +1622,7 @@ This is  a format any graph package can handle (maybe). To be on the save side, 
 <<>>=
 sprofedgel <- edgematrix(sprofadj)
 
-sprofedgel.lwd <- rank(sprofedgel$count, ties.method="min")
-sprofedgel$lwd  <- ceiling(sprofedgel.lwd /max(sprofedgel.lwd )*12)
-
+sprofedgel$lwd  <- as_rkindex(sprofedgel$count, maxindex=12, ties.method="min")
 @
 \filledpagebreak
 \subsubsection{graph package}
@@ -1527,24 +1639,157 @@ detach("package:graph")
 @
 \filledpagebreak
 \subsubsection{igraph package}
+
 Attributes for igraphs are documented in \ircode{help(igraph.plotting)}.
+
+Layouts available for \ircode{igraph}:
+\ircode{
+layout.auto(graph, dim=2, ...)
+
+layout.random(graph, params, dim=2)
+
+layout.circle(graph, params)
+
+layout.sphere(graph, params)
+
+layout.fruchterman.reingold(graph, ..., dim=2, params)
+
+layout.kamada.kawai(graph, ..., dim=2, params)
+
+layout.spring(graph, ..., params)
+
+layout.reingold.tilford(graph, ..., params)
+
+layout.fruchterman.reingold.grid(graph, ..., params)
+
+layout.lgl(graph, ..., params)
+
+layout.graphopt(graph, ..., params=list())
+
+layout.svd(graph, d=shortest.paths(graph), ...)
+
+layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
+      zmin = NULL, zmax = NULL)
+}
 <<>>=
 library(igraph)
 search() 
 <<>>=
+sprof_igraph <- function(sprof, layoutfun, params=NULL,...){
+adj <- adjacency(sprof)
+adj[adj!=0] <-1
+sprofig <- graph.adjacency(adj)
+sprofig <- set.graph.attribute(sprofig, "layout", layoutfun(sprofig,params=params,...),...)
+V(sprofig)$color <- "yellow"
+E(sprofig)$color <- "#0000FF20"
+E(sprofig)$width <- c(1,2)
+return(sprofig)
+}
+
+<<>>=
 sprofig <- graph.adjacency(adjacency(sprof))
 sprofig <- set.graph.attribute(sprofig, "layout", layout.kamada.kawai(sprofig))
-# see 
 V(sprofig)$color <- "yellow"
-E(sprofig)$width <- c(1,2,3)
-E(sprofig)$color <- "blue"
+#E(sprofig)$width <- c(1,2)
+E(sprofig)$color <- "#0000FF40"
+E(sprofig)$width <- c(1,2)
+# see 
+<<fig=TRUE, label=sprofigkamada,width=8, height=8>>=
+plot(sprofig, main="sprof01: igraph kamada.kawai layout")
+<<>>=
+sprofig <- graph.adjacency(adjacency(sprof))
+sprofig <- set.graph.attribute(sprofig, "layout", layout.auto(sprofig))
+@
 
-<<fig=TRUE, label=sprofig,width=8, height=8>>=
-plot(sprofig, main="sprof01: igraph layout")
-#plot(sprofig, main="sprof01: igraph layout", cex.main=2)
-#plotviz(sprofig, main="sprof01: igraph layout")
+Experiments with various layouts for \ircode{igraph} follow.
 
-detach("package:igraph")
+\filledpagebreak
+@
+<<fig=TRUE, label=sprofig_igraph_auto,width=8, height=8>>=
+#8 8
+sprofig_auto <- sprof_igraph(sprof, layout.auto)
+plot(sprofig_auto, main="sprof01: igraph auto layout")
+@
+\filledpagebreak
+
+<<fig=TRUE, label=sprofig_igraph_random,width=6, height=6>>=
+#6 6
+sprofig_auto <- sprof_igraph(sprof, layout.random)
+plot(sprofig_auto, main="sprof01: igraph random layout")
+@
+\filledpagebreak
+
+<<fig=TRUE, label=sprofig_igraph_circle,width=6, height=6>>=
+#6 6
+sprofig_auto <- sprof_igraph(sprof, layout.circle)
+plot(sprofig_auto, main="sprof01: igraph circle layout")
+@
+\filledpagebreak
+
+<<fig=TRUE, label=sprofig_igraph_sphere,width=6, height=6>>=
+#6 6
+sprofig_auto <- sprof_igraph(sprof, layout.sphere)
+plot(sprofig_auto, main="sprof01: igraph sphere layout")
+@
+\filledpagebreak
+
+<<fig=TRUE, label=sprofig_igraph_fruchterman_reingold,width=6, height=6>>=
+#6 6
+sprofig_auto <- sprof_igraph(sprof, layout.fruchterman.reingold)
+plot(sprofig_auto, main="sprof01: igraph fruchterman.reingold layout")
+@
+\filledpagebreak
+
+<<fig=TRUE, label=sprofig_igraph_kamada_kawai,width=6, height=6>>=
+#6 6
+sprofig_auto <- sprof_igraph(sprof, layout.kamada.kawai)
+plot(sprofig_auto, main="sprof01: igraph kamada.kawai layout")
+@
+\filledpagebreak
+
+<<fig=TRUE, label=sprofig_igraph_spring,width=6, height=6>>=
+#6 6
+sprofig_auto <- sprof_igraph(sprof, layout.spring)
+plot(sprofig_auto, main="sprof01: igraph spring layout")
+@
+%<<fig=TRUE, label=sprofig_igraph_reingold.tilford,width=6, height=6>>=
+%#6 6
+%sprofig_auto <- sprof_igraph(sprof, layout.reingold.tilford)
+%plot(sprofig_auto, main="sprof01: igraph reingold.tilford layout")
+@
+\filledpagebreak
+
+<<fig=TRUE, label=sprofig_igraph_fruchterman_reingold_grid,width=6, height=6>>=
+#6 6
+sprofig_auto <- sprof_igraph(sprof, layout.fruchterman.reingold.grid)
+plot(sprofig_auto, main="sprof01: igraph fruchterman.reingold.grid layout")
+@
+\filledpagebreak
+
+<<fig=TRUE, label=sprofig_igraph_lgl,width=6, height=6>>=
+#6 6
+sprofig_auto <- sprof_igraph(sprof, layout.lgl)
+plot(sprofig_auto, main="sprof01: igraph lgl layout")
+@
+\filledpagebreak
+
+<<fig=TRUE, label=sprofig_igraph_graphopt,width=6, height=6>>=
+#6 6
+sprofig_auto <- sprof_igraph(sprof, layout.graphopt)
+plot(sprofig_auto, main="sprof01: igraph graphopt layout")
+@
+\filledpagebreak
+
+<<fig=TRUE, label=sprofig_igraph_svd,width=6, height=6>>=
+#6 6
+sprofig_auto <- sprof_igraph(sprof, layout.svd)
+plot(sprofig_auto, main="sprof01: igraph svd layout")
+@
+%<<fig=TRUE, label=sprofig_igraph_norm,width=6, height=6>>=
+%#6 6
+%sprofig_auto <- sprof_igraph(sprof, layout.norm)
+%plot(sprofig_auto, main="sprof01: igraph norm layout")
+%detach("package:igraph")
 @
 \filledpagebreak
 \subsubsection{network package}
@@ -1560,9 +1805,8 @@ plot(nwsprofadj, label=rownames(sprofadj), main="sprof01: network layout", cex.m
 Experiments to include weight. \todo{maximum edge.lwd?}
 <<fig=TRUE, label=nwsprofadje,width=8, height=8>>=
 edge.lwd<-sprofadj
-edge.lwd[edge.lwd>0]<- rank(edge.lwd[edge.lwd>0], ties.method="min")
-#edge.lwd <- trunc(sprofadj/max(sprofadj)*10)+1
-edge.lwd <- ceiling(edge.lwd/max(edge.lwd)*12)
+edge.lwd[edge.lwd>0]<- as_rkindex(edge.lwd[edge.lwd>0], maxindex=12, ties.method="min")
+
 plot(nwsprofadj, label=rownames(sprofadj), main="sprof01: network layout", cex.main=2, edge.lwd=edge.lwd)
 detach("package:network")
 @
@@ -1606,12 +1850,14 @@ plot(sprofadjRag,"circo", main="sprof01: Graphviz circo layout")
 plot(sprofadjRag,"fdp", main="sprof01: Graphviz fdp layout")
 @
 \filledpagebreak
-\subsection{Trimmed example: regression}
+\section{Trimmed example: regression}
 \label{subsec:graphtre}
 %Packages used to run examples or
 %tests conditionally (e.g. via if(require(pkgname))) should be listed in ÔSuggestsÕ or
 %ÔEnhancesÕ.
 In this section, we use the reduced version of our example, \ircode{sprof04} for demonstration. Except for the change of the data set, this is just a copy of the previous chapter, collecting the various layouts for easy reference.
+
+\emph{Note: This section will be replaced by the template section. For intern use only. Skip it.}
 
 Some experiments may have found their way to this chapter. They will be expelled.
 
@@ -1683,9 +1929,9 @@ plot(nwsprofadj, label=rownames(sprofadj),
 <<fig=TRUE, label=s04nwsprofadje,width=8, height=8>>=
 #8
 edge.lwd<-sprofadj
-edge.lwd[edge.lwd>0]<- rank(edge.lwd[edge.lwd>0], ties.method="max")
-#edge.lwd <- trunc(sprofadj/max(sprofadj)*10)+1
-edge.lwd <- round(edge.lwd/max(edge.lwd)*12)
+edge.lwd[edge.lwd>0]<- as_rkindex(edge.lwd[edge.lwd>0], maxindex=12,
+ ties.method="max")
+
 plot(nwsprofadj, label=rownames(sprofadj), 
 	main="sprof04: network layout: trimmed data", 
 	cex.main=2, edge.lwd=edge.lwd)
@@ -1889,6 +2135,7 @@ On the first look, information on the profile level is not informative. Profile 
 
 @
 We now do a step down analysis. Aggregating the information from the profiling events, we have the frequency of stack references. On the stack level, we encode the frequency in colour, and linking propagates this to the profile level.
+\todo{use as\_rkindex}
 <<fig=TRUE, label=sREplotstacks4col>>=
 stackfreqscore <- rank(sprof01$stacks$refcount,ties.method="random")
 stacksperm <- order(sprof01$stacks$refcount,decreasing=TRUE)
