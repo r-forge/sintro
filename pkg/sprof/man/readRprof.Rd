@@ -30,11 +30,13 @@ readRprof(filename = "Rprof.out", chunksize = 5000,
   is read in blocks of \code{chunksize} lines.  Increasing \code{chunksize}
   will make the function run faster if sufficient memory is available.
   
+  (This data structure is subject to change.)
+
   The input format is controlled by the \code{head} argument. Format \code{"auto"} tries to detect control lines as interspersed by \code{Rprof}. These lines are not included in the output.
  
  \code{"none"} igores all control information and includes these lines as strange stacks.  
  
- \code{"Rprofmem"} isolates headers as provided by  \code{Rprofmem}. \code{new page} entries are encoded as \code{malloc} requests with length 0.
+\code{"Rprofmem"} isolates headers as provided by  \code{Rprofmem}. \code{new page} entries are encoded as \code{malloc} requests with length 0.
 }
 \value{
 This data structure is subject to change.
@@ -72,7 +74,7 @@ Temporarily: A list with components
  \code{\link[proftools]{flatProfile}} in \code{library(proftools)}.
 
 %\code{\link[profr]{parse_rprof}} in \code{library(profr)}.
-\code{{parse_rprof}} in \code{library(profr)}.
+\code{\link{parse_rprof}} in \code{library(profr)}.
 
 
   The chapter on \dQuote{Tidying and profiling R code} in
