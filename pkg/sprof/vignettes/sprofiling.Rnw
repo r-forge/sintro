@@ -277,6 +277,7 @@ plot(x,
 	attrs=list(node=list(cex=4, fontsize=40,  
 	shape="ellipse")), 
 	cex.main=2, ...)
+title(sub=as.character(class(x)))	
 }
 
 @
@@ -1281,9 +1282,28 @@ for (i in 1:length(el04$lwd))
 {edgeRenderInfo(a04NEL)$lwd[i] <- el04$lwd[i]}
 a04NEL
 }
+<<>>=
+plot_graphNEL_sprof <- function(graphNEL)
+{
+	main1 <- deparse(substitute(graphNEL))
+	
+	if (inherits(graphNEL, "sprof")) {
+	main1 <- graphNEL$info$id
+	graphNEL <- 	
+		as_graphNEL_sprof(graphNEL, weight=FALSE)
+		}
 
+	renderGraph(graphNEL)
+	title(main=paste0(main1, " Rgraphviz/graph"))
+	
+#title(main="nodes time", sub=sprof04$info$id)
+#legend("bottomright",legend= c("node color: self.time, pwr=0.5", "node #lwd: total.time, pwr=0.5"), bty="n")
+
+}
 <<>>=
 a04NEL <- as_graphNEL_sprof(sprof04)
+<<fig=TRUE, label=plot04NEL, width=6, height=6>>=
+plot_graphNEL_sprof(a04NEL)
 @
 %We still are experimenting with the facilities to display this graph.
 %This is the state of the current experiments.
@@ -1416,8 +1436,8 @@ edgeRenderInfo(a04NEL0) <- list(col= "#80808080")
 # strx(edgeRenderInfo(a04NEL0))
 
 renderGraph(a04NEL0)
-title(main="nodes time", sub=sprof04$info$id)
-legend("bottomright",legend= c("node color: self.time, pwr=0.5", "node lwd: total.time, pwr=0.5"), bty="n")
+title(main="nodes (time)", sub=sprof04$info$id, col.sub=grey(0.5))
+legend("bottomright",legend= c("node color: self.time, pwr=0.5", "node lwd: total.time, pwr=0.5"), bty="n", text.font=3)
 
 detach(package:Rgraphviz)
 @
@@ -1468,13 +1488,16 @@ edgeRenderInfo(a04NEL0rle) <- list(col= "#80808080")
 # strx(edgeRenderInfo(a04NEL0rle))
 
 renderGraph(a04NEL0rle)
-title(main="nodes run length", sub=sprof04$info$id)
-legend("bottomright",legend= c("node color: avg time, pwr=0.5", "node lwd: nr runs, pwr=0.5"), bty="n")
+title(main="nodes (run length)", sub=sprof04$info$id, col.sub=grey(0.5))
+legend("bottomright",
+	legend= c("node lwd: nr runs, pwr=0.5", 
+	"node color: avg time, pwr=0.5"), 
+	bty="n", text.font=3)
 detach(package:Rgraphviz)
 @
-%edge.lwd<-sprofadj
+%edge.lwd<-sprofadj02
 %edge.lwd[edge.lwd>0]<- rank(edge.lwd[edge.lwd>0], ties.method="min")
-%#edge.lwd <- trunc(sprofadj/max(sprofadj)*10)+1
+%#edge.lwd <- trunc(sprofadj02/max(sprofadj02)*10)+1
 %edge.lwd <- round(edge.lwd/max(edge.lwd)*12)
 %
 %
@@ -1574,7 +1597,7 @@ these three functions.
 %
 \section{More Graphs}
 \label{sec:moregraph}
-\emph{Note: This section is collecting experiments  with various graph packages. It is only of interest for you, if you prefer some graphic package and want to look up a wrapper here.}
+\emph{Note: This section is collecting experiments  with various graph packages. It is only of interest for you, if you have a preference for some graphic package and want to look up a wrapper here. On the other side: contributions and sugestions are welcome.}
 
 Graph layout is a theme of its own. Proposals are readily available, as are their implementation. For some of them, there are \R{} interfaces or re-implementations in \R{}. Their usefulness in our context has to be explored, and the answers will vary with personal preferences. 
 
@@ -1605,14 +1628,14 @@ To interface \ircode{sprof} to a graph handling package,  \irfunx{util}{adjacenc
 There are various packages for finding a graph layout, and the choice is open to your preferences.  The \R{} packages for most of these are just wrapper
 
 <<>>=
-sprofadj <- adjacency(sprof)
+sprofadj02 <- adjacency(sprof)
 
 @
 This is  a format any graph package can handle (maybe). To be on the save side, we provide an (extended) edge list. The added component \ircode{lwd} is a proposal for the line width in the graph rendering.
 <<>>=
-sprofedgel <- edgematrix(sprofadj)
+sprofedgel02 <- edgematrix(sprofadj02)
 
-sprofedgel$lwd  <- rkindex(sprofedgel$count, maxindex=12, ties.method="min")
+sprofedgel02$lwd  <- rkindex(sprofedgel02$count, maxindex=12, ties.method="min")
 @
 \filledpagebreak
 \subsubsection{graph package}
@@ -1620,7 +1643,7 @@ sprofedgel$lwd  <- rkindex(sprofedgel$count, maxindex=12, ties.method="min")
 library(graph)
 search() 
 <<>>=
-sprofadjNEL <- as(sprofadj,"graphNEL")
+sprofadjNEL <- as(sprofadj02,"graphNEL")
 <<fig=TRUE, label=sprofadjNEL,width=8, height=8>>=
 plotviz(sprofadjNEL,  main=paste("graph layout\n",sprof$info$id))
 @
@@ -1697,90 +1720,90 @@ Experiments with various layouts for \ircode{igraph} follow.
 
 \filledpagebreak
 @
-<<fig=TRUE, label=sprofig_igraph_auto,width=8, height=8>>=
+<<fig=TRUE, label=sprof_ig_igraph_auto,width=8, height=8>>=
 #8 8
-sprofig_auto <- as_igraph_sprof(sprof, layout.auto)
-plot(sprofig_auto, main="sprof01: igraph auto layout")
+sprof_ig_auto <- as_igraph_sprof(sprof, layout.auto)
+plot(sprof_ig_auto, main="sprof01: igraph auto layout")
 @
 \filledpagebreak
 
-<<fig=TRUE, label=sprofig_igraph_random,width=6, height=6>>=
+<<fig=TRUE, label=sprof_ig_igraph_random,width=6, height=6>>=
 #6 6
-sprofig_auto <- as_igraph_sprof(sprof, layout.random)
-plot(sprofig_auto, main="sprof01: igraph random layout")
+sprof_ig_auto <- as_igraph_sprof(sprof, layout.random)
+plot(sprof_ig_auto, main="sprof01: igraph random layout")
 @
 \filledpagebreak
 
-<<fig=TRUE, label=sprofig_igraph_circle,width=6, height=6>>=
+<<fig=TRUE, label=sprof_ig_igraph_circle,width=6, height=6>>=
 #6 6
-sprofig_auto <- as_igraph_sprof(sprof, layout.circle)
-plot(sprofig_auto, main="sprof01: igraph circle layout")
+sprof_ig_auto <- as_igraph_sprof(sprof, layout.circle)
+plot(sprof_ig_auto, main="sprof01: igraph circle layout")
 @
 \filledpagebreak
 
-<<fig=TRUE, label=sprofig_igraph_sphere,width=6, height=6>>=
+<<fig=TRUE, label=sprof_ig_igraph_sphere,width=6, height=6>>=
 #6 6
-sprofig_auto <- as_igraph_sprof(sprof, layout.sphere)
-plot(sprofig_auto, main="sprof01: igraph sphere layout")
+sprof_ig_auto <- as_igraph_sprof(sprof, layout.sphere)
+plot(sprof_ig_auto, main="sprof01: igraph sphere layout")
 @
 \filledpagebreak
 
-<<fig=TRUE, label=sprofig_igraph_fruchterman_reingold,width=6, height=6>>=
+<<fig=TRUE, label=sprof_ig_igraph_fruchterman_reingold,width=6, height=6>>=
 #6 6
-sprofig_auto <- as_igraph_sprof(sprof, layout.fruchterman.reingold)
-plot(sprofig_auto, main="sprof01: igraph fruchterman.reingold layout")
+sprof_ig_auto <- as_igraph_sprof(sprof, layout.fruchterman.reingold)
+plot(sprof_ig_auto, main="sprof01: igraph fruchterman.reingold layout")
 @
 \filledpagebreak
 
-<<fig=TRUE, label=sprofig_igraph_kamada_kawai,width=6, height=6>>=
+<<fig=TRUE, label=sprof_ig_igraph_kamada_kawai,width=6, height=6>>=
 #6 6
-sprofig_auto <- as_igraph_sprof(sprof, layout.kamada.kawai)
-plot(sprofig_auto, main="sprof01: igraph kamada.kawai layout")
+sprof_ig_auto <- as_igraph_sprof(sprof, layout.kamada.kawai)
+plot(sprof_ig_auto, main="sprof01: igraph kamada.kawai layout")
 @
 \filledpagebreak
 
-<<fig=TRUE, label=sprofig_igraph_spring,width=6, height=6>>=
+<<fig=TRUE, label=sprof_ig_igraph_spring,width=6, height=6>>=
 #6 6
-sprofig_auto <- as_igraph_sprof(sprof, layout.spring)
-plot(sprofig_auto, main="sprof01: igraph spring layout")
+sprof_ig_auto <- as_igraph_sprof(sprof, layout.spring)
+plot(sprof_ig_auto, main="sprof01: igraph spring layout")
 @
-%<<fig=TRUE, label=sprofig_igraph_reingold.tilford,width=6, height=6>>=
+%<<fig=TRUE, label=sprof_ig_igraph_reingold.tilford,width=6, height=6>>=
 %#6 6
-%sprofig_auto <- as_igraph_sprof(sprof, layout.reingold.tilford)
-%plot(sprofig_auto, main="sprof01: igraph reingold.tilford layout")
+%sprof_ig_auto <- as_igraph_sprof(sprof, layout.reingold.tilford)
+%plot(sprof_ig_auto, main="sprof01: igraph reingold.tilford layout")
 @
 \filledpagebreak
 
-<<fig=TRUE, label=sprofig_igraph_fruchterman_reingold_grid,width=6, height=6>>=
+<<fig=TRUE, label=sprof_ig_igraph_fruchterman_reingold_grid,width=6, height=6>>=
 #6 6
-sprofig_auto <- as_igraph_sprof(sprof, layout.fruchterman.reingold.grid)
-plot(sprofig_auto, main="sprof01: igraph fruchterman.reingold.grid layout")
+sprof_ig_auto <- as_igraph_sprof(sprof, layout.fruchterman.reingold.grid)
+plot(sprof_ig_auto, main="sprof01: igraph fruchterman.reingold.grid layout")
 @
 \filledpagebreak
 
-<<fig=TRUE, label=sprofig_igraph_lgl,width=6, height=6>>=
+<<fig=TRUE, label=sprof_ig_igraph_lgl,width=6, height=6>>=
 #6 6
-sprofig_auto <- as_igraph_sprof(sprof, layout.lgl)
-plot(sprofig_auto, main="sprof01: igraph lgl layout")
+sprof_ig_auto <- as_igraph_sprof(sprof, layout.lgl)
+plot(sprof_ig_auto, main="sprof01: igraph lgl layout")
 @
 \filledpagebreak
 
-<<fig=TRUE, label=sprofig_igraph_graphopt,width=6, height=6>>=
+<<fig=TRUE, label=sprof_ig_igraph_graphopt,width=6, height=6>>=
 #6 6
-sprofig_auto <- as_igraph_sprof(sprof, layout.graphopt)
-plot(sprofig_auto, main="sprof01: igraph graphopt layout")
+sprof_ig_auto <- as_igraph_sprof(sprof, layout.graphopt)
+plot(sprof_ig_auto, main="sprof01: igraph graphopt layout")
 @
 \filledpagebreak
 
-<<fig=TRUE, label=sprofig_igraph_svd,width=6, height=6>>=
+<<fig=TRUE, label=sprof_ig_igraph_svd,width=6, height=6>>=
 #6 6
-sprofig_auto <- as_igraph_sprof(sprof, layout.svd)
-plot(sprofig_auto, main="sprof01: igraph svd layout")
+sprof_ig_auto <- as_igraph_sprof(sprof, layout.svd)
+plot(sprof_ig_auto, main="sprof01: igraph svd layout")
 @
-%<<fig=TRUE, label=sprofig_igraph_norm,width=6, height=6>>=
+%<<fig=TRUE, label=sprof_ig_igraph_norm,width=6, height=6>>=
 %#6 6
-%sprofig_auto <- as_igraph_sprof(sprof, layout.norm)
-%plot(sprofig_auto, main="sprof01: igraph norm layout")
+%sprof_ig_auto <- as_igraph_sprof(sprof, layout.norm)
+%plot(sprof_ig_auto, main="sprof01: igraph norm layout")
 %detach("package:igraph")
 @
 \filledpagebreak
@@ -1793,37 +1816,44 @@ search()
 \todo{propagate}
 <<>>=
 as_network_sprof <- function(sprof) {
-	sprofadj <- adjacency(sprof)
-	nwsprofadj <- as.network(sprofadj)
+	sprofadj02 <- adjacency(sprof)
+	nwsprofadj <- as.network(sprofadj02)
 	network.vertex.names(nwsprofadj) <- 
-		rownames(sprofadj) # not honoured by plot
+		rownames(sprofadj02) # not honoured by plot
 	return(nwsprofadj)
 }
 <<>>=
-plot_network_sprof <- function(nwsprof) {
+plot_network_sprof <- function(nwsprof,mode = "fruchtermanreingold", ...) {
 	main1 <- deparse(substitute(nwsprof))
-	if (inherits(nwsprof, "sprof")) nwsprof <- as_network_sprof(nwsprof)
+	if (inherits(nwsprof, "sprof")) nwsprof <- 	
+		as_network_sprof(nwsprof)
 	plot(nwsprof, 
 	label=network.vertex.names(nwsprof), 
-	main=paste0(main1,": network layout"), 
+	main=paste0(main1,": network layout ", mode), 
+	mode = mode,
+	edge.len=2,
+	edge.col="#80808080",
 	sub= main1,
-	cex.main=2)
+	cex.main=2,...)
 }
+@
+\filledpagebreak
+
 <<fig=TRUE, label=plotnwsprofadj,width=6, height=6>>=
 plot_network_sprof(sprof04)
 
 <<fig=TRUE, label=nwsprofadj,width=8, height=8>>=
-nwsprofadj <- as.network(sprofadj) # names is not imported 
-network.vertex.names(nwsprofadj) <- rownames(sprofadj) # not honoured by plot
-plot(nwsprofadj, label=rownames(sprofadj), main="sprof01: network layout", cex.main=2)
+nwsprofadj <- as.network(sprofadj02) # names is not imported 
+#network.vertex.names(nwsprofadj) <- rownames(sprofadj02) # not honoured by plot
+plot(nwsprofadj, label=rownames(sprofadj02), main="sprof01: network layout", cex.main=2)
 @
 \filledpagebreak
 Experiments to include weight. \todo{maximum edge.lwd?}
 <<fig=TRUE, label=nwsprofadje,width=8, height=8>>=
-edge.lwd<- sprofadj
+edge.lwd<- sprofadj02
 edge.lwd[edge.lwd>0]<- rkindex(edge.lwd[edge.lwd>0], maxindex=12, ties.method="min")
 
-plot(nwsprofadj, label=rownames(sprofadj), main="sprof01: network layout", cex.main=2, edge.lwd=edge.lwd)
+plot(nwsprofadj, label=rownames(sprofadj02), main="sprof01: network layout", cex.main=2, edge.lwd=edge.lwd)
 detach("package:network")
 @
 \filledpagebreak
@@ -1885,11 +1915,11 @@ sprof <- sprof04
 To interface \ircode{sprof} to a graph handling package,  \irfunx{adjacency}{until} can extract the adjacency matrix from the profile.
 
 <<>>=
-sprofadj <- adjacency(sprof)
-adjname <- colnames(sprofadj)
+sprofadj02 <- adjacency(sprof)
+adjname <- colnames(sprofadj02)
 adjname[adjname==""] <- "<NULL>"
- colnames(sprofadj) <- adjname
- rownames(sprofadj) <- adjname
+ colnames(sprofadj02) <- adjname
+ rownames(sprofadj02) <- adjname
 @
 This is  a format any graph package can handle (maybe).
 @
@@ -1901,7 +1931,7 @@ search()
 @
 Some tests for scaling \ldots
 <<>>=
-sprofadjNEL <- as(sprofadj,"graphNEL")
+sprofadjNEL <- as(sprofadj02,"graphNEL")
 <<fig=TRUE, label=s04adjNEL,width=8, height=8>>=
 #8
 plot(sprofadjNEL,  main="sprof04: graph layout",)
@@ -1922,7 +1952,7 @@ plot(sprofadjNEL,  main="sprof04: graph layout")
 library(igraph)
 search()
 <<>>=
-sprofig <- graph.adjacency(sprofadj)
+sprofig <- graph.adjacency(sprofadj02)
 <<fig=TRUE, label=s04ig,width=6, height=6>>=
 #6
 #plot(sprofig, main="sprof04: igraph layout", cex.main=2)
@@ -1936,38 +1966,38 @@ library(network)
 search()
 <<fig=TRUE, label=s04nwsprofadj,width=6, height=6>>=
 #6
-nwsprofadj <- as.network(sprofadj) # names is not imported 
-network.vertex.names(nwsprofadj) <- rownames(sprofadj) # not honoured by plot
-plot(nwsprofadj, label=rownames(sprofadj), 
+nwsprofadj <- as.network(sprofadj02) # names is not imported 
+network.vertex.names(nwsprofadj) <- rownames(sprofadj02) # not honoured by plot
+plot(nwsprofadj, label=rownames(sprofadj02), 
 	main="sprof04: network layout: trimmed data", cex.main=2)
 @
 \filledpagebreak
 <<fig=TRUE, label=s04nwsprofadje,width=8, height=8>>=
 #8
-edge.lwd<-sprofadj
+edge.lwd<-sprofadj02
 edge.lwd[edge.lwd>0]<- rkindex(edge.lwd[edge.lwd>0], maxindex=12,
  ties.method="max")
 
-plot(nwsprofadj, label=rownames(sprofadj), 
+plot(nwsprofadj, label=rownames(sprofadj02), 
 	main="sprof04: network layout: trimmed data", 
 	cex.main=2, edge.lwd=edge.lwd)
 @
 \filledpagebreak
 <<fig=TRUE, label=s04nwsprofadjekamadakawai, width=12, height=12>>=
 #12
-plot(nwsprofadj, label=rownames(sprofadj), 
+plot(nwsprofadj, label=rownames(sprofadj02), 
 main="sprof04: network kamadakawai layout: \n trimmed data", 
 mode="kamadakawai",
 cex.main=2, edge.lwd=edge.lwd)
 @
 \filledpagebreak
 <<fig=TRUE, label=s04nwsprofadjecircle,width=8, height=8>>=
-plot(nwsprofadj, label=rownames(sprofadj), 
+plot(nwsprofadj, label=rownames(sprofadj02), 
 	main="sprof04: network circle layout: \n trimmed data", 
 	mode="circle",
 	cex.main=2, edge.lwd=edge.lwd)
 <<fig=TRUE, label=s04nwsprofadjefruchtermanreingold,width=8, height=8>>=
-plot(nwsprofadj, label=rownames(sprofadj), 
+plot(nwsprofadj, label=rownames(sprofadj02), 
 	main="sprof04: network fruchtermanreingold layout: \n trimmed data", 
 	mode="fruchtermanreingold",
 	cex.main=2, edge.lwd=edge.lwd)
