@@ -1,10 +1,10 @@
 %!TEX root = /Users/gs/projects/rforge/sintro/pkg/sprof/work/vignettes/sprofiling.tex
 % -*- mode: noweb; noweb-default-code-mode: R-mode; -*-
 %#$HeadURL$
-%#$Id$
-%#$Date$
-%#$Author$
-%#$Revision$
+%#	$Id$
+%#	$Date$
+%#	$Author$
+%#	$Revision$
 
 \listfiles
 
@@ -21,7 +21,7 @@
 \documentclass[utf8]{amsart}
 \usepackage[utf8]{inputenc}
 %\usepackage[applemac]{inputenc}
-\usepackage[english]{babel} %ngerman
+\usepackage[english]{babel} %ngerman -- british english
 \usepackage{svninfo}
 \RequirePackage{layouts}
 
@@ -479,22 +479,9 @@ See \vref{fig:sREplotnodes01h}.
 We can add colour. To illustrate this, we encode the frequency of the nodes as colour. As a palette, we choose a heat map here. 
 \todo{apply colour to selection?}
 \todo{spread colour on displayed part}
-%:****as_rkindex
-<<>>=
-as_rkindex <- function(x, 
-	maxindex=length(x), 
-	pwr=1, 
-	ties.method="random" ) {
-		ix <- rank(x, ties.method=ties.method)
-		rg <- range(ix)
-		ix <- (ix/rg[2])^pwr
-		ix <- ix*(maxindex-1) +1
-		ix <- round(ix)
-		return(ix)
-}
 
 <<>>=
-freqrank01 <- as_rkindex(-sprof01$nodes$total.time, ties.method="random")
+freqrank01 <- rkindex(-sprof01$nodes$total.time, ties.method="random")
 freqrankcol01 <- heat.colors(length(freqrank01))
 @
 Here is the node view using these choices:
@@ -1169,7 +1156,9 @@ See \vref{tab:pramt1}
 We can add this information to our base.
 <<>>=
  nr <- nodesrunlength(sprof02, clean=FALSE)
- nr <- rbind(nr,0) ## hack. keep length in nodesrunlength
+ #nr <- rbind(nr,0) ## hack. keep length in nodesrunlength
+ rownames(nr) <- sprof02$nodes$name
+
  sprof02$nodes <- cbind(sprof02$nodes, nr)
  
  rownames(sprof02$nodes) <- sprof02$nodes$name
@@ -1261,7 +1250,7 @@ rownames(a04)<- rnames; colnames(a04)<- rnames;
 } #! define lwd first
 
 el04 <- edgematrix(a04)
-el04$lwd  <- as_rkindex(el04$count, maxindex=6, ties.method="min")
+el04$lwd  <- rkindex(el04$count, maxindex=6, ties.method="min")
 
 a04NEL <- as(a04,"graphNEL")
 nodeDataDefaults(a04NEL, "shape") <- "ellipse"
@@ -1406,11 +1395,11 @@ nDD2 <- (nodeRenderInfo(a04NEL0))
 a04NEL0 <- layoutGraph(a04NEL0) 
 # node attributes
 #sprof04$nodes$self.time -> fill
-fill_list <- heat.colors(12)[as_rkindex(-sprof04$nodes$self.time, pwr=0.5, maxindex=12, ties.method="min")]
+fill_list <- heat.colors(12)[rkindex(-sprof04$nodes$self.time, pwr=0.5, maxindex=12, ties.method="min")]
 names(fill_list) <- sprof04$nodes$name
 
 #sprof04$nodes$total.time -> lwd
-lwd_list  <-  as_rkindex(sprof04$nodes$total.time, pwr=0.5,maxindex=6, ties.method="min")
+lwd_list  <-  rkindex(sprof04$nodes$total.time, pwr=0.5,maxindex=6, ties.method="min")
 names(lwd_list) <- sprof04$nodes$name
 
 #strx(nodeRenderInfo(a04NEL0))
@@ -1457,11 +1446,11 @@ nDD2 <- (nodeRenderInfo(a04NEL0rle))
 a04NEL0rle <- layoutGraph(a04NEL0rle) 
 # node attributes
 #sprof04$nodes$self.time -> fill
-fill_list <- heat.colors(12)[as_rkindex(-amt04[,"avg_time"], pwr=0.5, maxindex=12, ties.method="min")]
+fill_list <- heat.colors(12)[rkindex(-amt04[,"avg_time"], pwr=0.5, maxindex=12, ties.method="min")]
 names(fill_list) <- sprof04$nodes$name
 
 #sprof04$nodes$total.time -> lwd
-lwd_list  <-  as_rkindex(amt04[,"nr_runs"], pwr=0.5,maxindex=6, ties.method="min")
+lwd_list  <-  rkindex(amt04[,"nr_runs"], pwr=0.5,maxindex=6, ties.method="min")
 names(lwd_list) <- sprof04$nodes$name
 
 #strx(nodeRenderInfo(a04NEL0rle))
@@ -1622,7 +1611,7 @@ This is  a format any graph package can handle (maybe). To be on the save side, 
 <<>>=
 sprofedgel <- edgematrix(sprofadj)
 
-sprofedgel$lwd  <- as_rkindex(sprofedgel$count, maxindex=12, ties.method="min")
+sprofedgel$lwd  <- rkindex(sprofedgel$count, maxindex=12, ties.method="min")
 @
 \filledpagebreak
 \subsubsection{graph package}
@@ -1643,34 +1632,33 @@ detach("package:graph")
 Attributes for igraphs are documented in \ircode{help(igraph.plotting)}.
 
 Layouts available for \ircode{igraph}:
-\ircode{
-layout.auto(graph, dim=2, ...)
 
-layout.random(graph, params, dim=2)
+\ircode{layout.auto(graph, dim=2, ...)}
 
-layout.circle(graph, params)
+\ircode{layout.random(graph, params, dim=2)}
 
-layout.sphere(graph, params)
+\ircode{layout.circle(graph, params)}
 
-layout.fruchterman.reingold(graph, ..., dim=2, params)
+\ircode{layout.sphere(graph, params)}
 
-layout.kamada.kawai(graph, ..., dim=2, params)
+\ircode{layout.fruchterman.reingold(graph, ..., dim=2, params)}
 
-layout.spring(graph, ..., params)
+\ircode{layout.kamada.kawai(graph, ..., dim=2, params)}
 
-layout.reingold.tilford(graph, ..., params)
+\ircode{layout.spring(graph, ..., params)}
 
-layout.fruchterman.reingold.grid(graph, ..., params)
+\ircode{layout.reingold.tilford(graph, ..., params)}
 
-layout.lgl(graph, ..., params)
+\ircode{layout.fruchterman.reingold.grid(graph, ..., params)}
 
-layout.graphopt(graph, ..., params=list())
+\ircode{layout.lgl(graph, ..., params)}
 
-layout.svd(graph, d=shortest.paths(graph), ...)
+\ircode{layout.graphopt(graph, ..., params=list())}
 
-layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
-      zmin = NULL, zmax = NULL)
-}
+\ircode{layout.svd(graph, d=shortest.paths(graph), ...)}
+
+\ircode{layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
+      zmin = NULL, zmax = NULL)}
 <<>>=
 library(igraph)
 search() 
@@ -1805,7 +1793,7 @@ plot(nwsprofadj, label=rownames(sprofadj), main="sprof01: network layout", cex.m
 Experiments to include weight. \todo{maximum edge.lwd?}
 <<fig=TRUE, label=nwsprofadje,width=8, height=8>>=
 edge.lwd<-sprofadj
-edge.lwd[edge.lwd>0]<- as_rkindex(edge.lwd[edge.lwd>0], maxindex=12, ties.method="min")
+edge.lwd[edge.lwd>0]<- rkindex(edge.lwd[edge.lwd>0], maxindex=12, ties.method="min")
 
 plot(nwsprofadj, label=rownames(sprofadj), main="sprof01: network layout", cex.main=2, edge.lwd=edge.lwd)
 detach("package:network")
@@ -1929,7 +1917,7 @@ plot(nwsprofadj, label=rownames(sprofadj),
 <<fig=TRUE, label=s04nwsprofadje,width=8, height=8>>=
 #8
 edge.lwd<-sprofadj
-edge.lwd[edge.lwd>0]<- as_rkindex(edge.lwd[edge.lwd>0], maxindex=12,
+edge.lwd[edge.lwd>0]<- rkindex(edge.lwd[edge.lwd>0], maxindex=12,
  ties.method="max")
 
 plot(nwsprofadj, label=rownames(sprofadj), 

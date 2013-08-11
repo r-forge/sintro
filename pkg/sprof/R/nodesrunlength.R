@@ -15,6 +15,7 @@ nodesrunlength <- function(sprof, clean=TRUE){
 	mts <- apply(mt,1,sum)
 	mtt <- apply(mt,1,function (x) {sum(x*seq(along.with=x))})
 	mtav <- mtt/mts
+	mtav[mtt==0] <- 0
 	amt=cbind(mt,nr_runs=mts, total_time=mtt, avg_time=mtav)
 	if (clean) {
 		amt <- amt[amt[,"nr_runs"]>0,]
