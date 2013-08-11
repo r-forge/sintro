@@ -1,4 +1,9 @@
 %$HeadURL$
+%$Id$
+%$Revision$
+%$Date$
+%$Author$
+%$Name:$
 \encoding{utf8}
 \name{sprof-package}
 \alias{sprof-package}
