@@ -1232,9 +1232,12 @@ This function is not included in the package to avoid dependency of \ircode{spro
 <<>>=
 library(graph)
 search() 
+<<>>=
+library(Rgraphviz)
+search()
 
 @
-%:as_graphNEL_sprof
+%:   as_graphNEL_sprof
 This is a common routine for the \ircode{grpah} and \ircode{Rgraphviz} package.
 <<>>=
 
@@ -1323,9 +1326,6 @@ To  use attributes on nodes and edges, we need \ircode{Rgraphviz}.
 %     "col"  "lty" "lwd" "cex", "edges")
   
 
-<<>>=
-library(Rgraphviz)
-search()
 @
 %<<fig=TRUE, label=sprofadj04NEL00, width=10, height=10>>=
 %
@@ -1377,7 +1377,7 @@ search()
 %{\huge very hot}
 %
 %Same data, unweighted edges, and colours, but attributes set after layout.
-
+\todo{merge with as\_graphNEL\_sprof}
 <<fig=TRUE, label=sprofadj04NEL02, width=6, height=6>>=
 library(graph)
 # see help(nodeRenderInfo) for attributes.
@@ -1418,6 +1418,7 @@ edgeRenderInfo(a04NEL0) <- list(col= "#80808080")
 renderGraph(a04NEL0)
 title(main="nodes time", sub=sprof04$info$id)
 legend("bottomright",legend= c("node color: self.time, pwr=0.5", "node lwd: total.time, pwr=0.5"), bty="n")
+
 detach(package:Rgraphviz)
 @
 We should not overload the plot. We could use colour encoding for the edges, but this would conflict visually with the colour encoding of the nodes. We could use different colours for classes of nodes, but then we would need an additional display to explain the shape information. 
@@ -1662,16 +1663,19 @@ Layouts available for \ircode{igraph}:
 <<>>=
 library(igraph)
 search() 
+@
+%:   as_igraph_sprof
 <<>>=
-sprof_igraph <- function(sprof, layoutfun, params=NULL,...){
-adj <- adjacency(sprof)
-adj[adj!=0] <-1
-sprofig <- graph.adjacency(adj)
-sprofig <- set.graph.attribute(sprofig, "layout", layoutfun(sprofig,params=params,...),...)
-V(sprofig)$color <- "yellow"
-E(sprofig)$color <- "#0000FF20"
-E(sprofig)$width <- c(1,2)
-return(sprofig)
+as_igraph_sprof <- function(sprof, layoutfun, params=NULL,...){
+	adj <- adjacency(sprof)
+	adj[adj!=0] <-1
+	sprofig <- graph.adjacency(adj)
+	sprofig <- set.graph.attribute(sprofig, "layout", 
+		layoutfun(sprofig,params=params,...),...)
+	V(sprofig)$color <- "yellow"
+	E(sprofig)$color <- "#0000FF20"
+	E(sprofig)$width <- c(1,2)
+	return(sprofig)
 }
 
 <<>>=
@@ -1695,87 +1699,87 @@ Experiments with various layouts for \ircode{igraph} follow.
 @
 <<fig=TRUE, label=sprofig_igraph_auto,width=8, height=8>>=
 #8 8
-sprofig_auto <- sprof_igraph(sprof, layout.auto)
+sprofig_auto <- as_igraph_sprof(sprof, layout.auto)
 plot(sprofig_auto, main="sprof01: igraph auto layout")
 @
 \filledpagebreak
 
 <<fig=TRUE, label=sprofig_igraph_random,width=6, height=6>>=
 #6 6
-sprofig_auto <- sprof_igraph(sprof, layout.random)
+sprofig_auto <- as_igraph_sprof(sprof, layout.random)
 plot(sprofig_auto, main="sprof01: igraph random layout")
 @
 \filledpagebreak
 
 <<fig=TRUE, label=sprofig_igraph_circle,width=6, height=6>>=
 #6 6
-sprofig_auto <- sprof_igraph(sprof, layout.circle)
+sprofig_auto <- as_igraph_sprof(sprof, layout.circle)
 plot(sprofig_auto, main="sprof01: igraph circle layout")
 @
 \filledpagebreak
 
 <<fig=TRUE, label=sprofig_igraph_sphere,width=6, height=6>>=
 #6 6
-sprofig_auto <- sprof_igraph(sprof, layout.sphere)
+sprofig_auto <- as_igraph_sprof(sprof, layout.sphere)
 plot(sprofig_auto, main="sprof01: igraph sphere layout")
 @
 \filledpagebreak
 
 <<fig=TRUE, label=sprofig_igraph_fruchterman_reingold,width=6, height=6>>=
 #6 6
-sprofig_auto <- sprof_igraph(sprof, layout.fruchterman.reingold)
+sprofig_auto <- as_igraph_sprof(sprof, layout.fruchterman.reingold)
 plot(sprofig_auto, main="sprof01: igraph fruchterman.reingold layout")
 @
 \filledpagebreak
 
 <<fig=TRUE, label=sprofig_igraph_kamada_kawai,width=6, height=6>>=
 #6 6
-sprofig_auto <- sprof_igraph(sprof, layout.kamada.kawai)
+sprofig_auto <- as_igraph_sprof(sprof, layout.kamada.kawai)
 plot(sprofig_auto, main="sprof01: igraph kamada.kawai layout")
 @
 \filledpagebreak
 
 <<fig=TRUE, label=sprofig_igraph_spring,width=6, height=6>>=
 #6 6
-sprofig_auto <- sprof_igraph(sprof, layout.spring)
+sprofig_auto <- as_igraph_sprof(sprof, layout.spring)
 plot(sprofig_auto, main="sprof01: igraph spring layout")
 @
 %<<fig=TRUE, label=sprofig_igraph_reingold.tilford,width=6, height=6>>=
 %#6 6
-%sprofig_auto <- sprof_igraph(sprof, layout.reingold.tilford)
+%sprofig_auto <- as_igraph_sprof(sprof, layout.reingold.tilford)
 %plot(sprofig_auto, main="sprof01: igraph reingold.tilford layout")
 @
 \filledpagebreak
 
 <<fig=TRUE, label=sprofig_igraph_fruchterman_reingold_grid,width=6, height=6>>=
 #6 6
-sprofig_auto <- sprof_igraph(sprof, layout.fruchterman.reingold.grid)
+sprofig_auto <- as_igraph_sprof(sprof, layout.fruchterman.reingold.grid)
 plot(sprofig_auto, main="sprof01: igraph fruchterman.reingold.grid layout")
 @
 \filledpagebreak
 
 <<fig=TRUE, label=sprofig_igraph_lgl,width=6, height=6>>=
 #6 6
-sprofig_auto <- sprof_igraph(sprof, layout.lgl)
+sprofig_auto <- as_igraph_sprof(sprof, layout.lgl)
 plot(sprofig_auto, main="sprof01: igraph lgl layout")
 @
 \filledpagebreak
 
 <<fig=TRUE, label=sprofig_igraph_graphopt,width=6, height=6>>=
 #6 6
-sprofig_auto <- sprof_igraph(sprof, layout.graphopt)
+sprofig_auto <- as_igraph_sprof(sprof, layout.graphopt)
 plot(sprofig_auto, main="sprof01: igraph graphopt layout")
 @
 \filledpagebreak
 
 <<fig=TRUE, label=sprofig_igraph_svd,width=6, height=6>>=
 #6 6
-sprofig_auto <- sprof_igraph(sprof, layout.svd)
+sprofig_auto <- as_igraph_sprof(sprof, layout.svd)
 plot(sprofig_auto, main="sprof01: igraph svd layout")
 @
 %<<fig=TRUE, label=sprofig_igraph_norm,width=6, height=6>>=
 %#6 6
-%sprofig_auto <- sprof_igraph(sprof, layout.norm)
+%sprofig_auto <- as_igraph_sprof(sprof, layout.norm)
 %plot(sprofig_auto, main="sprof01: igraph norm layout")
 %detach("package:igraph")
 @
@@ -1784,6 +1788,30 @@ plot(sprofig_auto, main="sprof01: igraph svd layout")
 <<>>=
 library(network)
 search()
+@
+%:   as_network_sprof
+\todo{propagate}
+<<>>=
+as_network_sprof <- function(sprof) {
+	sprofadj <- adjacency(sprof)
+	nwsprofadj <- as.network(sprofadj)
+	network.vertex.names(nwsprofadj) <- 
+		rownames(sprofadj) # not honoured by plot
+	return(nwsprofadj)
+}
+<<>>=
+plot_network_sprof <- function(nwsprof) {
+	main1 <- deparse(substitute(nwsprof))
+	if (inherits(nwsprof, "sprof")) nwsprof <- as_network_sprof(nwsprof)
+	plot(nwsprof, 
+	label=network.vertex.names(nwsprof), 
+	main=paste0(main1,": network layout"), 
+	sub= main1,
+	cex.main=2)
+}
+<<fig=TRUE, label=plotnwsprofadj,width=6, height=6>>=
+plot_network_sprof(sprof04)
+
 <<fig=TRUE, label=nwsprofadj,width=8, height=8>>=
 nwsprofadj <- as.network(sprofadj) # names is not imported 
 network.vertex.names(nwsprofadj) <- rownames(sprofadj) # not honoured by plot
@@ -1792,7 +1820,7 @@ plot(nwsprofadj, label=rownames(sprofadj), main="sprof01: network layout", cex.m
 \filledpagebreak
 Experiments to include weight. \todo{maximum edge.lwd?}
 <<fig=TRUE, label=nwsprofadje,width=8, height=8>>=
-edge.lwd<-sprofadj
+edge.lwd<- sprofadj
 edge.lwd[edge.lwd>0]<- rkindex(edge.lwd[edge.lwd>0], maxindex=12, ties.method="min")
 
 plot(nwsprofadj, label=rownames(sprofadj), main="sprof01: network layout", cex.main=2, edge.lwd=edge.lwd)
@@ -1833,8 +1861,8 @@ plot(sprofadjRag,"twopi", main="sprof01: Graphviz twopi layout")
 plot(sprofadjRag,"circo", main="sprof01: Graphviz circo layout")
 @
 \filledpagebreak
-<<fig=TRUE, label=sprofadjvizfdp,width=8, height=8>>=
-#8 8
+<<fig=TRUE, label=sprofadjvizfdp,width=6, height=6>>=
+#6  6
 plot(sprofadjRag,"fdp", main="sprof01: Graphviz fdp layout")
 @
 \filledpagebreak
@@ -1845,7 +1873,7 @@ plot(sprofadjRag,"fdp", main="sprof01: Graphviz fdp layout")
 %ÔEnhancesÕ.
 In this section, we use the reduced version of our example, \ircode{sprof04} for demonstration. Except for the change of the data set, this is just a copy of the previous chapter, collecting the various layouts for easy reference.
 
-\emph{Note: This section will be replaced by the template section. For intern use only. Skip it.}
+\emph{Note: This section will be replaced by the template section. For internal use only. Skip it.}
 
 Some experiments may have found their way to this chapter. They will be expelled.
 
