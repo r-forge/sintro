@@ -271,13 +271,20 @@ This is to be used with
 
 The graph visualisation family is not friendly. We try to get control by using a wrapper which is at least used to the members of the \ircode{graphviz} clan. This will be used in later sections.
 <<>>=
-plotviz <- function(x,...)
+plotviz <- function(x,y="dot", main,...)
 {
-plot(x,  
+main=paste0(main, "\n plotviz> Source:",deparse(substitute(x)))
+plot(x=x,  y=y,
 	attrs=list(node=list(cex=4, fontsize=40,  
 	shape="ellipse")), 
-	cex.main=2, ...)
-title(sub=as.character(class(x)))	
+	cex.main=1.5, 
+	main=main,...)
+	
+	title(sub=as.character(class(x)))	
+	legend("topleft", 
+		legend=class(x),
+		title="class:"
+		)
 }
 
 @
@@ -819,8 +826,8 @@ The preview, at this point, taking package \ircode{graph} as an example. \ircode
 we  extract the graph information from \ircode{sprof}, using and adjacency matrix here as a simple solution. 
 This is then converted to the \ircode{"graphNEL"} format which is shared by  \ircode{graph} and \ircode{Rgraphviz}.
 \ircode{Rgraphviz} is hidden in the use of  \ircode{plot}(). So here is a bare foot approach. A more sophisticated function implementation is in \vref{sec:graph}.
-%<<fig=TRUE, label=sprofadjNEL8, width=8, height=8>>=
-%#8 sprofadjNEL
+%<<fig=TRUE, label=sprofadjNEL028, width=8, height=8>>=
+%#8 sprofadjNEL02
 %library(graph)
 %sprof01adjNEL <- as(adjacency(sprof01),"graphNEL")
 %plot(sprof01adjNEL,  main="sprof01: graph layout example", cex.main=2)
@@ -828,9 +835,9 @@ This is then converted to the \ircode{"graphNEL"} format which is shared by  \ir
 %# detach("package:graph") 
 %#! sorry. still needed by Rgraphviz -- clean up
 
-<<fig=TRUE, label=sprofadjNEL6, width=6, height=6>>=
+<<fig=TRUE, label=sprofadjNEL026, width=6, height=6>>=
 
-#6 sprofadjNEL
+#6 sprofadjNEL02
 library(graph)
 sprof01adjNEL <- as(adjacency(sprof01),"graphNEL")
 
@@ -1643,9 +1650,9 @@ sprofedgel02$lwd  <- rkindex(sprofedgel02$count, maxindex=12, ties.method="min")
 library(graph)
 search() 
 <<>>=
-sprofadjNEL <- as(sprofadj02,"graphNEL")
-<<fig=TRUE, label=sprofadjNEL,width=8, height=8>>=
-plotviz(sprofadjNEL,  main=paste("graph layout\n",sprof$info$id))
+sprofadjNEL02 <- as(sprofadj02,"graphNEL")
+<<fig=TRUE, label=sprofadjNEL02,width=8, height=8>>=
+plotviz(sprofadjNEL02,  main=paste("graph layout\n",sprof$info$id))
 @
 <<>>=
 detach("package:graph")
@@ -1692,28 +1699,28 @@ search()
 as_igraph_sprof <- function(sprof, layoutfun, params=NULL,...){
 	adj <- adjacency(sprof)
 	adj[adj!=0] <-1
-	sprofig <- graph.adjacency(adj)
-	sprofig <- set.graph.attribute(sprofig, "layout", 
-		layoutfun(sprofig,params=params,...),...)
-	V(sprofig)$color <- "yellow"
-	E(sprofig)$color <- "#0000FF20"
-	E(sprofig)$width <- c(1,2)
-	return(sprofig)
+	sprof_igraph <- graph.adjacency(adj)
+	sprof_igraph <- set.graph.attribute(sprof_igraph, "layout", 
+		layoutfun(sprof_igraph,params=params,...),...)
+	V(sprof_igraph)$color <- "yellow"
+	E(sprof_igraph)$color <- "#0000FF20"
+	E(sprof_igraph)$width <- c(1,2)
+	return(sprof_igraph)
 }
 
 <<>>=
-sprofig <- graph.adjacency(adjacency(sprof))
-sprofig <- set.graph.attribute(sprofig, "layout", layout.kamada.kawai(sprofig))
-V(sprofig)$color <- "yellow"
-#E(sprofig)$width <- c(1,2)
-E(sprofig)$color <- "#0000FF40"
-E(sprofig)$width <- c(1,2)
+sprof_igraph <- graph.adjacency(adjacency(sprof))
+sprof_igraph <- set.graph.attribute(sprof_igraph, "layout", layout.kamada.kawai(sprof_igraph))
+V(sprof_igraph)$color <- "yellow"
+#E(sprof_igraph)$width <- c(1,2)
+E(sprof_igraph)$color <- "#0000FF40"
+E(sprof_igraph)$width <- c(1,2)
 # see 
-<<fig=TRUE, label=sprofigkamada,width=8, height=8>>=
-plot(sprofig, main="sprof01: igraph kamada.kawai layout")
+<<fig=TRUE, label=sprof_igraphkamada,width=8, height=8>>=
+plot(sprof_igraph, main="sprof01: igraph kamada.kawai layout")
 <<>>=
-sprofig <- graph.adjacency(adjacency(sprof))
-sprofig <- set.graph.attribute(sprofig, "layout", layout.auto(sprofig))
+sprof_igraph <- graph.adjacency(adjacency(sprof))
+sprof_igraph <- set.graph.attribute(sprof_igraph, "layout", layout.auto(sprof_igraph))
 @
 
 Experiments with various layouts for \ircode{igraph} follow.
@@ -1724,6 +1731,10 @@ Experiments with various layouts for \ircode{igraph} follow.
 #8 8
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.auto)
 plot(sprof_ig_auto, main="sprof01: igraph auto layout")
+	legend("topleft", 
+		legend=class(sprof_ig_auto),
+		title="class:"
+		)
 @
 \filledpagebreak
 
@@ -1862,11 +1873,13 @@ detach("package:network")
 library(Rgraphviz)
 search()
 <<>>=
-sprofadjRag <- agopen(sprofadjNEL, name="Rprof Example")
-<<fig=TRUE, label=sprofadjvizdot,width=8, height=8>>=
+sprofadjRag02 <- agopen(sprofadjNEL02, name="Rprof Example")
+@
+\filledpagebreak
+<<fig=TRUE, label=sprofadjvizdot,width=6, height=6>>=
 
-# 8 8
-plotviz(sprofadjRag, main="sprof01: Graphviz dot layout")
+# 6 6
+plotviz(sprofadjRag02, main="sprof02: Graphviz dot layout")
 @
 %agopen(graph, name, nodes, edges, kind = NULL, layout = TRUE,
 %layoutType = "dot",
@@ -1878,22 +1891,22 @@ plotviz(sprofadjRag, main="sprof01: Graphviz dot layout")
 \filledpagebreak
 <<fig=TRUE, label=sprofadjvizneato,width=8, height=8>>=
 #8 8
-plot(sprofadjRag,"neato", main="sprof01: Graphviz neato layout",)
+plot(sprofadjRag02,"neato", main="sprof02: Graphviz neato layout",)
 @
 \filledpagebreak
 <<fig=TRUE, label=sprofadjviztwopi,width=6, height=6>>=
 #6 6
-plot(sprofadjRag,"twopi", main="sprof01: Graphviz twopi layout")
+plot(sprofadjRag02,"twopi", main="sprof02: Graphviz twopi layout")
 @
 \filledpagebreak
-<<fig=TRUE, label=sprofadjvizcirco,width=8, height=8>>=
+<<fig=TRUE, label=sprofadjvizcirco8,width=8, height=8>>=
 #8 8
-plot(sprofadjRag,"circo", main="sprof01: Graphviz circo layout")
+plot(sprofadjRag02,"circo", main="sprof02: Graphviz circo layout")
 @
 \filledpagebreak
 <<fig=TRUE, label=sprofadjvizfdp,width=6, height=6>>=
 #6  6
-plot(sprofadjRag,"fdp", main="sprof01: Graphviz fdp layout")
+plotviz(sprofadjRag02,"fdp", main="sprof01: Graphviz fdp layout",cex=2)
 @
 \filledpagebreak
 \section{Trimmed example: regression}
@@ -1931,18 +1944,18 @@ search()
 @
 Some tests for scaling \ldots
 <<>>=
-sprofadjNEL <- as(sprofadj02,"graphNEL")
+sprofadjNEL02 <- as(sprofadj02,"graphNEL")
 <<fig=TRUE, label=s04adjNEL,width=8, height=8>>=
 #8
-plot(sprofadjNEL,  main="sprof04: graph layout",)
+plot(sprofadjNEL02,  main="sprof04: graph layout",)
 #detach("package:graph")
 <<fig=TRUE, label=s0418adjNEL, width=18, height=18>>=
 #18
-plot(sprofadjNEL,  main="sprof04: graph layout",)
+plot(sprofadjNEL02,  main="sprof04: graph layout",)
 #detach("package:graph")
 <<fig=TRUE, label=s0412adjNEL, width=12, height=12>>=
 #12
-plot(sprofadjNEL,  main="sprof04: graph layout")
+plot(sprofadjNEL02,  main="sprof04: graph layout")
 #detach("package:graph")
 
 @
@@ -1952,11 +1965,11 @@ plot(sprofadjNEL,  main="sprof04: graph layout")
 library(igraph)
 search()
 <<>>=
-sprofig <- graph.adjacency(sprofadj02)
+sprof_igraph <- graph.adjacency(sprofadj02)
 <<fig=TRUE, label=s04ig,width=6, height=6>>=
 #6
-#plot(sprofig, main="sprof04: igraph layout", cex.main=2)
-plot(sprofig, main="sprof04: igraph layout: trimmed data")
+#plot(sprof_igraph, main="sprof04: igraph layout", cex.main=2)
+plot(sprof_igraph, main="sprof04: igraph layout: trimmed data")
 detach("package:igraph")
 @
 \filledpagebreak
@@ -2010,10 +2023,10 @@ detach("package:network")
 library(Rgraphviz)
 search()
 <<>>=
-sprofadjRag <- agopen(sprofadjNEL, name="Rprof Example")
+sprofadjRag02 <- agopen(sprofadjNEL02, name="Rprof Example")
 <<fig=TRUE, label=s04adjvizdot, width=6, height=6>>=
 #6 6
-plotviz(sprofadjRag, main="sprof04: Graphviz dot layout")
+plotviz(sprofadjRag02, main="sprof04: Graphviz dot layout")
 @
 %agopen(graph, name, nodes, edges, kind = NULL, layout = TRUE,
 %layoutType = "dot",
@@ -2025,22 +2038,22 @@ plotviz(sprofadjRag, main="sprof04: Graphviz dot layout")
 \filledpagebreak
 <<fig=TRUE, label=s04adjvizneato,width=6, height=6>>=
 #6
-plotviz(sprofadjRag,"neato", main="sprof04: Graphviz neato layout")
+plotviz(x=sprofadjRag02,y="neato", main="sprof04: Graphviz neato layout")
 @
 \filledpagebreak
 <<fig=TRUE, label=s04adjviztwopi,width=6, height=6>>=
 #6
-plotviz(sprofadjRag,"twopi", main="sprof04: Graphviz twopi layout")
+plotviz(sprofadjRag02,y="twopi", main="sprof04: Graphviz twopi layout")
 @
 \filledpagebreak
-<<fig=TRUE, label=sprofadjvizcirco,width=6, height=6>>=
+<<fig=TRUE, label=sprofadjvizcirco6,width=6, height=6>>=
 #6
-plotviz(sprofadjRag,"circo", main="sprof04: Graphviz circo layout 6")
+plotviz(sprofadjRag02,y="circo", main="sprof04: Graphviz circo layout 6")
 @
 \filledpagebreak
 <<fig=TRUE, label=s04adjvizfdp,width=6, height=6>>=
 #6
-plotviz(sprofadjRag,"fdp", main="sprof04: Graphviz fdp layout")
+plotviz(sprofadjRag02,y="fdp", main="sprof04: Graphviz fdp layout")
 @
 \section{Template}
 \begin{itemize}
