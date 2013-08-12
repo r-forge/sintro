@@ -179,7 +179,7 @@ We want immediate warnings, if necessary. Set to level 2 to handle warnings as e
 message("switching  options(warn=1) -- immediate warning on")
 options(warn=1)
 @
-We want a second chance on errors. So install an error handler.
+We want a second chance on errors. So we install an error handler.
 <<>>=
 options(error = recover)
 @
@@ -195,7 +195,8 @@ strx <- function(x,
 	max.level=2, vec.len=3, 
 	nchar.max=40, 
 	list.len=12,
-	width=70, strict.width="wrap",...){
+	width=70, strict.width="wrap",...)
+{
 	cat(paste("##strx:",deparse(substitute(x)),"\n"))
 	str(x, max.level=max.level, 
 		vec.len=vec.len, 
@@ -210,7 +211,8 @@ strx <- function(x,
 For larger tables and data frames, we use a kludge to avoid long outputs.
 \todo{add keep3 to keep header, some middle, tail}
 <<>>=
-xcutdata.frame <- function(df,  cut, margin){
+xcutdata.frame <- function(df,  cut, margin=5)
+{
 #! keep3, to add: margin top - random center - margin bottom
 	if (!is.data.frame(df)) return(df)
 	nrow <- nrow(df)
@@ -227,12 +229,15 @@ xcutdata.frame <- function(df,  cut, margin){
 		df[-(cutfrom:cutto),]
 		}#if
 	}
+	
 	if (!missing(cut))  {df <- cutrng(cut[1],cut[2]); return(df)}
-	if (!missing(margin))  {
+	
+	if (!missing(margin))  { # changed. Set to default 5.
 		if (length(margin)==1) margin <-  c(margin,margin)
 	cut <- c(margin[1]+1,nrow-margin[2])
 	df <-cutrng(cut[1],cut[2]); 
 	return(df)}
+	
 #	if (!missing(keep3))  { cut <- c(keep3[1]+1, keep3[1]+1, 
 #		nrow-keep3[3]-1,nrow-keep3[3]-1)
 #	if (cut[3]-cut[4] > keep3[2]+2){delta<-(cut[3]-cut[2]) div 2
@@ -243,8 +248,9 @@ xcutdata.frame <- function(df,  cut, margin){
 }
 
 @
-We use the \R{} function \ircode{xtable()} for output and \LaTeX \ \ircode{longtable}. A convenient wrapper to use this in out \ircode{Sweave} source is:
-\todo{remove text vdots from string/name columns. Use empty string.}
+We use the \R{} function \ircode{xtable()} for output and \LaTeX \ \ircode{longtable}. A convenient wrapper to use this in our \ircode{Sweave} source is given here. Among others, it adds \ircode{zero.print}.
+\todo{remove text vdots from string/name columns. Note: this may be a factor. Use empty string.}
+%:  prxt
 <<>>= 
 library(xtable)
 prxt <- function (x, digits=2, cut=TRUE, caption=NULL, 
@@ -258,8 +264,16 @@ prxt <- function (x, digits=2, cut=TRUE, caption=NULL,
 		tabular.environment="longtable", 
 		caption.placement="top",
 		zero.print = ".",
-		NA.string="\\vdots", print.results=FALSE)
-		if(!is.null(zero.print)) pr <- gsub( " 0 ",zero.print, x=pr)
+		NA.string="\\vdots", 
+		print.results=FALSE)
+#		NA.string="",  #NA.string="\\vdots", 
+		
+		pr <- gsub( "$\backslash$vdots","\vdots",x=pr, fixed=TRUE)
+		
+		if(!is.null(zero.print)) 
+			pr <- gsub( " 0 ",zero.print, x=pr, fixed=TRUE)
+
+			
 		if (print.results) cat(pr)
 		invisible(pr)
 	}
@@ -273,7 +287,7 @@ The graph visualisation family is not friendly. We try to get control by using a
 <<>>=
 plotviz <- function(x,y="dot", main,...)
 {
-main=paste0(main, "\n plotviz> Source:",deparse(substitute(x)))
+main=paste0(main, "\n plotviz( ",deparse(substitute(x))," )")
 plot(x=x,  y=y,
 	attrs=list(node=list(cex=4, fontsize=40,  
 	shape="ellipse")), 
@@ -447,8 +461,8 @@ Common rearrangements as by total time and by self time are supplied by the disp
 %: floating figure
 \begin{figure}[htbp]
 \begin{center}
-<<fig = TRUE, echo = TRUE, print = FALSE, label=sREplotnodes01, width=10, height=10>>=
-#10
+<<fig = TRUE, echo = TRUE, print = FALSE, label=sREplotnodes01, width=8, height=8>>=
+#8
 oldpar <- par(mfrow=c(2,2))
 plot_nodes(sprof01)
 par(oldpar)
@@ -472,7 +486,7 @@ If you prefer, you can have the bar charts in horizontal layout, giving more spa
 <<fig = TRUE, echo = TRUE, print = FALSE, label=sREplotnodes01h, width=8, height=8>>=
 #8
 oldpar <- par(mfrow=c(2,2))
-plot_nodes(sprof01)
+plot_nodes(sprof01, horiz=TRUE)
 par(oldpar)
 @
 \caption{Basic information on node level}
@@ -515,8 +529,11 @@ See \vref{fig:sREplotnodes01h}.
 
 Colour is considered a volatile attribute. So you may need to pay some attention to keep colour indices (and colour 
 palettes) aligned to your context. You may want to do experiments with colour, trying to find a good solution for your 
-visual preferences. The recommended way is to use some stable colour index (the slot \ircode{icol} is reserved for this) and use this as an index to a choice of colour palettes. So \ircode{icol} becomes a part of the data structure, and the colour palette to be used is passed as a parameter.
-
+visual preferences. 
+The recommended way is to use some stable colour index (the slot \ircode{icol} is reserved for this) and use this as an index to a choice of colour palettes. So \ircode{icol} becomes a part of the data structure, and the colour palette to be used is passed as a parameter.
+Package \ircode{RColorBrewer} may be a helpful source for colour palettes. 
+You find more information and references on this in the vignette ``Bertin matrices'' 
+of package \ircode{bertin}, \url{http://bertin.r-forge.r-project.org}.
 \todo{improve colour: support colour in a structure}
 
 \subsubsection{Node classes}
@@ -537,17 +554,15 @@ nodekeyword0 <- function(node)
 }
 @
 <<>>=
-nodepackges <- nodepackage(sprof01$nodes$name)
-names(nodepackges) <- sprof01$nodes$name
-table(nodepackges)
+nodepackages <- nodepackage(sprof01$nodes$name)
+names(nodepackages) <- sprof01$nodes$name
+table(nodepackages)
 @
 <<>>=
-sprof01$nodes$icol <-as.factor(nodepackges)
+sprof01$nodes$icol <-as.factor(nodepackages)
 @
 %: floating figure
-\begin{figure}[htbp]
-\begin{center}
-<<fig = TRUE, echo = FALSE, print = FALSE, label=sREplotnodes01packcol1, png=TRUE,width=10, height=15>>= 
+<<fig = TRUE, echo = FALSE, print = FALSE, include=FALSE, label=sREplotnodes01packcol1, png=TRUE, width=10, height=15>>= 
 oldpar <- par(mfrow=c(3,2))
 
 if (require(RColorBrewer)) colpack <- brewer.pal(length(levels(sprof01$nodes$icol)), "Paired") else 
@@ -557,12 +572,15 @@ plot_nodes(sprof01, which=1:6, col=colpack)
 par(oldpar)
 @
 
-\caption{Nodes by package}
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics{sprofiling-sREplotnodes01packcol1}
+\caption{Nodes by package, colours by RColorBrewer.}
 \label{fig:sREplotnodes01packcol1}
 \end{center}
 \end{figure}
 
-See \vref{fig:sREplotnodes01packcol1}.
+Nodes by package, colours by RColorBrewer: see \vref{fig:sREplotnodes01packcol1}.
 
 % floating figure end
 <<>>=
@@ -597,47 +615,47 @@ nodeclass[sprof01$nodes$name =="<Anonymous>"] <- "x_Anon"
 <<>>=
 sprof01$nodes$icol <-as.factor(nodeclass)
 @
-adds a sticky colour attribute. To interpret, you should choose your preferred colour palette, for example \todo{add a reference to colorbrewer}
+adds a sticky colour attribute. To interpret, you should choose your preferred colour palette, for example 
 <<>>=
 classcol <- c("red", "green", "blue", "yellow", "cyan", "magenta", "purple")
 @
 \todo{Defaults by class}
-
-%: floating figure
-\begin{figure}[htbp]
-\begin{center}
-<<fig = TRUE,  label=sREplotnodes01col, width=10, height=15>>= 
-#10 15
+<<fig = TRUE,  label=sREplotnodes01col, width=8, height=12, include=FALSE>>= 
+#8 12
 oldpar <- par(mfrow=c(3,2))
 plot_nodes(sprof01, which=1:6, col=classcol)
 par(oldpar)
 @
 
-\caption{Nodes by class}
+%: floating figure
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics{sprofiling-sREplotnodes01col}
+\caption{Nodes by class. User defined colors.}
 \label{fig:sREplotnodes01col}
 \end{center}
 \end{figure}
 
-Nodes by package: See \vref{fig:sREplotnodes01col}.
+Nodes by class, user defined colors: see \vref{fig:sREplotnodes01col}.
 
 \todo{classes need separate colour palette}
 % floating figure end
 %: floating figure
-\begin{figure}[htbp]
-\begin{center}
-<<fig = TRUE,  label=sREplotnodes01colcb, width=10, height=15>>= 
-#10 15
+<<fig = TRUE,  label=sREplotnodes01colcb, width=8, height=12, include=FALSE>>= 
+#8 12
 oldpar <- par(mfrow=c(3,2))
 plot_nodes(sprof01, which=1:6)
 par(oldpar)
 @
-
-\caption{Nodes by class: default colour selection}
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics{sprofiling-sREplotnodes01colcb}
+\caption{8 12 Nodes by class: default colour selection}
 \label{fig:sREplotnodes01colcb}
 \end{center}
 \end{figure}
 
-Nodes by class: default colour selection. See \vref{fig:sREplotnodes01colcb}.
+Nodes by class: default colour selection: see \vref{fig:sREplotnodes01colcb}.
 
 % floating figure end
 
@@ -795,7 +813,7 @@ Not so often, but a frequent phenomenon is to have some ``burn in'' or ``fade ou
 <<>>=
 summary(sprof01$stacks$refcount)
 @
-\todo{we could do smart smoothng of the stacks here}
+\todo{we could do smart smoothing of the stacks here}
 This summary has to be taken with caution. As the program runs, the stacks are build up und teared down, and we only take random samples. So in dynamic parts, we see images with some fluctuation, as one stack may be a snapshot of an other under construction. A better information is to cut off fluctuations and use this summary as a reference.
 <<>>=
 summary(sprof01$stacks$refcount[sprof01$stacks$refcount>2])
@@ -906,8 +924,7 @@ prxt(sprof02$nodes,
 	
 @
 %: floating figure
-<<fig = TRUE, echo = TRUE, print = FALSE, label=shownodes02, png=TRUE, width=8, height=8>>= 
-
+<<fig = TRUE, echo = TRUE, print = FALSE, label=shownodes02, png=TRUE, width=8, height=8, include=FALSE>>= 
 #8 8
 shownodes(sprof02)
 @
@@ -915,12 +932,12 @@ shownodes(sprof02)
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics{sprofiling-shownodes02}
-\caption{SProf02: Nodes by stack and profile}
+\caption{sprof02: Nodes by stack and profile}
 \label{fig:shownodes02}
 \end{center}
 \end{figure}
 
-See \vref{fig:shownodes02}.
+Nodes by stack and profile: see \vref{fig:shownodes02}.
 
 % floating figure end
 
@@ -1301,17 +1318,31 @@ plot_graphNEL_sprof <- function(graphNEL)
 		}
 
 	renderGraph(graphNEL)
-	title(main=paste0(main1, " Rgraphviz/graph"))
-	
+	#title(main=paste0( "Rgraphviz/graph( ",main1, " )"))
+	title(main=main1)
 #title(main="nodes time", sub=sprof04$info$id)
 #legend("bottomright",legend= c("node color: self.time, pwr=0.5", "node #lwd: total.time, pwr=0.5"), bty="n")
+	legend("topleft", 
+		legend=class(graphNEL),
+		title="plot_graphNEL_sprof class:"
+		)
 
 }
-<<>>=
+
+<<fig=TRUE, label=plot04NEL, width=6, height=6, include=FALSE>>=
 a04NEL <- as_graphNEL_sprof(sprof04)
-<<fig=TRUE, label=plot04NEL, width=6, height=6>>=
 plot_graphNEL_sprof(a04NEL)
 @
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics{sprofiling-plot04NEL}
+\caption{Rgraphviz/graph basic plot}
+\label{fig:plot04NEL}
+\end{center}
+\end{figure}
+
+Rgraphviz/graph basic plot: see \vref{fig:plot04NEL}.
+
 %We still are experimenting with the facilities to display this graph.
 %This is the state of the current experiments.
 %<<fig=TRUE, label=sprofadj04NEL1, width=12, height=12>>=
@@ -1405,7 +1436,7 @@ To  use attributes on nodes and edges, we need \ircode{Rgraphviz}.
 %
 %Same data, unweighted edges, and colours, but attributes set after layout.
 \todo{merge with as\_graphNEL\_sprof}
-<<fig=TRUE, label=sprofadj04NEL02, width=6, height=6>>=
+<<fig=TRUE, label=sprofadj04NEL02, width=6, height=6, include=FALSE>>=
 library(graph)
 # see help(nodeRenderInfo) for attributes.
 #6 6
@@ -1422,11 +1453,14 @@ nDD2 <- (nodeRenderInfo(a04NEL0))
 a04NEL0 <- layoutGraph(a04NEL0) 
 # node attributes
 #sprof04$nodes$self.time -> fill
-fill_list <- heat.colors(12)[rkindex(-sprof04$nodes$self.time, pwr=0.5, maxindex=12, ties.method="min")]
+fill_list <- heat.colors(12)[
+	rkindex(-sprof04$nodes$self.time, 
+		pwr=0.5, maxindex=12, ties.method="min")]
 names(fill_list) <- sprof04$nodes$name
 
 #sprof04$nodes$total.time -> lwd
-lwd_list  <-  rkindex(sprof04$nodes$total.time, pwr=0.5,maxindex=6, ties.method="min")
+lwd_list  <-  rkindex(sprof04$nodes$total.time, 
+	pwr=0.5, maxindex=6, ties.method="min")
 names(lwd_list) <- sprof04$nodes$name
 
 #strx(nodeRenderInfo(a04NEL0))
@@ -1446,21 +1480,37 @@ renderGraph(a04NEL0)
 title(main="nodes (time)", sub=sprof04$info$id, col.sub=grey(0.5))
 legend("bottomright",legend= c("node color: self.time, pwr=0.5", "node lwd: total.time, pwr=0.5"), bty="n", text.font=3)
 
+	legend("topleft", 
+		legend=class(a04NEL0),
+		title="class:"
+		)
+
+@
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics{sprofiling-sprofadj04NEL02}
+\caption{Rgraphviz/graph plot with attributes}
+\label{fig:sprofadj04NEL02}
+\end{center}
+\end{figure}
+
+Rgraphviz/graph plot with attributes: see \vref{fig:sprofadj04NEL02}.
+
 detach(package:Rgraphviz)
 @
 We should not overload the plot. We could use colour encoding for the edges, but this would conflict visually with the colour encoding of the nodes. We could use different colours for classes of nodes, but then we would need an additional display to explain the shape information. 
 
 But within the choice of attributes used, we still can select the information shown. To close this round, instead of showing the node information from the rough summary, we can show the information from the run length discussed in \vref{sec:rle}.
 
-<<fig=TRUE, label=sprofadj04NEL02rle, width=6, height=6>>=
-
+<<fig=TRUE, label=sprofadj04NEL02rle, width=6, height=6, include=FALSE>>=
+#6 6
 amt04 <- nodesrunlength(sprof04)
 
 library(graph)
 library(Rgraphviz)
 
 # see help(nodeRenderInfo) for attributes.
-#6 6
+
 a04NEL0rle <- as_graphNEL_sprof(sprof04, weight=FALSE)
 #nDD0 <- (nodeRenderInfo(a04NEL0rle))
 #a04NEL0rle <- layoutGraph(a04NEL0rle)
@@ -1500,7 +1550,22 @@ legend("bottomright",
 	legend= c("node lwd: nr runs, pwr=0.5", 
 	"node color: avg time, pwr=0.5"), 
 	bty="n", text.font=3)
+legend("topleft", 
+		legend=class(a04NEL0rle),
+		title="class:"
+		)
+
 detach(package:Rgraphviz)
+@
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics{sprofiling-sprofadj04NEL02rle}
+\caption{nodes (run length)}
+\label{fig:sprofadj04NEL02rle}
+\end{center}
+\end{figure}
+Nodes marked by run length and run count: see \vref{fig:sprofadj04NEL02rle}.
+
 @
 %edge.lwd<-sprofadj02
 %edge.lwd[edge.lwd>0]<- rank(edge.lwd[edge.lwd>0], ties.method="min")
