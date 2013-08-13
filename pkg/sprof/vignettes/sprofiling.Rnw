@@ -478,7 +478,7 @@ Common rearrangements as by total time and by self time are supplied by the disp
 \irfunx{hplot}{plot\_nodes}, for example, currently gives a choice of four displays for nodes, and supports trimming by default. Our profile starts with 62 nodes. The defaults cut off 34 nodes as uninformative, either because they are too rare, or ubiquitous.
  
 % : floating figure
-<<fig = TRUE, echo = TRUE, print = FALSE, label=sREplotnodes01, width=8, height=8>>=
+<<fig = TRUE, echo = TRUE, print = FALSE, label=sREplotnodes01, width=8, height=8, include=FALSE>>=
 #8
 oldpar <- par(mfrow=c(2,2))
 plot_nodes(sprof01)
@@ -501,7 +501,7 @@ when using a logarithmic scale, so this is added.
 
 If you prefer, you can have the bar charts in horizontal layout, giving more space for labels.
 %: floating figure
-<<fig = TRUE, echo = TRUE, print = FALSE, label=sREplotnodes01h, width=8, height=8>>=
+<<fig = TRUE, echo = TRUE, print = FALSE, label=sREplotnodes01h, width=8, height=8, include=FALSE>>=
 #8
 oldpar <- par(mfrow=c(2,2))
 plot_nodes(sprof01, horiz=TRUE)
@@ -529,7 +529,7 @@ freqrankcol01 <- heat.colors(length(freqrank01))
 @
 Here is the node view using these choices:
 % :floating figure
-<<fig = TRUE, echo = TRUE, print = FALSE, label=sREplotnodes01freqcol, width=10, height=10>>=
+<<fig = TRUE, echo = TRUE, print = FALSE, label=sREplotnodes01freqcol, width=10, height=10, include=FALSE>>=
 #10
 sprof01$nodes$icol <- freqrank01
 oldpar <- par(mfrow=c(2,2))
@@ -622,7 +622,7 @@ or use assignments on the fly
 nodeclass[sprof01$nodes$name %in% 
 	c("eval",  "evalFunc",
 		"try", "tryCatch", "tryCatchList", "tryCatchOne",
-		"doTryCatch")
+		"doTryCatch", "withVisible")
 		] <- "x_eval"
 nodeclass[sprof01$nodes$name %in% 
 	c("model.frame", "model.matrix.default","model.frame.default",
@@ -632,6 +632,8 @@ nodeclass[sprof01$nodes$name %in%
 	c("lm", "lm.fit", "summary.lm")
 		] <- "x_lm"
 nodeclass[sprof01$nodes$name =="<Anonymous>"] <- "x_Anon"
+nodeclass[sprof01$nodes$name == "Sweave"] <- "x_Sweave"
+nodeclass[sprof01$nodes$name %in% c( "summay" ,"summay.lm")] <- "x_summary"
 
 @
 % data.frame(sprof01$nodes$name,sprof01$nodes$icol)
@@ -640,7 +642,10 @@ sprof01$nodes$icol <-as.factor(nodeclass)
 @
 adds a sticky colour attribute. To interpret, you should choose your preferred colour palette, for example 
 <<>>=
-classcol <- c("red", "green", "blue", "yellow", "cyan", "magenta", "purple")
+classcol <- c("red", "green", "blue", "yellow", 
+	"cyan", "magenta", "purple", "brown", "aquamarine")
+	
+# gold cyan4 aquamarine pink violet orchid hotpink salmon turquoise1
 @
 \todo{Defaults by class}
 <<fig = TRUE,  label=sREplotnodes01col, width=8, height=12, include=FALSE>>= 
@@ -1063,6 +1068,52 @@ chopstack <- function(x , chop, replacement)
 # merge x <- head + replacement + tiail
 return(x)
 }
+@
+We use a prepared sanitised version of our data set.
+
+
+\todo{fix null name}
+<<>>=
+sprof04 <- readRprof("RprofsRegressionExpl03.out", id="sprof04")
+@
+Applying our old classification:
+<<>>=
+nodeclass <- rep("x_nn", sprof04$info$nrnodes)
+nodeclass[sprof04$nodes$name %in% x_apply] <- "x_apply"
+nodeclass[sprof04$nodes$name %in% x_as] <- "x_as"
+nodeclass[sprof04$nodes$name %in% 
+	c("eval",  "evalFunc",
+		"try", "tryCatch", "tryCatchList", "tryCatchOne",
+		"doTryCatch", "withVisible")
+		] <- "x_eval"
+nodeclass[sprof04$nodes$name %in% 
+	c("model.frame", "model.matrix.default","model.frame.default",
+	 " model.response", "model.matrix", "model.response")
+		] <- "x_model"
+nodeclass[sprof04$nodes$name %in% 
+	c("lm", "lm.fit", "summary.lm")
+		] <- "x_lm"
+nodeclass[sprof04$nodes$name =="<Anonymous>"] <- "x_Anon"
+nodeclass[sprof04$nodes$name == "Sweave"] <- "x_Sweave"
+nodeclass[sprof04$nodes$name %in% c( "summay" ,"summay.lm")] <- sprof04$nodes$icol <-as.factor(nodeclass)
+@
+now gives
+<<fig = TRUE,  label=sREplotnodes04col, width=8, height=12, include=FALSE>>= 
+#8 12
+oldpar <- par(mfrow=c(3,2))
+plot_nodes(sprof04, which=1:6, col=classcol)
+par(oldpar)
+@
+%: floating figure
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics{sprofiling-sREplotnodes04col}
+\caption{Sanitized. Nodes by class. User defined colors.}
+\label{fig:sREplotnodes04col}
+\end{center}
+\end{figure}
+
+Sanitized nodes by class, user defined colors: see \vref{fig:sREplotnodes04col}.
 
 @
 \subsection{Run length}
@@ -1192,7 +1243,7 @@ prxt(amt,
 	digits=c(rep(0,dim(amt)[2]) ,2), 
 	zero.print=" . ") #dim(amt)[2]-1, +1 for rownames
 @
-See \vref{tab:pramt1}
+See \vref{tab:pramt1}: Marginal statistics on nodes by run length.
 %<<>>=
 %prop.table(profile_nodes_rlearray, margin = c(1,3))
 @
@@ -1254,7 +1305,7 @@ See \vref{fig:sprofadj01NEL} for a comparison before and after trimming. The sca
 % floating figure end
 \R{} is function based, and control structures in general are implemented as functions. In a graph representation, they appear as nodes, concentrating and seeding to unrelated paths. We can detect these on the stack level and replace them by surrogates, introducing new nodes. This is a case for surgery.
 
-We used a prepared sanitised version of our data set.
+We use a prepared sanitised version of our data set.
 @
 
 \todo{fix null name}
