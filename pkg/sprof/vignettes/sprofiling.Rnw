@@ -284,22 +284,41 @@ This is to be used with
 \verb+<<print=FALSE, results =tex, label=tab:prxx>>=+
 
 The graph visualisation family is not friendly. We try to get control by using a wrapper which is at least used to the members of the \ircode{graphviz} clan. This will be used in later sections.
-<<>>=
-plotviz <- function(x,y="dot", main,...)
+%:  plotviz
+%nodeDataDefaults(x, "shape") <- "ellipse"
+%nodeDataDefaults(x, "cex") <- 0.6
+%nodeDataDefaults(x, "cex.main") <- 0.6
+%nodeDataDefaults(x, "fontsize") <- 10
+%nodeDataDefaults(x, "weigth") <- 1
+%nodeDataDefaults(x, "fill") <- "green"
+%nodeDataDefaults(x, "col") <- "yellow"
+%	nodeAttrs=list(node=list(cex=4, fontsize=40,  
+%	shape="ellipse")),
+
+<<label=plotviz>>=
+plotviz <- function(x,y="dot", main=NULL, sub=NULL,...)
 {
-main=paste0(main, "\n plotviz( ",deparse(substitute(x))," )")
+if (!is.null(sub)) sub <- as.character(sub)
+if (is.null(main)) 
+	main <-paste0("plotviz( ",deparse(substitute(x)),", ", y, " ) ") else
+	main=paste0(main, "\n plotviz( ",deparse(substitute(x)),", ", y, " ) ")
+
+
 plot(x=x,  y=y,
 	attrs=list(node=list(cex=4, fontsize=40,  
 	shape="ellipse")), 
 	cex.main=1.5, 
 	main=main,...)
 	
-	title(sub=as.character(class(x)))	
+	title(sub=paste0(sub, " ",as.character(class(x)))	)
 	legend("topleft", 
-		legend=class(x),
-		title="class:"
+		legend=c(class(x),"method: ",y),
+		title="class:",
+		bg="#FFFFE040",
+				seg.len=0
 		)
 }
+#"lightyellow",
 
 @
 \section{Profiling}
@@ -458,21 +477,22 @@ Common rearrangements as by total time and by self time are supplied by the disp
 
 \irfunx{hplot}{plot\_nodes}, for example, currently gives a choice of four displays for nodes, and supports trimming by default. Our profile starts with 62 nodes. The defaults cut off 34 nodes as uninformative, either because they are too rare, or ubiquitous.
  
-%: floating figure
-\begin{figure}[htbp]
-\begin{center}
+% : floating figure
 <<fig = TRUE, echo = TRUE, print = FALSE, label=sREplotnodes01, width=8, height=8>>=
 #8
 oldpar <- par(mfrow=c(2,2))
 plot_nodes(sprof01)
 par(oldpar)
 @
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics{sprofiling-sREplotnodes01}
 \caption{Basic information on node level}
 \label{fig:sREplotnodes01}
 \end{center}
 \end{figure}
 
-See \vref{fig:sREplotnodes01}.
+Basic information on node level: see \vref{fig:sREplotnodes01}.
 
 % floating figure end
 
@@ -481,20 +501,21 @@ when using a logarithmic scale, so this is added.
 
 If you prefer, you can have the bar charts in horizontal layout, giving more space for labels.
 %: floating figure
-\begin{figure}[htbp]
-\begin{center}
 <<fig = TRUE, echo = TRUE, print = FALSE, label=sREplotnodes01h, width=8, height=8>>=
 #8
 oldpar <- par(mfrow=c(2,2))
 plot_nodes(sprof01, horiz=TRUE)
 par(oldpar)
 @
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics{sprofiling-sREplotnodes01h}
 \caption{Basic information on node level}
 \label{fig:sREplotnodes01h}
 \end{center}
 \end{figure}
 
-See \vref{fig:sREplotnodes01h}.
+Basic information on node level - horizontal bars: see \vref{fig:sREplotnodes01h}.
 
 % floating figure end
 
@@ -507,9 +528,7 @@ freqrank01 <- rkindex(-sprof01$nodes$total.time, ties.method="random")
 freqrankcol01 <- heat.colors(length(freqrank01))
 @
 Here is the node view using these choices:
-%: floating figure
-\begin{figure}[htbp]
-\begin{center}
+% :floating figure
 <<fig = TRUE, echo = TRUE, print = FALSE, label=sREplotnodes01freqcol, width=10, height=10>>=
 #10
 sprof01$nodes$icol <- freqrank01
@@ -517,12 +536,16 @@ oldpar <- par(mfrow=c(2,2))
 plot_nodes(sprof01, col=freqrankcol01)
 par(oldpar)
 @
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics{sprofiling-sREplotnodes01freqcol}
 \caption{Basic information on node level, colour by total time.}
 \label{fig:sREplotnodes01freqcol}
 \end{center}
 \end{figure}
 
-See \vref{fig:sREplotnodes01h}.
+Basic information on node level, colour by total time: 
+see \vref{fig:sREplotnodes01h}.
 
 % floating figure end
 
@@ -1178,7 +1201,17 @@ See \vref{tab:pramt1}
 \todo{generate a coplot representation}
 \todo{remove counts per level?}
 \todo{hack. keep length in nodesrunlength}
-We can add this information to our base.
+We can add this information to our base and use it to enhance graphical displays. See: nodes marked by run length and run count, \vref{fig:sprofadj04NEL02rle}.
+
+
+\ircode{eval} is the base of all evaluation in \R{}, so we should not be surprised to find it at the top of the list. The next two entries, \ircode{model.frame} and \ircode{model.frame.default} are seen $77$ times. We know that in our example we had a loop with 100 repetitions, so a frequency of 100 would not be surprising. A closer look shows that both functions occur as isolated events 40 times, but frequency decreases with run length until we see another high at run lenght 6. We are sampling, and of course sampling can miss some function calls. But this pattern is what if occurs if we do not miss a function call, but we miss a gap. So several function calls appear as some longer runs.
+
+We can improve the hit rate by increasing the sampling rate. But of course this is at the expense of using more space for the log files, and increased time for the overhead. In our case, 1 ms seems to be a good compromise, but 0.1 ms might be another feasible choice. 
+
+As we walk down the list, \ircode{na.omit} is next, followed closely by \ircode{na.omit.data.frame}. In our problem, there are no missing data. But \R{} does not have something like a ``vanilla mode''. The overhead used for the handling of potentially missing values would need a restructuring of the linear model algorithm, e.g. by introducing a ``has.na'' flag.
+
+Walkinf further down, we see other candidates such as \ircode{as.character} that may be avoidable in this problem.
+
 <<>>=
  nr <- nodesrunlength(sprof02, clean=FALSE)
  #nr <- rbind(nr,0) ## hack. keep length in nodesrunlength
@@ -1203,9 +1236,9 @@ search()
 #12 6
 oldpar <- par(mfrow=c(1,2))
 plotviz(as(adjacency(sprof01),"graphNEL"),  
-	main="graph layout sprof01", sub=sprof01$info$id)
+	 sub=sprof01$info$id)
 plotviz(as(adjacency(sprof02),"graphNEL"),  
-	main="graph layout sprof02", sub=sprof02$info$id)
+	 sub=sprof02$info$id)
 par(oldpar)
 @
 \begin{figure}[htbp]
@@ -1227,20 +1260,20 @@ We used a prepared sanitised version of our data set.
 \todo{fix null name}
 <<>>=
 sprof04 <- readRprof("RprofsRegressionExpl03.out", id="sprof04")
-<<fig = TRUE, echo = TRUE, print = FALSE, label=sprofadj04NEL, width=12, height=6, include=FALSE>>= 
+<<fig = TRUE, echo = TRUE, print = FALSE, label=sprofadj0204NEL, width=12, height=6, include=FALSE>>= 
 #12 6
 oldpar <- par(mfrow=c(1,2))
 plotviz(as(adjacency(sprof02),"graphNEL"),  
-	main="graph layout sprof02", sub=sprof02$info$id)
+	sub=sprof02$info$id)
 plotviz(as(adjacency(sprof04),"graphNEL"),  
-	main="graph layout sprof04", sub=as.character(sprof04$info$id))
+	 sub=as.character(sprof04$info$id))
 par(oldpar)
 @
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics{sprofiling-sprofadj04NEL}
+\includegraphics{sprofiling-sprofadj0204NEL}
 \caption{Sprof graph, after trimming, and after trimming and some sanitizing.}
-\label{fig:sprofadj04NEL}
+\label{fig:sprofadj0204NEL}
 \end{center}
 \end{figure}
 
@@ -1320,8 +1353,10 @@ plot_graphNEL_sprof <- function(graphNEL)
 	renderGraph(graphNEL)
 	#title(main=paste0( "Rgraphviz/graph( ",main1, " )"))
 	title(main=main1)
-#title(main="nodes time", sub=sprof04$info$id)
-#legend("bottomright",legend= c("node color: self.time, pwr=0.5", "node #lwd: total.time, pwr=0.5"), bty="n")
+	#title(main="nodes time", sub=sprof04$info$id)
+	#legend("bottomright",legend= c("node color: self.time, pwr=0.5", "node 
+	#lwd: total.time, pwr=0.5"), bty="n")
+
 	legend("topleft", 
 		legend=class(graphNEL),
 		title="plot_graphNEL_sprof class:"
@@ -1478,7 +1513,10 @@ edgeRenderInfo(a04NEL0) <- list(col= "#80808080")
 
 renderGraph(a04NEL0)
 title(main="nodes (time)", sub=sprof04$info$id, col.sub=grey(0.5))
-legend("bottomright",legend= c("node color: self.time, pwr=0.5", "node lwd: total.time, pwr=0.5"), bty="n", text.font=3)
+legend("bottomright",legend= c("node color: self.time, pwr=0.5", 
+	"node lwd: total.time, pwr=0.5",
+	"edge lwd: frequency"), 
+	bty="n", text.font=3)
 
 	legend("topleft", 
 		legend=class(a04NEL0),
@@ -1494,8 +1532,9 @@ legend("bottomright",legend= c("node color: self.time, pwr=0.5", "node lwd: tota
 \end{center}
 \end{figure}
 
-Rgraphviz/graph plot with attributes: see \vref{fig:sprofadj04NEL02}.
+Rgraphviz/graph plot with attributes: see \vref{fig:sprofadj04NEL02}. This plot gives us the traditional view, highlighting nodes and edges with overall time presence.
 
+<<>>=
 detach(package:Rgraphviz)
 @
 We should not overload the plot. We could use colour encoding for the edges, but this would conflict visually with the colour encoding of the nodes. We could use different colours for classes of nodes, but then we would need an additional display to explain the shape information. 
@@ -1548,8 +1587,10 @@ renderGraph(a04NEL0rle)
 title(main="nodes (run length)", sub=sprof04$info$id, col.sub=grey(0.5))
 legend("bottomright",
 	legend= c("node lwd: nr runs, pwr=0.5", 
-	"node color: avg time, pwr=0.5"), 
+	"node color: avg time, pwr=0.5",
+	"edge lwd: frequency"), 
 	bty="n", text.font=3)
+	
 legend("topleft", 
 		legend=class(a04NEL0rle),
 		title="class:"
@@ -1564,7 +1605,8 @@ detach(package:Rgraphviz)
 \label{fig:sprofadj04NEL02rle}
 \end{center}
 \end{figure}
-Nodes marked by run length and run count: see \vref{fig:sprofadj04NEL02rle}.
+Nodes marked by run length and run count: see \vref{fig:sprofadj04NEL02rle}.  This plot gives us a more informative  view, highlighting nodes by number of runs and avaerage run lenght and edges with overall time presence.
+
 
 @
 %edge.lwd<-sprofadj02
@@ -1611,6 +1653,17 @@ these three functions.
 
 \filledpagebreak
 \subsection{Plot}
+Examples are given in the reference manual for \ircode{sprof}.
+<<label=rpoplotnodes, print=FALSE, eval=FALSE>>=
+plot_nodes(sprof)
+<<label=rpoplotstacks, print=FALSE, eval=FALSE>>=
+plot_stacks(sprof)
+<<label=rpoplotprofiles, print=FALSE, eval=FALSE>>=
+plot_profiles(sprof)
+@
+The \irfunx{hplot}{plot.sprof} method for \ircode{sprof} objects concatenates 
+these three functions.
+
 %Looking at lists of numbers is not too informative. We get a first impression 
 %by plotting the data. 
 %Examples of the plot output is not given here. Please run the examples, or 
@@ -1711,15 +1764,11 @@ sprofedgel02$lwd  <- rkindex(sprofedgel02$count, maxindex=12, ties.method="min")
 @
 \filledpagebreak
 \subsubsection{graph package}
-<<>>=
-library(graph)
-search() 
-<<>>=
-sprofadjNEL02 <- as(sprofadj02,"graphNEL")
 <<fig=TRUE, label=sprofadjNEL02,width=8, height=8>>=
-plotviz(sprofadjNEL02,  main=paste("graph layout\n",sprof$info$id))
-@
-<<>>=
+library(graph)
+#search() 
+sprofadjNEL02 <- as(sprofadj02,"graphNEL")
+plotviz(sprofadjNEL02,  sub=sprof$info$id)
 detach("package:graph")
 @
 \filledpagebreak
@@ -1782,11 +1831,16 @@ E(sprof_igraph)$color <- "#0000FF40"
 E(sprof_igraph)$width <- c(1,2)
 # see 
 <<fig=TRUE, label=sprof_igraphkamada,width=8, height=8>>=
-plot(sprof_igraph, main="sprof01: igraph kamada.kawai layout")
-<<>>=
-sprof_igraph <- graph.adjacency(adjacency(sprof))
-sprof_igraph <- set.graph.attribute(sprof_igraph, "layout", layout.auto(sprof_igraph))
+plot(sprof_igraph, main=paste0("igraph kamada.kawai layout\n", sprof$info$id))
+	legend("topleft", 
+		legend=class(sprof_igraph),
+		title="igraph class:"
+		)
 @
+%<<>>=
+%sprof_igraph <- graph.adjacency(adjacency(sprof))
+%sprof_igraph <- set.graph.attribute(sprof_igraph, "layout", layout.auto(sprof_igraph))
+%@
 
 Experiments with various layouts for \ircode{igraph} follow.
 
@@ -1795,53 +1849,60 @@ Experiments with various layouts for \ircode{igraph} follow.
 <<fig=TRUE, label=sprof_ig_igraph_auto,width=8, height=8>>=
 #8 8
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.auto)
-plot(sprof_ig_auto, main="sprof01: igraph auto layout")
+plot(sprof_ig_auto, main=paste0("igraph auto layout\n", sprof$info$id))
 	legend("topleft", 
 		legend=class(sprof_ig_auto),
-		title="class:"
+		title="igraph class:"
 		)
 @
 \filledpagebreak
 
 <<fig=TRUE, label=sprof_ig_igraph_random,width=6, height=6>>=
 #6 6
-sprof_ig_auto <- as_igraph_sprof(sprof, layout.random)
-plot(sprof_ig_auto, main="sprof01: igraph random layout")
+sprof_ig_random <- as_igraph_sprof(sprof, layout.random)
+plot(sprof_ig_random, main=paste0("igraph random layout\n", sprof$info$id))
+	legend("topleft", 
+		legend=class(sprof_ig_random),
+		title="igraph class:"
+		)
+
 @
 \filledpagebreak
 
 <<fig=TRUE, label=sprof_ig_igraph_circle,width=6, height=6>>=
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.circle)
-plot(sprof_ig_auto, main="sprof01: igraph circle layout")
+plot(sprof_ig_auto, main=paste0("igraph circle layout\n", sprof$info$id))
 @
 \filledpagebreak
 
 <<fig=TRUE, label=sprof_ig_igraph_sphere,width=6, height=6>>=
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.sphere)
-plot(sprof_ig_auto, main="sprof01: igraph sphere layout")
+plot(sprof_ig_auto, main=paste0("igraph sphere layout\n", sprof$info$id))
 @
 \filledpagebreak
 
 <<fig=TRUE, label=sprof_ig_igraph_fruchterman_reingold,width=6, height=6>>=
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.fruchterman.reingold)
-plot(sprof_ig_auto, main="sprof01: igraph fruchterman.reingold layout")
+plot(sprof_ig_auto, main=paste0("igraph fruchterman.reingold layout\n", sprof$info$id))
 @
 \filledpagebreak
 
 <<fig=TRUE, label=sprof_ig_igraph_kamada_kawai,width=6, height=6>>=
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.kamada.kawai)
-plot(sprof_ig_auto, main="sprof01: igraph kamada.kawai layout")
+plot(sprof_ig_auto, main=paste0("igraph kamada.kawai layout\n", sprof$info$id))
+
 @
 \filledpagebreak
 
 <<fig=TRUE, label=sprof_ig_igraph_spring,width=6, height=6>>=
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.spring)
-plot(sprof_ig_auto, main="sprof01: igraph spring layout")
+plot(sprof_ig_auto, main=paste0("igraph spring layout\n", sprof$info$id))
+
 @
 %<<fig=TRUE, label=sprof_ig_igraph_reingold.tilford,width=6, height=6>>=
 %#6 6
@@ -1853,28 +1914,30 @@ plot(sprof_ig_auto, main="sprof01: igraph spring layout")
 <<fig=TRUE, label=sprof_ig_igraph_fruchterman_reingold_grid,width=6, height=6>>=
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.fruchterman.reingold.grid)
-plot(sprof_ig_auto, main="sprof01: igraph fruchterman.reingold.grid layout")
+plot(sprof_ig_auto, main=paste0("igraph fruchterman.reingold.grid layout\n", sprof$info$id))
+
 @
 \filledpagebreak
 
 <<fig=TRUE, label=sprof_ig_igraph_lgl,width=6, height=6>>=
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.lgl)
-plot(sprof_ig_auto, main="sprof01: igraph lgl layout")
+plot(sprof_ig_auto, main=paste0("igraph lgl layout\n", sprof$info$id))
+
 @
 \filledpagebreak
 
 <<fig=TRUE, label=sprof_ig_igraph_graphopt,width=6, height=6>>=
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.graphopt)
-plot(sprof_ig_auto, main="sprof01: igraph graphopt layout")
+plot(sprof_ig_auto, main=paste0("igraph graphopt layout\n", sprof$info$id))
 @
 \filledpagebreak
 
 <<fig=TRUE, label=sprof_ig_igraph_svd,width=6, height=6>>=
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.svd)
-plot(sprof_ig_auto, main="sprof01: igraph svd layout")
+plot(sprof_ig_auto, main=paste0("igraph svd layout\n", sprof$info$id))
 @
 %<<fig=TRUE, label=sprof_ig_igraph_norm,width=6, height=6>>=
 %#6 6
@@ -1900,28 +1963,39 @@ as_network_sprof <- function(sprof) {
 }
 <<>>=
 plot_network_sprof <- function(nwsprof,mode = "fruchtermanreingold", ...) {
+	classnwsprof <- class(nwsprof)
 	main1 <- deparse(substitute(nwsprof))
 	if (inherits(nwsprof, "sprof")) nwsprof <- 	
 		as_network_sprof(nwsprof)
+		
 	plot(nwsprof, 
 	label=network.vertex.names(nwsprof), 
-	main=paste0(main1,": network layout ", mode), 
+	main=paste0(main1,": network layout\n ", mode), 
 	mode = mode,
 	edge.len=2,
 	edge.col="#80808080",
 	sub= main1,
-	cex.main=2,...)
+	cex.main=1.5,...)
+	
+	legend("topleft", 
+		legend=c(classnwsprof,mode),
+		title="class & mode:",
+		bg="#FFFFE040",
+				seg.len=0
+		)
+	
 }
 @
 \filledpagebreak
 
 <<fig=TRUE, label=plotnwsprofadj,width=6, height=6>>=
+#6 6
 plot_network_sprof(sprof04)
 
 <<fig=TRUE, label=nwsprofadj,width=8, height=8>>=
 nwsprofadj <- as.network(sprofadj02) # names is not imported 
 #network.vertex.names(nwsprofadj) <- rownames(sprofadj02) # not honoured by plot
-plot(nwsprofadj, label=rownames(sprofadj02), main="sprof01: network layout", cex.main=2)
+plot(nwsprofadj, label=rownames(sprofadj02), main="sprof02: network layout", cex.main=2)
 @
 \filledpagebreak
 Experiments to include weight. \todo{maximum edge.lwd?}
@@ -1929,7 +2003,7 @@ Experiments to include weight. \todo{maximum edge.lwd?}
 edge.lwd<- sprofadj02
 edge.lwd[edge.lwd>0]<- rkindex(edge.lwd[edge.lwd>0], maxindex=12, ties.method="min")
 
-plot(nwsprofadj, label=rownames(sprofadj02), main="sprof01: network layout", cex.main=2, edge.lwd=edge.lwd)
+plot(nwsprofadj, label=rownames(sprofadj02), main="sprof02: network layout", cex.main=2, edge.lwd=edge.lwd)
 detach("package:network")
 @
 \filledpagebreak
@@ -1944,7 +2018,7 @@ sprofadjRag02 <- agopen(sprofadjNEL02, name="Rprof Example")
 <<fig=TRUE, label=sprofadjvizdot,width=6, height=6>>=
 
 # 6 6
-plotviz(sprofadjRag02, main="sprof02: Graphviz dot layout")
+plotviz(sprofadjRag02, sub=sprof$info$id)
 @
 %agopen(graph, name, nodes, edges, kind = NULL, layout = TRUE,
 %layoutType = "dot",
@@ -1954,24 +2028,31 @@ plotviz(sprofadjRag02, main="sprof02: Graphviz dot layout")
 
 %dot, neato, twopi, circo, and fdp.
 \filledpagebreak
-<<fig=TRUE, label=sprofadjvizneato,width=8, height=8>>=
-#8 8
-plot(sprofadjRag02,"neato", main="sprof02: Graphviz neato layout",)
+<<fig=TRUE, label=sprofadjvizneato,width=6, height=6>>=
+#6 6
+plotviz(sprofadjRag02,"neato", 
+	sub=sprof$info$id)
 @
 \filledpagebreak
 <<fig=TRUE, label=sprofadjviztwopi,width=6, height=6>>=
 #6 6
-plot(sprofadjRag02,"twopi", main="sprof02: Graphviz twopi layout")
+plotviz(sprofadjRag02,"twopi", 
+	sub=sprof$info$id)
+
 @
 \filledpagebreak
-<<fig=TRUE, label=sprofadjvizcirco8,width=8, height=8>>=
-#8 8
-plot(sprofadjRag02,"circo", main="sprof02: Graphviz circo layout")
+<<fig=TRUE, label=sprofadj02vizcirco6,width=6, height=6>>=
+#6 6
+plotviz(sprofadjRag02,"circo", 
+	sub=sprof$info$id)
+
 @
 \filledpagebreak
 <<fig=TRUE, label=sprofadjvizfdp,width=6, height=6>>=
 #6  6
-plotviz(sprofadjRag02,"fdp", main="sprof01: Graphviz fdp layout",cex=2)
+plotviz(sprofadjRag02,"fdp", 
+	sub=sprof$info$id)
+
 @
 \filledpagebreak
 \section{Trimmed example: regression}
@@ -2091,7 +2172,8 @@ search()
 sprofadjRag02 <- agopen(sprofadjNEL02, name="Rprof Example")
 <<fig=TRUE, label=s04adjvizdot, width=6, height=6>>=
 #6 6
-plotviz(sprofadjRag02, main="sprof04: Graphviz dot layout")
+plotviz(sprofadjRag02, sub=as.character(sprof$info$id))
+
 @
 %agopen(graph, name, nodes, edges, kind = NULL, layout = TRUE,
 %layoutType = "dot",
@@ -2103,26 +2185,26 @@ plotviz(sprofadjRag02, main="sprof04: Graphviz dot layout")
 \filledpagebreak
 <<fig=TRUE, label=s04adjvizneato,width=6, height=6>>=
 #6
-plotviz(x=sprofadjRag02,y="neato", main="sprof04: Graphviz neato layout")
+plotviz(x=sprofadjRag02,y="neato")
 @
 \filledpagebreak
 <<fig=TRUE, label=s04adjviztwopi,width=6, height=6>>=
 #6
-plotviz(sprofadjRag02,y="twopi", main="sprof04: Graphviz twopi layout")
+plotviz(sprofadjRag02,y="twopi")
 @
 \filledpagebreak
 <<fig=TRUE, label=sprofadjvizcirco6,width=6, height=6>>=
 #6
-plotviz(sprofadjRag02,y="circo", main="sprof04: Graphviz circo layout 6")
+plotviz(sprofadjRag02,y="circo")
 @
 \filledpagebreak
 <<fig=TRUE, label=s04adjvizfdp,width=6, height=6>>=
 #6
-plotviz(sprofadjRag02,y="fdp", main="sprof04: Graphviz fdp layout")
+plotviz(sprofadjRag02, y="fdp")
 @
 \section{Template}
 \begin{itemize}
-	\item{Run a profiling routine to prfoile your functions. You can do it on the fly}
+	\item{Run a profiling routine to profile your functions. You can do it on the fly}
 	\item{Read in the profile}
 	\item{Get a survey}
 	\item{Trim base level and burn-in/fade-out}
