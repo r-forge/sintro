@@ -23,9 +23,8 @@ plot a plot for the output of class \code{scode}.
 %\if{latex}{\figure{logo.jpg}{options: width=0.5in}}
 These displays may be outdated. Please run the examples. Plots are from this collection:
 
-\if{html}{\figure{plotsprof.png}}
+\if{html}{\figure{plotsprof.png}{options: width=6.0in}}
 \if{latex}{\figure{plotsprof.pdf}}
-
 }
 \value{subject to change}
 \references{  \url{http://sintro.r-forge.r-project.org/} }
@@ -33,19 +32,22 @@ These displays may be outdated. Please run the examples. Plots are from this col
 See the vignette for in-context explanations.
 
 Displays of the graph structure are given in the vignette.
+
+The \code{plot.sprof} method for \code{sprof} objects concatenates 
+ three plot functions. Using the plot functions one by one allows better control and will be preferred. \code{\link{shownodes}} may be a sufficient summary.
 }
 \author{Günther Sawitzki <gsawitzki@users.r-forge.r-project.org>}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
- \code{\link{summaryRprof}}  
- 
- \code{\link{plot_profiles}}
- 
- \code{\link{plot_nodes}}
-\code{\link{plot_stacks}}
+\code{\link{shownodes}}
 
+\code{\link{summaryRprof}}  
+ 
+\code{\link{plot_nodes}}
+\code{\link{plot_stacks}}
+\code{\link{plot_profiles}}
 }
 \examples{
 data(sprof01lm)

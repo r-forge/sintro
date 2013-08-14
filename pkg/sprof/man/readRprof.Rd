@@ -19,7 +19,9 @@ readRprof(filename = "Rprof.out", chunksize = 5000,
 \arguments{
    \item{filename}{Name of a file produced by \code{Rprof()}.}
    \item{chunksize}{Number of lines to read at a time.}
-   \item{interval}{Real: time interval between samples, in s.}
+   \item{interval}{Real number: time interval between samples, in s.
+   Defaults to 0.02s for consistency with \code{Rprof}, 
+   but shorter times should be used.}
    \item{head}{\code{c("auto", "none", "Rprofmem")} to interpret control information as provided by \code{Rprof} or \code{Rprofmem}. See details.}
    \item{id}{An optional identification  string. Defaults to filename and date.}
 }
@@ -42,16 +44,20 @@ readRprof(filename = "Rprof.out", chunksize = 5000,
 This data structure is subject to change.
 
 Temporarily: A list with components
-\item{firstline}{A verbatim copy of the first line of the input file. 
-	Typically this contains timing or formatting information.}
+%\item{firstline}{A verbatim copy of the first line of the input file. 
+%	Typically this contains timing or formatting information.}
+\item{info}{Summary information.} 
 \item{nodes}{A vector of node names. 
 	This may include stray entries from interperspersed lines.} 
-\item{stacks}{A vector of unique stacks found in input, stored as verbatim copies.}
-\item{stacksrenc}{A list of unique stacks in top down order (top first), 
-	encoded as vectors or references to \code{stacks}.}
-\item{data}{A vector encoding the data file as referenes to  \code{stacks}.}
-\item{timesRLE}{Vector of sampling intervals, in miliseconds. Run-length encoded.}
-\item{freq}{A frequency table summarizing \code{data}.} 
+\item{stacks}{Stacks, represented as reference list to nodes, and stack frequencies.}
+\item{profiles}{Recorded data, as reference to stacks, and possibly additional data per reference.}
+
+%{A vector of unique stacks found in input, stored as verbatim copies.}
+%\item{stacksrenc}{A list of unique stacks in top down order (top first), 
+%	encoded as vectors or references to \code{stacks}.}
+%\item{data}{A vector encoding the data file as referenes to  \code{stacks}.}
+%\item{timesRLE}{Vector of sampling intervals, in miliseconds. Run-length %encoded. defunct -- will be removed.}
+%\item{freq}{A frequency table summarizing \code{data}.} 
 
 }
 
@@ -66,32 +72,31 @@ Temporarily: A list with components
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
- \code{\link{summaryRprof}}
+\code{\link{summaryRprof}}
 
- \code{\link{summaryRprof}}
+\code{\link{summaryRprof}}
  
 %\code{\link[proftools]{ileData}} and 
- \code{\link[proftools]{flatProfile}} in \code{library(proftools)}.
+\code{\link[proftools]{flatProfile}} in \code{library(proftools)}.
 
 %\code{\link[profr]{parse_rprof}} in \code{library(profr)}.
-\code{\link{parse_rprof}} in \code{library(profr)}.
+\code{\link[profr]{parse_rprof}} in \code{library(profr)}.
 
 
-  The chapter on \dQuote{Tidying and profiling R code} in
+The chapter on \dQuote{Tidying and profiling R code} in
   \dQuote{Writing \R Extensions} (see the \file{doc/manual} subdirectory
   of the \R source tree).
 
   
-%\code{\link{ileData}} and  \code{\link{flatProfile}} in \code{library(proftools)}.
+%\code{\link{ProfileData}} and  \code{\link{flatProfile}} in \code{library(proftools)}.
   
 \code{\link{Rprof}} is a sampling profiler.
 
-  \code{\link{tracemem}} traces copying of an object via the C function
-  \code{duplicate}.
+\code{\link{tracemem}} traces copying of an object via the C function  \code{duplicate}.
 
-  \code{\link{Rprofmem}} is a non-sampling memory-use profiler.
+\code{\link{Rprofmem}} is a non-sampling memory-use profiler.
 
-  \url{http://developer.r-project.org/memory-profiling.html}
+\url{http://developer.r-project.org/memory-profiling.html}
 }
 \examples{
 \dontrun{

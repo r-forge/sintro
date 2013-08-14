@@ -50,8 +50,7 @@ These displays may be outdated. Please run the examples. Plots are from this col
 
 % %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{
-See Also as \code{\link{plot.sprof}}, ~~~
+\seealso{\code{\link{plot.sprof}}
 }
 \examples{
  data(sprof01lm)

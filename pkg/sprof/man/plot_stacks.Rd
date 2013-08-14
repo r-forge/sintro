@@ -49,8 +49,7 @@ Plots are from this collection:
 
 % %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{
-See Also as \code{\link{plot.sprof}}, ~~~
+\seealso{\code{\link{plot.sprof}}.
 }
 \examples{
  data(sprof01lm)

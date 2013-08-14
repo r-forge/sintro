@@ -37,7 +37,7 @@ Run length and other compressions might be implemented in data.frames by default
 % %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
- \code{\link{rrleb}}, ~~~
+ \code{\link{rrleb}}
 }
 \examples{
 x <- matrix(c(

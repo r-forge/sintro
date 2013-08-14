@@ -8,9 +8,16 @@ readRprof <- function(filename = "Rprof.out",
 	chunksize = 5000, 
 	interval = 0.02, 
 	head=c("auto", "none", "Rprofmem"),
-	id=NULL){
+	id=NULL)
+{
+	stripQuotes <- function(x) {
+    	if ((substr(x, 1, 1) == "\"") & (substr(x, 1, 1) == "\""))
+            	substr(x, 2, nchar(x) - 1) else x
+    }
+            
 	con <- file(filename, "rt")
-    if (is.null(id)) id <- paste(deparse(substitute(filename)), file.info(filename)$mtime)
+    if (is.null(id)) id <- 
+    	paste(stripQuotes(deparse(substitute(filename))), file.info(filename)$mtime)
 	firstline <- readLines(con, n = 1L)
 	
 	head <- match.arg(head)
@@ -240,17 +247,22 @@ readRprof <- function(filename = "Rprof.out",
 #		rownames(stacks) <- rownames(stacks,do.NULL=FALSE, prefix="s")
 		#browser()
 		
+		nrrecords = length(profile_lines)
+		
 	Rprofdata <- list(
 		info= data.frame(
-		id = id,
-		date= Sys.time(),
-		nrnodes =nrnodes,
-		nrstacks = nrstacks,
-		nrrecords = length(profile_lines),
-	   # diagnostics support
-		firstline=firstline, 
-		ctllines=collcontrols,
-		ctllinenr=collcontrollinenr
+			id = as.character(id),
+			date= Sys.time(),
+			nrnodes =nrnodes,
+			nrstacks = nrstacks,
+			nrrecords = nrrecords,
+			sample.interval = sampleinterval/1e3,
+			sampling.time = nrrecords * sampleinterval/1e3,
+		   # diagnostics support
+		   # firstline=firstline, 
+			ctllines=collcontrols,
+			ctllinenr=collcontrollinenr,
+			stringsAsFactors=FALSE
 		),
 		
 		# basic data tables
@@ -264,10 +276,10 @@ readRprof <- function(filename = "Rprof.out",
 		# these are conceptually a data frame and must be line aligned
         # shoule be improved to allow multiple profile collections 	
         profiles =list(
-		data= profile_lines,	# references to stacksrenc
-		mem = collmemcounts, # additional, line-synced  --- merge to data
-		malloc = collmalloccounts, # additional, line-synced  --- merge to data
-		timesRLE = rle(collinterval)  # --- merge to data
+			data= profile_lines,	# references to stacksrenc
+			mem = collmemcounts, # additional, line-synced  --- merge to data
+			malloc = collmalloccounts, # additional, line-synced  --- merge to data
+			timesRLE = rle(collinterval)  # --- merge to data
 		)
 		)
 		}
