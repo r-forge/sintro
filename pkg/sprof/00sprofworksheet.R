@@ -152,7 +152,7 @@ mv ChangeLog0  sprof/ChangeLog
 pdf <- function(){
 cd ~/projects/rforge/sintro/pkg/
 rm sprof_internal.pdf
-R CMD Rd2pdf -o sprof_internal.pdf  --internals --no-clean --title="sprof internal" sprof
+R CMD Rd2pdf -o sprof_internal.pdf  --internals --no-clean --title="sprof reference" sprof
 cp sprof_internal.pdf ../www/sprof/
 }
 

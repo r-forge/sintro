@@ -311,11 +311,11 @@ plot(x=x,  y=y,
 	main=main,...)
 	
 	title(sub=paste0(sub, " ",as.character(class(x)))	)
+	
 	legend("topleft", 
-		legend=c(class(x),"method: ",y),
-		title="class:",
+		legend=c(paste0("class: ",class(x)),paste0("method: ",y)),
 		bg="#FFFFE040",
-				seg.len=0
+		seg.len=0
 		)
 }
 #"lightyellow",
@@ -868,7 +868,12 @@ What you have seen so far is what you get for free when using package \ircode{sp
 
 If you want to wrap up the information and look at it from a graph point of view, here is just one example. More are in \vref{sec:graph} and vref{sec:moregraph}. But before changing to the graph perspective, we recommend to see the next sections, not to skip them. 
 
-The preview, at this point, taking package \ircode{graph} as an example. \ircode{graph} on its side has an undocumented feature: it needs  \ircode{Rgraphviz} to handle graph attributes. We have to take two steps. 
+The preview, at this point, taking package \ircode{graph} as an example 
+\footnote{Package ‘graph’ was removed from the CRAN repository.
+
+This package is now available from Bioconductor only, see \url{http://www.bioconductor.org/packages/release/bioc/html/graph.html}.}. \ircode{graph} on its side has an undocumented feature: it needs  \ircode{Rgraphviz} to handle graph attributes\footnote{Package ‘Rgraphviz’ was removed from the CRAN repository.
+
+This package is now available from Bioconductor only, see \url{http://www.bioconductor.org/packages/release/bioc/html/Rgraphviz.html}.}. We have to take two steps. 
 we  extract the graph information from \ircode{sprof}, using and adjacency matrix here as a simple solution. 
 This is then converted to the \ircode{"graphNEL"} format which is shared by  \ircode{graph} and \ircode{Rgraphviz}.
 \ircode{Rgraphviz} is hidden in the use of  \ircode{plot}(). So here is a bare foot approach. A more sophisticated function implementation is in \vref{sec:graph}.
@@ -1197,7 +1202,7 @@ On a given stack level, the run length is the best information on the time used 
 %return(profile_nodes_rlearray)
 %} # nodesprofile
 @
-If you need it, you can represent the run lenght information by level as a matrix. 
+If you need it, you can represent the run length information by level as a matrix. 
 This is expanding a sparse matrix to full and should be avoided.
  
 <<>>=
@@ -1228,7 +1233,7 @@ But \ircode{print.xtable} has no \ircode{zero.print} \ldots
 \todo{ $[$ needs to be hidden for print.xtable}
 \todo{handle gaps in run length = NA counts}
 <<print = FALSE, results = tex, label=tab:pramt4>>=
-#special sanitizing for xtable
+#special sanitising for xtable
 xr <- rownames(amt)
 #for (i in (1:length(xr))) {xr[i] <- sub(xr[i],"\\[","$[$", fixed=TRUE)}
  #xr <- paste("$",xr,"$")
@@ -1255,13 +1260,13 @@ See \vref{tab:pramt1}: Marginal statistics on nodes by run length.
 We can add this information to our base and use it to enhance graphical displays. See: nodes marked by run length and run count, \vref{fig:sprofadj04NEL02rle}.
 
 
-\ircode{eval} is the base of all evaluation in \R{}, so we should not be surprised to find it at the top of the list. The next two entries, \ircode{model.frame} and \ircode{model.frame.default} are seen $77$ times. We know that in our example we had a loop with 100 repetitions, so a frequency of 100 would not be surprising. A closer look shows that both functions occur as isolated events 40 times, but frequency decreases with run length until we see another high at run lenght 6. We are sampling, and of course sampling can miss some function calls. But this pattern is what if occurs if we do not miss a function call, but we miss a gap. So several function calls appear as some longer runs.
+\ircode{eval} is the base of all evaluation in \R{}, so we should not be surprised to find it at the top of the list. The next two entries, \ircode{model.frame} and \ircode{model.frame.default} are seen $77$ times. We know that in our example we had a loop with 100 repetitions, so a frequency of 100 would not be surprising. A closer look shows that both functions occur as isolated events 40 times, but frequency decreases with run length until we see another high at run length 6. We are sampling, and of course sampling can miss some function calls. But this pattern is what if occurs if we do not miss a function call, but we miss a gap. So several function calls appear as some longer runs.
 
 We can improve the hit rate by increasing the sampling rate. But of course this is at the expense of using more space for the log files, and increased time for the overhead. In our case, 1 ms seems to be a good compromise, but 0.1 ms might be another feasible choice. 
 
 As we walk down the list, \ircode{na.omit} is next, followed closely by \ircode{na.omit.data.frame}. In our problem, there are no missing data. But \R{} does not have something like a ``vanilla mode''. The overhead used for the handling of potentially missing values would need a restructuring of the linear model algorithm, e.g. by introducing a ``has.na'' flag.
 
-Walkinf further down, we see other candidates such as \ircode{as.character} that may be avoidable in this problem.
+Walking further down, we see other candidates such as \ircode{as.character} that may be avoidable in this problem.
 
 <<>>=
  nr <- nodesrunlength(sprof02, clean=FALSE)
@@ -1300,7 +1305,7 @@ par(oldpar)
 \end{center}
 \end{figure}
 
-See \vref{fig:sprofadj01NEL} for a comparison before and after trimming. The scaffold effect are removed from the picture on the right side. This cuts off tehe uninformative spine, and induces minor changes in the body of the graph. You can do additional trimming, if you want.
+See \vref{fig:sprofadj01NEL} for a comparison before and after trimming. The scaffold effect are removed from the picture on the right side. This cuts off the uninformative spine, and induces minor changes in the body of the graph. You can do additional trimming, if you want.
 
 % floating figure end
 \R{} is function based, and control structures in general are implemented as functions. In a graph representation, they appear as nodes, concentrating and seeding to unrelated paths. We can detect these on the stack level and replace them by surrogates, introducing new nodes. This is a case for surgery.
@@ -1323,7 +1328,7 @@ par(oldpar)
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics{sprofiling-sprofadj0204NEL}
-\caption{Sprof graph, after trimming, and after trimming and some sanitizing.}
+\caption{Sprof graph, after trimming, and after trimming and some sanitising.}
 \label{fig:sprofadj0204NEL}
 \end{center}
 \end{figure}
@@ -1335,7 +1340,7 @@ Now the structure becomes obvious. Cutting off may be taken two levels deeper. T
 We know ho to create standard graph displays from this. The next step is to encode additional information
 we have from the profiles as attribute to the graph. 
 
-The derived edge frequency is the first bit of information Implicitly, it can be used as weight in the graph placement routines. We make this explicit by giving a choice whether to use  it or not. Irrespective of this choice, we encode referenc counts as line width of the edges.
+The derived edge frequency is the first bit of information Implicitly, it can be used as weight in the graph placement routines. We make this explicit by giving a choice whether to use  it or not. Irrespective of this choice, we encode reference counts as line width of the edges.
 
 This function is not included in the package to avoid dependency of \ircode{sprof} on \ircode{graph} and other graph packages.
 <<>>=
@@ -1347,7 +1352,7 @@ search()
 
 @
 %:   as_graphNEL_sprof
-This is a common routine for the \ircode{grpah} and \ircode{Rgraphviz} package.
+This is a common routine for the \ircode{graph} and \ircode{Rgraphviz} package.
 <<>>=
 
 as_graphNEL_sprof <- function(sprof, weight=TRUE){
@@ -1402,15 +1407,12 @@ plot_graphNEL_sprof <- function(graphNEL)
 		}
 
 	renderGraph(graphNEL)
-	#title(main=paste0( "Rgraphviz/graph( ",main1, " )"))
 	title(main=main1)
-	#title(main="nodes time", sub=sprof04$info$id)
-	#legend("bottomright",legend= c("node color: self.time, pwr=0.5", "node 
-	#lwd: total.time, pwr=0.5"), bty="n")
 
 	legend("topleft", 
-		legend=class(graphNEL),
-		title="plot_graphNEL_sprof class:"
+		legend=paste0("class: ",class(graphNEL)),
+		bg="#FFFFE040",
+		seg.len=0
 		)
 
 }
@@ -1441,7 +1443,7 @@ Rgraphviz/graph basic plot: see \vref{fig:plot04NEL}.
 %#24 12 --ellipses are lost?? needs to be recovered
 %plotviz(a04NEL,  main="graph layout sprof04 plotviz",sub="xxx")
 %@
-To  use attributes on nodes and edges, we need \ircode{Rgraphviz}.
+To use attributes on nodes and edges, we need \ircode{Rgraphviz}.
 %## This function will plot individual nodes on the plotting device.
 %## Update: This is now in a vectorized form (user can still
 %## supply a function, but that has to deal with vectorized data for now)
@@ -1567,12 +1569,15 @@ title(main="nodes (time)", sub=sprof04$info$id, col.sub=grey(0.5))
 legend("bottomright",legend= c("node color: self.time, pwr=0.5", 
 	"node lwd: total.time, pwr=0.5",
 	"edge lwd: frequency"), 
-	bty="n", text.font=3)
+	bty="n", 
+	text.font=3,
+	bg="#00004040",
+	seg.len=0)
 
 	legend("topleft", 
-		legend=class(a04NEL0),
-		title="class:"
-		)
+		legend=paste0("class: ",class(a04NEL0)),
+		bg="#FFFFE040",
+		seg.len=0)
 
 @
 \begin{figure}[htbp]
@@ -1640,11 +1645,15 @@ legend("bottomright",
 	legend= c("node lwd: nr runs, pwr=0.5", 
 	"node color: avg time, pwr=0.5",
 	"edge lwd: frequency"), 
-	bty="n", text.font=3)
+			bg="#FFFFE040",
+		seg.len=0,
+	bty="n", 
+	text.font=3)
 	
 legend("topleft", 
-		legend=class(a04NEL0rle),
-		title="class:"
+		legend=paste0("class: ",class(a04NEL0rle)),
+		bg="#FFFFE040",
+		seg.len=0
 		)
 
 detach(package:Rgraphviz)
@@ -1656,7 +1665,7 @@ detach(package:Rgraphviz)
 \label{fig:sprofadj04NEL02rle}
 \end{center}
 \end{figure}
-Nodes marked by run length and run count: see \vref{fig:sprofadj04NEL02rle}.  This plot gives us a more informative  view, highlighting nodes by number of runs and avaerage run lenght and edges with overall time presence.
+Nodes marked by run length and run count: see \vref{fig:sprofadj04NEL02rle}.  This plot gives us a more informative  view, highlighting nodes by number of runs and average run lenght and edges with overall time presence. It puts the information in place, showing us the context where the resources are consumed. Some are consumed with good reason, since here work is done. Others are very doubtful and seem to be mere administration. These are candidates for improvement.
 
 
 @
@@ -1713,7 +1722,22 @@ plot_stacks(sprof)
 plot_profiles(sprof)
 @
 The \irfunx{hplot}{plot.sprof} method for \ircode{sprof} objects concatenates 
-these three functions.
+these three functions, see \vref{fig:plotsprof}. Using the plot functions above allows better control and will be preferred. \irfunx{hplot}{shownodes} may be a sufficient summary, see \vref{fig:shownodes01rb}.
+<<fig = TRUE, echo = TRUE, print = FALSE, label=plotsprof, png=TRUE, width=16, height=12, include=FALSE>>= 
+#12 16
+oldpar <- par(mfrow=c(3,4))
+plot.sprof(sprof04)
+par(oldpar)
+@
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics{sprofiling-plotsprof}
+\caption{\ircode{plot.sprof(sprof04)}}
+\label{fig:plotsprof}
+\end{center}
+\end{figure}
+
+
 
 %Looking at lists of numbers is not too informative. We get a first impression 
 %by plotting the data. 
@@ -1777,10 +1801,10 @@ these three functions.
 
 Graph layout is a theme of its own. Proposals are readily available, as are their implementation. For some of them, there are \R{} interfaces or re-implementations in \R{}. Their usefulness in our context has to be explored, and the answers will vary with personal preferences. 
 
-For some graph layout packages we illustrate an interface here and show a sample result. We use the original profile data here. This is a nasty graph with some \R{} stack peculiarities. The corresponding results for the trimmed profile data are shown in the next section \vref{subsec:graphtre}. This is a more realistic example of the kind of graphs you will have to work with.
+For some graph layout packages we illustrate an interface here and show a sample result. We use the original profile data here. This is a nasty graph with some \R{} stack peculiarities. The corresponding results for the trimmed profile data are shown in the next \vref{subsec:graphtre}. This is a more realistic example of the kind of graphs you will have to work with.
 
 \todo{by graph package: preferred input format?}
-\todo{use attributes. Edge with should be easy.}
+\todo{use attributes. Edge width should be easy.}
 \todo{include information from stack connectivity.}
 
 @
@@ -1815,6 +1839,11 @@ sprofedgel02$lwd  <- rkindex(sprofedgel02$count, maxindex=12, ties.method="min")
 @
 \filledpagebreak
 \subsubsection{graph package}
+
+Package ‘graph’ was removed from the CRAN repository.
+
+This package is now available from Bioconductor only, see \url{http://www.bioconductor.org/packages/release/bioc/html/graph.html}.
+
 <<fig=TRUE, label=sprofadjNEL02,width=8, height=8>>=
 library(graph)
 #search() 
@@ -1884,8 +1913,9 @@ E(sprof_igraph)$width <- c(1,2)
 <<fig=TRUE, label=sprof_igraphkamada,width=8, height=8>>=
 plot(sprof_igraph, main=paste0("igraph kamada.kawai layout\n", sprof$info$id))
 	legend("topleft", 
-		legend=class(sprof_igraph),
-		title="igraph class:"
+		legend= paste0("class: ",class(sprof_igraph)),
+		bg="#FFFFE040",
+		seg.len=0
 		)
 @
 %<<>>=
@@ -1902,8 +1932,9 @@ Experiments with various layouts for \ircode{igraph} follow.
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.auto)
 plot(sprof_ig_auto, main=paste0("igraph auto layout\n", sprof$info$id))
 	legend("topleft", 
-		legend=class(sprof_ig_auto),
-		title="igraph class:"
+		legend= paste0("class: ",class(sprof_ig_auto)),
+		bg="#FFFFE040",
+		seg.len=0
 		)
 @
 \filledpagebreak
@@ -1913,8 +1944,9 @@ plot(sprof_ig_auto, main=paste0("igraph auto layout\n", sprof$info$id))
 sprof_ig_random <- as_igraph_sprof(sprof, layout.random)
 plot(sprof_ig_random, main=paste0("igraph random layout\n", sprof$info$id))
 	legend("topleft", 
-		legend=class(sprof_ig_random),
-		title="igraph class:"
+		legend= paste0("class: ",class(sprof_ig_random)),
+		bg="#FFFFE040",
+		seg.len=0
 		)
 
 @
@@ -1922,8 +1954,13 @@ plot(sprof_ig_random, main=paste0("igraph random layout\n", sprof$info$id))
 
 <<fig=TRUE, label=sprof_ig_igraph_circle,width=6, height=6>>=
 #6 6
-sprof_ig_auto <- as_igraph_sprof(sprof, layout.circle)
-plot(sprof_ig_auto, main=paste0("igraph circle layout\n", sprof$info$id))
+sprof_ig_circle <- as_igraph_sprof(sprof, layout.circle)
+plot(sprof_ig_circle, main=paste0("igraph circle layout\n", sprof$info$id))
+	legend("topleft", 
+		legend= paste0("class: ",class(sprof_ig_circle)),
+		bg="#FFFFE040",
+		seg.len=0
+		)
 @
 \filledpagebreak
 
@@ -1931,6 +1968,11 @@ plot(sprof_ig_auto, main=paste0("igraph circle layout\n", sprof$info$id))
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.sphere)
 plot(sprof_ig_auto, main=paste0("igraph sphere layout\n", sprof$info$id))
+	legend("topleft", 
+		legend= paste0("class: ",class(sprof_ig_auto)),
+		bg="#FFFFE040",
+		seg.len=0
+		)
 @
 \filledpagebreak
 
@@ -1938,6 +1980,12 @@ plot(sprof_ig_auto, main=paste0("igraph sphere layout\n", sprof$info$id))
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.fruchterman.reingold)
 plot(sprof_ig_auto, main=paste0("igraph fruchterman.reingold layout\n", sprof$info$id))
+	legend("topleft", 
+		legend= paste0("class: ",class(sprof_ig_auto)),
+		bg="#FFFFE040",
+		seg.len=0
+		)
+
 @
 \filledpagebreak
 
@@ -1945,6 +1993,11 @@ plot(sprof_ig_auto, main=paste0("igraph fruchterman.reingold layout\n", sprof$in
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.kamada.kawai)
 plot(sprof_ig_auto, main=paste0("igraph kamada.kawai layout\n", sprof$info$id))
+	legend("topleft", 
+		legend= paste0("class: ",class(sprof_ig_auto)),
+		bg="#FFFFE040",
+		seg.len=0
+		)
 
 @
 \filledpagebreak
@@ -1953,6 +2006,11 @@ plot(sprof_ig_auto, main=paste0("igraph kamada.kawai layout\n", sprof$info$id))
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.spring)
 plot(sprof_ig_auto, main=paste0("igraph spring layout\n", sprof$info$id))
+	legend("topleft", 
+		legend= paste0("class: ",class(sprof_ig_auto)),
+		bg="#FFFFE040",
+		seg.len=0
+		)
 
 @
 %<<fig=TRUE, label=sprof_ig_igraph_reingold.tilford,width=6, height=6>>=
@@ -1966,6 +2024,11 @@ plot(sprof_ig_auto, main=paste0("igraph spring layout\n", sprof$info$id))
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.fruchterman.reingold.grid)
 plot(sprof_ig_auto, main=paste0("igraph fruchterman.reingold.grid layout\n", sprof$info$id))
+	legend("topleft", 
+		legend= paste0("class: ",class(sprof_ig_auto)),
+		bg="#FFFFE040",
+		seg.len=0
+		)
 
 @
 \filledpagebreak
@@ -1974,6 +2037,11 @@ plot(sprof_ig_auto, main=paste0("igraph fruchterman.reingold.grid layout\n", spr
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.lgl)
 plot(sprof_ig_auto, main=paste0("igraph lgl layout\n", sprof$info$id))
+	legend("topleft", 
+		legend= paste0("class: ",class(sprof_ig_auto)),
+		bg="#FFFFE040",
+		seg.len=0
+		)
 
 @
 \filledpagebreak
@@ -1982,6 +2050,11 @@ plot(sprof_ig_auto, main=paste0("igraph lgl layout\n", sprof$info$id))
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.graphopt)
 plot(sprof_ig_auto, main=paste0("igraph graphopt layout\n", sprof$info$id))
+	legend("topleft", 
+		legend= paste0("class: ",class(sprof_ig_auto)),
+		bg="#FFFFE040",
+		seg.len=0
+		)
 @
 \filledpagebreak
 
@@ -1989,6 +2062,11 @@ plot(sprof_ig_auto, main=paste0("igraph graphopt layout\n", sprof$info$id))
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.svd)
 plot(sprof_ig_auto, main=paste0("igraph svd layout\n", sprof$info$id))
+	legend("topleft", 
+		legend= paste0("class: ",class(sprof_ig_auto)),
+		bg="#FFFFE040",
+		seg.len=0
+		)
 @
 %<<fig=TRUE, label=sprof_ig_igraph_norm,width=6, height=6>>=
 %#6 6
@@ -1999,6 +2077,10 @@ plot(sprof_ig_auto, main=paste0("igraph svd layout\n", sprof$info$id))
 \filledpagebreak
 \subsubsection{network package}
 <<>>=
+detach("package:igraph")
+#detach("package:sna")
+
+search()
 library(network)
 search()
 @
@@ -2007,58 +2089,66 @@ search()
 <<>>=
 as_network_sprof <- function(sprof) {
 	sprofadj02 <- adjacency(sprof)
-	nwsprofadj <- as.network(sprofadj02)
-	network.vertex.names(nwsprofadj) <- 
+	nwsprof02 <- as.network(sprofadj02)
+	network.vertex.names(nwsprof02) <- 
 		rownames(sprofadj02) # not honoured by plot
-	return(nwsprofadj)
+	return(nwsprof02)
 }
 <<>>=
-plot_network_sprof <- function(nwsprof,mode = "fruchtermanreingold", ...) {
+plot_network_sprof <- function( nwsprof, 
+	mode = "fruchtermanreingold", main=NULL, label=NULL,...) {
 	classnwsprof <- class(nwsprof)
 	main1 <- deparse(substitute(nwsprof))
+	if (!is.null(main)) main1 <- paste0(main,"\n",main1)
+	
 	if (inherits(nwsprof, "sprof")) nwsprof <- 	
 		as_network_sprof(nwsprof)
 		
-	plot(nwsprof, 
-	label=network.vertex.names(nwsprof), 
-	main=paste0(main1,": network layout\n ", mode), 
-	mode = mode,
-	edge.len=2,
-	edge.col="#80808080",
-	sub= main1,
-	cex.main=1.5,...)
+	if (!is.null(label)) warning("explicit label supplied, but will use vertex names")
+	
+	plot( nwsprof,
+		label = network.vertex.names(nwsprof), 
+		main= paste0(main1, ": network layout\n ", mode), 
+		mode = mode,
+		edge.len=2,
+		edge.col="#80808080",
+		sub= main1,
+		cex.main=1.5,...)
 	
 	legend("topleft", 
-		legend=c(classnwsprof,mode),
-		title="class & mode:",
-		bg="#FFFFE040",
-				seg.len=0
+		legend=c(paste0("class: ",classnwsprof),paste0("mode: ",mode)),		bg="#FFFFE040",
+		seg.len=0
 		)
 	
 }
 @
 \filledpagebreak
 
-<<fig=TRUE, label=plotnwsprofadj,width=6, height=6>>=
+<<fig=TRUE, label=plotnwsprof02,width=6, height=6>>=
 #6 6
 plot_network_sprof(sprof04)
 
-<<fig=TRUE, label=nwsprofadj,width=8, height=8>>=
-nwsprofadj <- as.network(sprofadj02) # names is not imported 
-#network.vertex.names(nwsprofadj) <- rownames(sprofadj02) # not honoured by plot
-plot(nwsprofadj, label=rownames(sprofadj02), main="sprof02: network layout", cex.main=2)
+<<fig=TRUE, label=nwsprof02,width=8, height=8>>=
+nwsprof02 <- as.network(sprofadj02) # names is not imported 
+plot_network_sprof(nwsprof02, label=rownames(sprofadj02))
 @
 \filledpagebreak
 Experiments to include weight. \todo{maximum edge.lwd?}
-<<fig=TRUE, label=nwsprofadje,width=8, height=8>>=
+<<fig=TRUE, label=nwsprof02e,width=8, height=8>>=
 edge.lwd<- sprofadj02
 edge.lwd[edge.lwd>0]<- rkindex(edge.lwd[edge.lwd>0], maxindex=12, ties.method="min")
 
-plot(nwsprofadj, label=rownames(sprofadj02), main="sprof02: network layout", cex.main=2, edge.lwd=edge.lwd)
+plot_network_sprof(nwsprof02, label=rownames(sprofadj02), 
+ edge.lwd=edge.lwd)
 detach("package:network")
 @
 \filledpagebreak
 \subsubsection{Rgraphviz package}
+
+Package ‘Rgraphviz’ was removed from the CRAN repository.
+
+This package is now available from Bioconductor only, see \url{http://www.bioconductor.org/packages/release/bioc/html/Rgraphviz.html}.
+
 <<>>=
 library(Rgraphviz)
 search()
@@ -2174,40 +2264,40 @@ detach("package:igraph")
 <<>>=
 library(network)
 search()
-<<fig=TRUE, label=s04nwsprofadj,width=6, height=6>>=
+<<fig=TRUE, label=s04nwsprof02,width=6, height=6>>=
 #6
-nwsprofadj <- as.network(sprofadj02) # names is not imported 
-network.vertex.names(nwsprofadj) <- rownames(sprofadj02) # not honoured by plot
-plot(nwsprofadj, label=rownames(sprofadj02), 
+nwsprof02 <- as.network(sprofadj02) # names is not imported 
+network.vertex.names(nwsprof02) <- rownames(sprofadj02) # not honoured by plot
+plot(nwsprof02, label=rownames(sprofadj02), 
 	main="sprof04: network layout: trimmed data", cex.main=2)
 @
 \filledpagebreak
-<<fig=TRUE, label=s04nwsprofadje,width=8, height=8>>=
+<<fig=TRUE, label=s04nwsprof02e,width=8, height=8>>=
 #8
 edge.lwd<-sprofadj02
 edge.lwd[edge.lwd>0]<- rkindex(edge.lwd[edge.lwd>0], maxindex=12,
  ties.method="max")
 
-plot(nwsprofadj, label=rownames(sprofadj02), 
+plot(nwsprof02, label=rownames(sprofadj02), 
 	main="sprof04: network layout: trimmed data", 
 	cex.main=2, edge.lwd=edge.lwd)
 @
 \filledpagebreak
-<<fig=TRUE, label=s04nwsprofadjekamadakawai, width=12, height=12>>=
+<<fig=TRUE, label=s04nwsprof02ekamadakawai, width=12, height=12>>=
 #12
-plot(nwsprofadj, label=rownames(sprofadj02), 
+plot(nwsprof02, label=rownames(sprofadj02), 
 main="sprof04: network kamadakawai layout: \n trimmed data", 
 mode="kamadakawai",
 cex.main=2, edge.lwd=edge.lwd)
 @
 \filledpagebreak
-<<fig=TRUE, label=s04nwsprofadjecircle,width=8, height=8>>=
-plot(nwsprofadj, label=rownames(sprofadj02), 
+<<fig=TRUE, label=s04nwsprof02ecircle,width=8, height=8>>=
+plot(nwsprof02, label=rownames(sprofadj02), 
 	main="sprof04: network circle layout: \n trimmed data", 
 	mode="circle",
 	cex.main=2, edge.lwd=edge.lwd)
-<<fig=TRUE, label=s04nwsprofadjefruchtermanreingold,width=8, height=8>>=
-plot(nwsprofadj, label=rownames(sprofadj02), 
+<<fig=TRUE, label=s04nwsprof02efruchtermanreingold,width=8, height=8>>=
+plot(nwsprof02, label=rownames(sprofadj02), 
 	main="sprof04: network fruchtermanreingold layout: \n trimmed data", 
 	mode="fruchtermanreingold",
 	cex.main=2, edge.lwd=edge.lwd)
