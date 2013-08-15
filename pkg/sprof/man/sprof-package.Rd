@@ -11,23 +11,24 @@
 \docType{package}
 \title{sprof: Analysis of R profiles}
 \description{
-Profiling, timing and optimization utilitites}
+Profiling, timing and optimisation utilities}
 \details{
 \tabular{ll}{
 Package: \tab sprof\cr
 Type: \tab Package\cr
 Version: \tab 0.0-6\cr
-Date: \tab 2013-08-02\cr
+Date: \tab 2013-08-15\cr
 License: \tab GPL-2 | GPL-3\cr
 }
 \code{\link{readRprof}()} reads a profile file from \code{\link{Rprof}()} or other profilers and 
 returns a composite structure of class \code{sprof}. The basic components of \code{sprof} are (conceptually) four data frames
-\tabular{ll}{
-\code{info} \tab general information and summaries\cr
+\tabular{ll}{\code{info} \tab general information and summaries\cr
 \code{nodes} \tab node specific information\cr
-\code{stacks} \tab node specific information. Stacks are random snapshots from
+\code{stacks} \tab node specific information. Stacks are random snapshots from\cr
+ \tab 
 the program execution, possibly including side 
-information such as traces of the memory management.\cr
+information such as traces \cr
+\tab of the memory management.\cr
 \code{profiles} \tab collected records of a profile, encoded as references to stacks
 }
 

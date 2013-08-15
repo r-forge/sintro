@@ -154,8 +154,12 @@ cd ~/projects/rforge/sintro/pkg/
 rm sprof_internal.pdf
 R CMD Rd2pdf -o sprof_internal.pdf  --internals --no-clean --title="sprof reference" sprof
 cp sprof_internal.pdf ../www/sprof/
+cp ./sprof/work/vignettes/sprofiling.pdf ../www/sprof/
+cp ./sprof/work/vignettes/sprofiling.pdf ./sprof/vignettes/
+cp ./sprof.Rcheck/sprof-Ex.pdf ../www/sprof/
 }
 
+~/projects/rforge/sintro/pkg/sprof.Rcheck/sprof-Ex.pdf
 #### R cmds for ad hoc construction
 setwd("/Users/gs/projects/rforge/sintro/pkg/sprof/")
 

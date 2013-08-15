@@ -29,7 +29,7 @@ passed.
 %\if{latex}{\figure{logo.jpg}{options: width=0.5in}}
 Plots are from this collection:
 
-\if{html}{\figure{rpoplotprofiles.png}}
+\if{html}{\figure{rpoplotprofiles.png}{options: width=6.0in}}
 \if{latex}{\figure{rpoplotprofiles.pdf}}
 
 }

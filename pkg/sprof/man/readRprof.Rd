@@ -36,9 +36,9 @@ readRprof(filename = "Rprof.out", chunksize = 5000,
 
   The input format is controlled by the \code{head} argument. Format \code{"auto"} tries to detect control lines as interspersed by \code{Rprof}. These lines are not included in the output.
  
- \code{"none"} igores all control information and includes these lines as strange stacks.  
+ \code{"none"} ignores all control information and includes these lines as strange stacks.  
  
-\code{"Rprofmem"} isolates headers as provided by  \code{Rprofmem}. \code{new page} entries are encoded as \code{malloc} requests with length 0.
+\code{"Rprofmem"} isolates headers as provided by  \code{Rprofmem}. \code{"Rprofmem"}  \code{new page} entries are encoded as \code{malloc} requests with length 0.
 }
 \value{
 This data structure is subject to change.
@@ -48,16 +48,16 @@ Temporarily: A list with components
 %	Typically this contains timing or formatting information.}
 \item{info}{Summary information.} 
 \item{nodes}{A vector of node names. 
-	This may include stray entries from interperspersed lines.} 
+	This may include stray entries from interspersed lines.} 
 \item{stacks}{Stacks, represented as reference list to nodes, and stack frequencies.}
 \item{profiles}{Recorded data, as reference to stacks, and possibly additional data per reference.}
 
 %{A vector of unique stacks found in input, stored as verbatim copies.}
 %\item{stacksrenc}{A list of unique stacks in top down order (top first), 
 %	encoded as vectors or references to \code{stacks}.}
-%\item{data}{A vector encoding the data file as referenes to  \code{stacks}.}
-%\item{timesRLE}{Vector of sampling intervals, in miliseconds. Run-length %encoded. defunct -- will be removed.}
-%\item{freq}{A frequency table summarizing \code{data}.} 
+%\item{data}{A vector encoding the data file as references to  \code{stacks}.}
+%\item{timesRLE}{Vector of sampling intervals, in milliseconds. Run-length %encoded. defunct -- will be removed.}
+%\item{freq}{A frequency table summarising \code{data}.} 
 
 }
 

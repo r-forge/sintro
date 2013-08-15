@@ -16,12 +16,12 @@ nodescloud(sprof, min.freq = 3, icol, col)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{sprof}{A data structure as returned by  \code{\link{readRprof}}.}
-  \item{min.freq}{Minimum frequency to be included.}
-  \item{icol}{An index vector to colour palette. Defaults to \code{sprof$nodes$icol}.}
+  \item{min.freq}{Minimum frequency of a node to be included.}
+  \item{icol}{An index vector to colour palette, encoding node class. Defaults to \code{sprof$nodes$icol}.}
   \item{col}{A colour palette.}
 }
 \details{
-Note: these figures may be ourdated. Please run the examples.
+Note: these figures may be outdated. Please run the examples.
 
 Plots are from this collection:
 

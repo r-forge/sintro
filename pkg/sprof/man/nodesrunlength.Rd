@@ -9,7 +9,7 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Marginal information for run length from profile}
 \description{
-Run length count, by node and run lenght, from profile.}
+Run length count, by node and run length, from profile.}
 \usage{
 nodesrunlength(sprof, clean=TRUE)
 }
@@ -21,11 +21,11 @@ nodesrunlength(sprof, clean=TRUE)
 \details{
 If \code{clean=TRUE}, zero results are removed and the nodes are sorted by average time.
 
-If \code{clean=TRUE}, zero results and sorting are preserved. Trailing zero count nodes 
-may have been lost in the process, and are  added.
+If \code{clean=TRUE}, zero results and sorting are preserved. Trailing nodes with zero count  
+may have been lost in the process, and are added.
 
 }
-\value{A matrix \code{count[node, run length]} with additonal columns
+\value{A matrix \code{count[node, run length]} with a column giving the number of runs by run lenght and three additional columns
  \item{nr_runs}{sum of counts over all run lengths.}
  \item{total_time }{sum of \code{count*run length}}
  \item{avg_time }{\code{total_time / count}}
@@ -40,8 +40,6 @@ may have been lost in the process, and are  added.
 \examples{
 		data(sprof01lm)
  		nodesrunlength(sprof01lm) 
-		
-		
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
