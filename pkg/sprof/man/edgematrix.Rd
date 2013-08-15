@@ -23,7 +23,7 @@ edgematrix(data, counts = TRUE, na.rm = TRUE,  no.name="<nn>")
   \item{counts}{include a column of counts
 }
   \item{na.rm}{remove lines with a count \code{NA}.}
-  \item{no.name}{If not null: replacement for empy strings as name.}
+  \item{no.name}{If not null: replacement for empty strings as name.}
 
 }
 \details{The adjacency matrix is flattened. Lines with a count zero are eliminated.}

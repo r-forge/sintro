@@ -9,7 +9,7 @@
 \alias{rkindex}
 \title{Index, based on rank.}
 \description{
-Convert \code{x} to an index in $1\ldots maxindex$}
+Convert \code{x} to an index in 1\ldots maxindex}
 \usage{
 rkindex(x, maxindex = length(x), pwr = 1, ties.method = "random")
 }
@@ -25,7 +25,7 @@ See details.}
 }
 \details{
 \code{x} is transformed to a rank scale, using \code{ties.method}.
-It is then rescaled to $[0,1]$, and (optionally) a power transfromation is
+It is then rescaled to [0,1], and (optionally) a power transformation is
 applied. In visualisation terms, this is a gamma correction. The result is rescaled to 1 \dots maxindex.}
 \value{
 A vector of rescaled values. }

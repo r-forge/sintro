@@ -32,7 +32,7 @@ Note: these figures may be outdated. Please run the examples.
 
 Plots are from this collection:
 
-\if{html}{\figure{rpoplotstacks.png}}
+\if{html}{\figure{rpoplotstacks.png}{options: width=6.0in}}
 \if{latex}{\figure{rpoplotstacks.pdf}}
 
 }

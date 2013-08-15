@@ -24,7 +24,7 @@ Note: these figures may be outdated. Please run the examples.
 
 Plots are from this collection:
 
-\if{html}{\figure{sprofiling-shownodes02.png}}
+\if{html}{\figure{sprofiling-shownodes02.png}{options: width=6.0in}}
 \if{latex}{\figure{sprofiling-shownodes02.pdf}}
 }
 \value{

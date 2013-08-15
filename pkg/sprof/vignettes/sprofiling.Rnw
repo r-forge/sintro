@@ -21,7 +21,8 @@
 \documentclass[utf8]{amsart}
 \usepackage[utf8]{inputenc}
 %\usepackage[applemac]{inputenc}
-\usepackage[english]{babel} %ngerman -- british english
+\usepackage[english]{babel} %we use british english here
+%or ngerman -- 
 \usepackage{svninfo}
 \RequirePackage{layouts}
 
@@ -121,8 +122,14 @@ Known issues:
 \tableofcontents
 }
 \section*{Profiling facilities in \R{}}
+
+\emph{For the impatient: \vref{tab:prSRREbs} and \vref{tab:prSRREbt} give you information from profiling $100$ runs of a simple linear regression. 
+You get another view of the same information by \vref{fig:sprofadj04NEL02rle}. If you want to know more, please have some patience.
+}
+
 \R{} provides the basic instruments for profiling, both for time based samplers as for 
-event based instrumentation. Information on \R{} profiling is in Section 3.2 ``Profiling R code for speed'' and section ``3.3 Profiling R code for memory use''. of  Writing R Extensions \url{http://cran.r-project.org/doc/manuals/R-exts.html}. Specific information on memory profiling is in \url{http://developer.r-project.org/memory-profiling.html}.
+event based instrumentation. Information on \R{} profiling is in section 3.2 ``Profiling R code for speed'' and section 3.3. ``Profiling R code for memory use'' of  ``Writing R Extensions'' \url{http://cran.r-project.org/doc/manuals/R-exts.html}. Specific information on memory profiling is in\\
+ \url{http://developer.r-project.org/memory-profiling.html}.
 
 However this source of information seems to be rarely
 used.
@@ -868,13 +875,14 @@ What you have seen so far is what you get for free when using package \ircode{sp
 
 If you want to wrap up the information and look at it from a graph point of view, here is just one example. More are in \vref{sec:graph} and vref{sec:moregraph}. But before changing to the graph perspective, we recommend to see the next sections, not to skip them. 
 
-The preview, at this point, taking package \ircode{graph} as an example 
-\footnote{Package ‘graph’ was removed from the CRAN repository.
+The preview, at this point, taking package \ircode{graph} as an example\footnote{Package ‘graph’ was removed from the CRAN repository.
 
 This package is now available from Bioconductor only, see \url{http://www.bioconductor.org/packages/release/bioc/html/graph.html}.}. \ircode{graph} on its side has an undocumented feature: it needs  \ircode{Rgraphviz} to handle graph attributes\footnote{Package ‘Rgraphviz’ was removed from the CRAN repository.
 
-This package is now available from Bioconductor only, see \url{http://www.bioconductor.org/packages/release/bioc/html/Rgraphviz.html}.}. We have to take two steps. 
-we  extract the graph information from \ircode{sprof}, using and adjacency matrix here as a simple solution. 
+This package is now available from Bioconductor only.
+
+See \url{http://www.bioconductor.org/packages/release/bioc/html/Rgraphviz.html}.}. We have to take two steps. 
+We  extract the graph information from \ircode{sprof}. Using an adjacency matrix is a simple solution here. 
 This is then converted to the \ircode{"graphNEL"} format which is shared by  \ircode{graph} and \ircode{Rgraphviz}.
 \ircode{Rgraphviz} is hidden in the use of  \ircode{plot}(). So here is a bare foot approach. A more sophisticated function implementation is in \vref{sec:graph}.
 %<<fig=TRUE, label=sprofadjNEL028, width=8, height=8>>=
@@ -1006,10 +1014,10 @@ Or going two steps back, we can encode nodes in colour, giving coloured stacks, 
 \subsubsection{Surgery}
 \label{sec:surgery}
 
-Note: surgery may be supported by the graph packages.
+Note: surgery may be supported by the graph packages. Use the implementation you are more familiar with.
 
 
-Looking at nodes gives you a point-wise horizon. Looking at edges gives you a one step horizon. The stacks give a wider horizon, typically a step size of 10 or more. The stacks we get from \R{} have peculiarities, and we can handle with this broader perspective. These are not relevant if we look point-wise, but may become dominating if we try to get a global picture. We take a look ahead (details to come in \vref{sec:graph} and have a preview how our example is represented as a graph. Left is the original graph as recovered from the edge information,  right the graph after we have cut off the scaffold effects.
+Looking at nodes gives you a point-wise horizon. Looking at edges gives you a one step horizon. The stacks give a wider horizon, typically a step size of 10 or more. The stacks we get from \R{} have peculiarities, and we can handle with this broader perspective. These are not relevant if we look point-wise, but may become dominating if we try to get a global picture. We take a look ahead (details to come in \vref{sec:graph}9 and have a preview how our example is represented as a graph. Left is the original graph as recovered from the edge information,  right the graph after we have cut off the scaffold effects.
 \todo{cut next level}
 
 @
@@ -1017,7 +1025,9 @@ Control structures may be represented in \R{} as function, and these may lead to
 Using information from the stacks, we can avoid these by introducing substitute nodes on the stack level. 
 For example, \ircode{lapply} is appearing in various contexts and may be confusing any graph representation.
 We can avoid this by replacing a short sequence.
+
 \ircode{"[" "lapply" ".getXlevels"  -> "<.getXlevels\_[>"}
+
 \todo{Implement. Currently best handled on source=text level}
 If the node does not exist, we want to add it to our global variable. For now, we do it 
 using expressions on the \R{} basic level and avoid tricks like simulating ``call by reference''.
@@ -1038,6 +1048,7 @@ node <- "<.getXlevels_[>"
 	}
 	nodei <- i
 }
+
 # sprof <- sprof01; nodei(sprof,"kiki"); sprof$nodes
 @
 Now we have to identify the stacks that may get a replacement.
@@ -1113,12 +1124,12 @@ par(oldpar)
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics{sprofiling-sREplotnodes04col}
-\caption{Sanitized. Nodes by class. User defined colors.}
+\caption{Sanitised. Nodes by class. User defined colours.}
 \label{fig:sREplotnodes04col}
 \end{center}
 \end{figure}
 
-Sanitized nodes by class, user defined colors: see \vref{fig:sREplotnodes04col}.
+Sanitised nodes by class, user defined colours: see \vref{fig:sREplotnodes04col}.
 
 @
 \subsection{Run length}
@@ -1148,8 +1159,7 @@ strx(profile_nodes_rle, list.len=5)
 %profile_nodes_rlef<- rrle(profile_nodesf) # Error in rle(x[1, ]) : 'x' must be an atomic vector
 
 @
-On a given stack level, the run length is the best information on the time used per call, and the run count of a node is the best information on the number of calls. So this is a prime starting point for in-depth analysis.
-\todo{keep as factor. This is a sparse cube with margins node, stack level, run length. Nodes are mostly concentrated on few levels.}
+On a given stack level, the run length is the best information on the time used per call, and the run count of a node is the best information on the number of calls. So this is a prime starting point for in-depth analysis.\todo{keep as factor. This is a sparse cube with margins node, stack level, run length. Nodes are mostly concentrated on few levels.}
 \todo{Warning: data structure still under discussion}
 %<<>>=
 %# side effect: NAs are removed
@@ -1202,7 +1212,9 @@ On a given stack level, the run length is the best information on the time used 
 %return(profile_nodes_rlearray)
 %} # nodesprofile
 @
-If you need it, you can represent the run length information by level as a matrix. 
+
+If you need it, you can represent the run length information by 
+level as a matrix.
 This is expanding a sparse matrix to full and should be avoided.
  
 <<>>=
@@ -1260,7 +1272,7 @@ See \vref{tab:pramt1}: Marginal statistics on nodes by run length.
 We can add this information to our base and use it to enhance graphical displays. See: nodes marked by run length and run count, \vref{fig:sprofadj04NEL02rle}.
 
 
-\ircode{eval} is the base of all evaluation in \R{}, so we should not be surprised to find it at the top of the list. The next two entries, \ircode{model.frame} and \ircode{model.frame.default} are seen $77$ times. We know that in our example we had a loop with 100 repetitions, so a frequency of 100 would not be surprising. A closer look shows that both functions occur as isolated events 40 times, but frequency decreases with run length until we see another high at run length 6. We are sampling, and of course sampling can miss some function calls. But this pattern is what if occurs if we do not miss a function call, but we miss a gap. So several function calls appear as some longer runs.
+\ircode{eval} is the base of all evaluation in \R{}, so we should not be surprised to find it at the top of the list. The next two entries, \ircode{model.frame} and \ircode{model.frame.default} are seen $77$ times. We know that in our example we had a loop with 100 repetitions, so a frequency of 100 would not be surprising. A closer look shows that both functions occur as isolated events 40 times, but frequency decreases with run length until we see another high at run length 6. We are sampling, and of course sampling can miss some function calls. But this pattern is the oopposite. This is what if occurs if we do not miss a function call, but we miss a gap. So several function calls are joined and appear as some longer runs, typically a multiple of the original run lenght.
 
 We can improve the hit rate by increasing the sampling rate. But of course this is at the expense of using more space for the log files, and increased time for the overhead. In our case, 1 ms seems to be a good compromise, but 0.1 ms might be another feasible choice. 
 
@@ -1340,7 +1352,7 @@ Now the structure becomes obvious. Cutting off may be taken two levels deeper. T
 We know ho to create standard graph displays from this. The next step is to encode additional information
 we have from the profiles as attribute to the graph. 
 
-The derived edge frequency is the first bit of information Implicitly, it can be used as weight in the graph placement routines. We make this explicit by giving a choice whether to use  it or not. Irrespective of this choice, we encode reference counts as line width of the edges.
+The derived edge frequency is the first bit of information. Implicitly, it can be used as weight in the graph placement routines. We make this explicit by giving a choice whether to use  it or not. Irrespective of this choice, we encode reference counts as line width of the edges.
 
 This function is not included in the package to avoid dependency of \ircode{sprof} on \ircode{graph} and other graph packages.
 <<>>=
@@ -1665,7 +1677,7 @@ detach(package:Rgraphviz)
 \label{fig:sprofadj04NEL02rle}
 \end{center}
 \end{figure}
-Nodes marked by run length and run count: see \vref{fig:sprofadj04NEL02rle}.  This plot gives us a more informative  view, highlighting nodes by number of runs and average run lenght and edges with overall time presence. It puts the information in place, showing us the context where the resources are consumed. Some are consumed with good reason, since here work is done. Others are very doubtful and seem to be mere administration. These are candidates for improvement.
+Nodes marked by run length and run count: see \vref{fig:sprofadj04NEL02rle}.  This plot gives us a more informative  view, highlighting nodes by number of runs and average run length and edges with overall time presence. It puts the information in place, showing us the context where the resources are consumed. Some are consumed with good reason, since here work is done. Others are very doubtful and seem to be mere administration. These are candidates for improvement.
 
 
 @
@@ -1687,7 +1699,7 @@ sprof <- sprof01
 @
 \subsection{Print}
 We omit the (lengthy) print output here and just give the commands as a reference.
-\todo{Clarify:"print prints its argument and returns it invisibly (via invisible(x))." Return the argument, or some print represntation?}
+\todo{Clarify:"print prints its argument and returns it invisibly (via invisible(x))." Return the argument, or some print representation?}
 \todo{is there a print=FALSE variant to postpone printing to e.g. xtable?}
 %<<print=FALSE, results =tex, label=rpoprintnodes>>=
 <<label=rpoprintnodes, print=FALSE, eval=FALSE>>=
@@ -1797,7 +1809,7 @@ par(oldpar)
 %
 \section{More Graphs}
 \label{sec:moregraph}
-\emph{Note: This section is collecting experiments  with various graph packages. It is only of interest for you, if you have a preference for some graphic package and want to look up a wrapper here. On the other side: contributions and sugestions are welcome.}
+\emph{Note: This section is collecting experiments  with various graph packages. It is only of interest for you, if you have a preference for some graphic package and want to look up a wrapper here. On the other side: contributions and suggestions are welcome.}
 
 Graph layout is a theme of its own. Proposals are readily available, as are their implementation. For some of them, there are \R{} interfaces or re-implementations in \R{}. Their usefulness in our context has to be explored, and the answers will vary with personal preferences. 
 
@@ -1854,7 +1866,7 @@ detach("package:graph")
 \filledpagebreak
 \subsubsection{igraph package}
 
-Attributes for igraphs are documented in \ircode{help(igraph.plotting)}.
+Attributes for \ircode{igraph} are documented in \ircode{help(igraph.plotting)}.
 
 Layouts available for \ircode{igraph}:
 

@@ -22,7 +22,7 @@ a \code{sprof} data structure with profiling information.
 }
 }
 \details{
- Run lenght counts by node, level and run length.
+ Run length counts by node, level and run length.
 }
 \value{
     \code{counts[ node, level, run length]} .}
