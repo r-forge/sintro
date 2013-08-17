@@ -302,30 +302,64 @@ The graph visualisation family is not friendly. We try to get control by using a
 %	nodeAttrs=list(node=list(cex=4, fontsize=40,  
 %	shape="ellipse")),
 
+%<<label=plotviz>>=
+%plotviz <- function(x,y="dot", main=NULL, sub=NULL,...)
+%{	xid <- deparse(substitute(x))
+%	if (inherits(x,"sprof")) {
+%		sub <- paste0(sub, " ",x$info$id)
+%		x <- as(adjacency(x),"graphNEL")
+%	}
+%...
+%...	
+%	title(sub=sub) 
+%	# lost ???
+%...
+%}
 <<label=plotviz>>=
-plotviz <- function(x,y="dot", main=NULL, sub=NULL,...)
+plotviz <- function(x, method="dot", main=NULL, sub=NULL,...)
 {
-if (!is.null(sub)) sub <- as.character(sub)
-if (is.null(main)) 
-	main <-paste0("plotviz( ",deparse(substitute(x)),", ", y, " ) ") else
-	main=paste0(main, "\n plotviz( ",deparse(substitute(x)),", ", y, " ) ")
-
-
-plot(x=x,  y=y,
-	attrs=list(node=list(cex=4, fontsize=40,  
-	shape="ellipse")), 
-	cex.main=1.5, 
-	main=main,...)
+	xid <- deparse(substitute(x))
+	xsubid <- NULL
 	
-	title(sub=paste0(sub, " ",as.character(class(x)))	)
+	if (inherits(x,"sprof")) {
+		xsubid <- x$info$id
+		sub <- paste0(sub, " ",x$info$id)
+		x <- as(adjacency(x),"graphNEL")
+	}
+
+	if (!is.null(sub)) sub <- as.character(sub)
+	if (is.null(main)) 
+		main <-paste0("plotviz( ", xid ,", ", method, " )\n", xsubid) else
+		main=paste0(main, "\n plotviz( ", xid ,", ", method, " )\n", xsubid)
 	
+	plot(x=x,  y=method,
+		attrs=list(
+			node=list(cex=4, fontsize=40,  shape="ellipse")), 
+		cex.main=1.2, 
+		main=main,sub=sub,...)
+		
+#	title(sub = paste0(sub, " ", as.character(class(x)))	)
+		
 	legend("topleft", 
-		legend=c(paste0("class: ",class(x)),paste0("method: ",y)),
+		legend=c(paste0("class: ",class(x)), paste0("method: ",method)),
 		bg="#FFFFE040",
 		seg.len=0
-		)
+		)#"lightyellow" =#FFFFE0
 }
-#"lightyellow",
+@
+To make sure we do not depend onpackages collected along the way,
+we clean up packages. Calls to this funtion will be hidden.
+<<>>=
+cleanpackages <- function()
+{
+	# make sure we do not get inherited methods or garbage here.
+	try(detach("package:sna"), silent=TRUE)
+	try(detach("package:igraph"), silent=TRUE)
+	try(detach("package:network"), silent=TRUE)
+	try(detach("package:graph"), silent=TRUE)
+	try(detach("package:Rgraphviz"), silent=TRUE)
+	try(detach("package:graph"), silent=TRUE)
+}
 
 @
 \section{Profiling}
@@ -1295,6 +1329,13 @@ Walking further down, we see other candidates such as \ircode{as.character} that
 \section{Graph package}
 \label{sec:graph}
 What we have achieved so far can be seen from the graph representations.
+For our purposes, an edge table is most convenient. To allow for edge attibutes, we can use an \R{} \ircode{data.frame} as provided by
+
+We can make use of any graph mapping package. Unfortunately, each seem to have its own calling convention. So we habe to do some translation.
+
+%:   cleanpackages() try detach
+<<echo=FALSE, print=FALSE>>=
+cleanpackages()
 <<>>=
 library(graph)
 search() 
@@ -1303,10 +1344,8 @@ search()
 <<fig = TRUE, echo = TRUE, print = FALSE, label=sprofadj01NEL, width=12, height=6, include=FALSE>>= 
 #12 6
 oldpar <- par(mfrow=c(1,2))
-plotviz(as(adjacency(sprof01),"graphNEL"),  
-	 sub=sprof01$info$id)
-plotviz(as(adjacency(sprof02),"graphNEL"),  
-	 sub=sprof02$info$id)
+plotviz(sprof01)
+plotviz(sprof02)
 par(oldpar)
 @
 \begin{figure}[htbp]
@@ -1331,10 +1370,8 @@ sprof04 <- readRprof("RprofsRegressionExpl03.out", id="sprof04")
 <<fig = TRUE, echo = TRUE, print = FALSE, label=sprofadj0204NEL, width=12, height=6, include=FALSE>>= 
 #12 6
 oldpar <- par(mfrow=c(1,2))
-plotviz(as(adjacency(sprof02),"graphNEL"),  
-	sub=sprof02$info$id)
-plotviz(as(adjacency(sprof04),"graphNEL"),  
-	 sub=as.character(sprof04$info$id))
+plotviz(sprof02)
+plotviz(sprof04)
 par(oldpar)
 @
 \begin{figure}[htbp]
@@ -1368,58 +1405,67 @@ This is a common routine for the \ircode{graph} and \ircode{Rgraphviz} package.
 <<>>=
 
 as_graphNEL_sprof <- function(sprof, weight=TRUE){
-
-a04<-adjacency(sprof)
-
-rnames <- rownames(a04)
-
-if (!weight) {
-dimold <- dim(a04);a04 <- as.numeric(a04); dim(a04) <- dimold
-rownames(a04)<- rnames; colnames(a04)<- rnames;
-} #! define lwd first
-
-el04 <- edgematrix(a04)
-el04$lwd  <- rkindex(el04$count, maxindex=6, ties.method="min")
-
-a04NEL <- as(a04,"graphNEL")
-nodeDataDefaults(a04NEL, "shape") <- "ellipse"
-nodeDataDefaults(a04NEL, "cex") <- 0.6
-nodeDataDefaults(a04NEL, "weigth") <- 1
-nodeDataDefaults(a04NEL, "fill") <- "green"
-nodeDataDefaults(a04NEL, "col") <- "yellow"
-
-a04NEL <- layoutGraph(a04NEL)
-
-nodeRenderInfo(a04NEL) <- list(shape="ellipse")
-nodeRenderInfo(a04NEL) <- list(cex=0.6, shape="ellipse")
-nodeRenderInfo(a04NEL) <- list(weight=1)
-#nodeRenderInfo(a04NEL) <- list(color="yellow")
-nodeRenderInfo(a04NEL) <- list(fill="yellow", col="blue")
-
-edgeDataDefaults(a04NEL,"lwd") <- 1
-edgeDataDefaults(a04NEL,"col") <- "grey"
-
-#nodeRenderInfo(a04NEL) <- list(weight=1)
-
-#edgeRenderInfo(a04NEL) <- list(lwd=el04$lwd)
-#edgeRenderInfo(a04NEL)$lwd <- el04$lwd
-for (i in 1:length(el04$lwd))
-{edgeRenderInfo(a04NEL)$lwd[i] <- el04$lwd[i]}
-a04NEL
+	
+	a04<-adjacency(sprof)
+	
+	rnames <- rownames(a04)
+	
+	if (!weight) {
+	dimold <- dim(a04);a04 <- as.numeric(a04); dim(a04) <- dimold
+	rownames(a04)<- rnames; colnames(a04)<- rnames;
+	} #! define lwd first
+	
+	el04 <- edgedf(a04)
+	el04$lwd  <- rkindex(el04$count, maxindex=6, ties.method="min")
+	
+	a04NEL <- as(a04,"graphNEL")
+	nodeDataDefaults(a04NEL, "shape") <- "ellipse"
+	nodeDataDefaults(a04NEL, "cex") <- 0.6
+	nodeDataDefaults(a04NEL, "weigth") <- 1
+	nodeDataDefaults(a04NEL, "fill") <- "green"
+	nodeDataDefaults(a04NEL, "col") <- "yellow"
+	
+	a04NEL <- layoutGraph(a04NEL)
+	
+	nodeRenderInfo(a04NEL) <- list(shape="ellipse")
+	nodeRenderInfo(a04NEL) <- list(cex=0.6, shape="ellipse")
+	nodeRenderInfo(a04NEL) <- list(weight=1)
+	#nodeRenderInfo(a04NEL) <- list(color="yellow")
+	nodeRenderInfo(a04NEL) <- list(fill="yellow", col="blue")
+	
+	edgeDataDefaults(a04NEL,"lwd") <- 1
+	edgeDataDefaults(a04NEL,"col") <- "grey"
+	
+	#nodeRenderInfo(a04NEL) <- list(weight=1)
+	
+	#edgeRenderInfo(a04NEL) <- list(lwd=el04$lwd)
+	#edgeRenderInfo(a04NEL)$lwd <- el04$lwd
+	for (i in 1:length(el04$lwd))
+	{edgeRenderInfo(a04NEL)$lwd[i] <- el04$lwd[i]}
+	a04NEL
 }
 <<>>=
-plot_graphNEL_sprof <- function(graphNEL)
+plot_graphNEL_sprof <- function(graphNEL, mode="dot", main=NULL, sub=NULL,...)
 {
 	main1 <- deparse(substitute(graphNEL))
+	xsubid <- NULL
+	y<-NULL
 	
 	if (inherits(graphNEL, "sprof")) {
 	main1 <- graphNEL$info$id
 	graphNEL <- 	
 		as_graphNEL_sprof(graphNEL, weight=FALSE)
+		layout(graphNEL,mode)
+		y <- mode
 		}
 
 	renderGraph(graphNEL)
-	title(main=main1)
+	if (!is.null(sub)) sub <- as.character(sub)
+	if (is.null(main)) 
+		main <-paste0("plot_graphNEL_sprof( ",main1 ,", ", y, " )\n", xsubid) else
+		main=paste0(main, "\n plot_graphNEL_sprof( ", main1 ,", ", y, " )\n", xsubid)
+
+	title(main=main1, sub=sub)
 
 	legend("topleft", 
 		legend=paste0("class: ",class(graphNEL)),
@@ -1845,10 +1891,11 @@ sprofadj02 <- adjacency(sprof)
 @
 This is  a format any graph package can handle (maybe). To be on the save side, we provide an (extended) edge list. The added component \ircode{lwd} is a proposal for the line width in the graph rendering.
 <<>>=
-sprofedgel02 <- edgematrix(sprofadj02)
+sprofedgel02 <- edgedf(sprofadj02)
 
 sprofedgel02$lwd  <- rkindex(sprofedgel02$count, maxindex=12, ties.method="min")
 @
+\todo{add usage of sprofedgel02}
 \filledpagebreak
 \subsubsection{graph package}
 
@@ -1859,8 +1906,7 @@ This package is now available from Bioconductor only, see \url{http://www.biocon
 <<fig=TRUE, label=sprofadjNEL02,width=8, height=8>>=
 library(graph)
 #search() 
-sprofadjNEL02 <- as(sprofadj02,"graphNEL")
-plotviz(sprofadjNEL02,  sub=sprof$info$id)
+plotviz(sprof)
 detach("package:graph")
 @
 \filledpagebreak
@@ -2108,23 +2154,34 @@ as_network_sprof <- function(sprof) {
 }
 <<>>=
 plot_network_sprof <- function( nwsprof, 
-	mode = "fruchtermanreingold", main=NULL, label=NULL,...) {
+	mode = "fruchtermanreingold", main=NULL, label=NULL, sub=NULL,...) 
+{
 	classnwsprof <- class(nwsprof)
-	main1 <- deparse(substitute(nwsprof))
-	if (!is.null(main)) main1 <- paste0(main,"\n",main1)
+	xid <- deparse(substitute(nwsprof))
+	xsubid <- NULL
 	
-	if (inherits(nwsprof, "sprof")) nwsprof <- 	
-		as_network_sprof(nwsprof)
-		
-	if (!is.null(label)) warning("explicit label supplied, but will use vertex names")
+	if (inherits(nwsprof, "sprof")) {
+		xsubid <- nwsprof$info$id
+		nwsprof <- 	
+			as_network_sprof(nwsprof)
+		}
+	if (!is.null(label)) 
+		warning("explicit label supplied, but will use vertex names")
 	
+	if (!is.null(sub)) sub <- as.character(sub)
+	if (is.null(main)) 
+		main <-
+			paste0("plot_network_sprof( ", xid ,", ", mode, " )\n", xsubid) else
+		main <- 
+			paste0(main, "\n plot_network_sprof( ", xid ,", ", mode, " )\n", xsubid)
+
 	plot( nwsprof,
 		label = network.vertex.names(nwsprof), 
-		main= paste0(main1, ": network layout\n ", mode), 
+		main= main, 
 		mode = mode,
 		edge.len=2,
 		edge.col="#80808080",
-		sub= main1,
+		sub= sub,
 		cex.main=1.5,...)
 	
 	legend("topleft", 
@@ -2165,13 +2222,14 @@ This package is now available from Bioconductor only, see \url{http://www.biocon
 library(Rgraphviz)
 search()
 <<>>=
+sprofadjNEL02 <- as(sprofadj02,"graphNEL")
 sprofadjRag02 <- agopen(sprofadjNEL02, name="Rprof Example")
 @
 \filledpagebreak
 <<fig=TRUE, label=sprofadjvizdot,width=6, height=6>>=
 
 # 6 6
-plotviz(sprofadjRag02, sub=sprof$info$id)
+plotviz(sprofadjRag02,sub=sprof$info$id)
 @
 %agopen(graph, name, nodes, edges, kind = NULL, layout = TRUE,
 %layoutType = "dot",
@@ -2228,15 +2286,20 @@ To interface \ircode{sprof} to a graph handling package,  \irfunx{adjacency}{unt
 
 <<>>=
 sprofadj02 <- adjacency(sprof)
-adjname <- colnames(sprofadj02)
-adjname[adjname==""] <- "<NULL>"
- colnames(sprofadj02) <- adjname
- rownames(sprofadj02) <- adjname
 @
+%has been moved to adjacency
+%adjname <- colnames(sprofadj02)
+%adjname[adjname==""] <- "<NULL>"
+% colnames(sprofadj02) <- adjname
+% rownames(sprofadj02) <- adjname
+
 This is  a format any graph package can handle (maybe).
 @
 \filledpagebreak
 \subsubsection{graph package}
+%:   cleanpackages() try detach
+<<echo=FALSE, print=FALSE>>=
+cleanpackages()
 <<>>=
 library(graph)
 search()
@@ -2338,22 +2401,22 @@ plotviz(sprofadjRag02, sub=as.character(sprof$info$id))
 \filledpagebreak
 <<fig=TRUE, label=s04adjvizneato,width=6, height=6>>=
 #6
-plotviz(x=sprofadjRag02,y="neato")
+plotviz(x=sprofadjRag02,method="neato")
 @
 \filledpagebreak
 <<fig=TRUE, label=s04adjviztwopi,width=6, height=6>>=
 #6
-plotviz(sprofadjRag02,y="twopi")
+plotviz(sprofadjRag02,method="twopi")
 @
 \filledpagebreak
 <<fig=TRUE, label=sprofadjvizcirco6,width=6, height=6>>=
 #6
-plotviz(sprofadjRag02,y="circo")
+plotviz(sprofadjRag02,method="circo")
 @
 \filledpagebreak
 <<fig=TRUE, label=s04adjvizfdp,width=6, height=6>>=
 #6
-plotviz(sprofadjRag02, y="fdp")
+plotviz(sprofadjRag02, method="fdp")
 @
 \section{Template}
 \begin{itemize}

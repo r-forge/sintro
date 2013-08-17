@@ -5,11 +5,11 @@
 #$Revision$
 #\encoding{utf8}
 # setwd("")
-# source('~/Documents/lectures/src/insider/profile/sprof/pkg/R/edgematrix.R', chdir = TRUE)
+# source('~/Documents/lectures/src/insider/profile/sprof/pkg/R/edgedf.R', chdir = TRUE)
 #! To Do
 #!
 
-#\name{edgematrix}
+#\name{edgedf}
 #\title{edgem matrix}
 #\desciption{Build an edge matrix matrix from profile information}
 
@@ -18,15 +18,15 @@
 
 		 # to=c("T1","T2","T3","T4"))
 
-#\name{edgematrix}
-#\alias{edgematrix}
-#\title{edgematrix matrix}
-#\desciption{Build an edgematrix matrix from profile information}
+#\name{edgedf}
+#\alias{edgedf}
+#\title{edgedf matrix}
+#\desciption{Build an edgedf matrix from profile information}
 
-edgematrix <- function(data, counts=TRUE, na.rm=TRUE, no.name="<nn>") {
+edgedf <- function(data, counts=TRUE, na.rm=TRUE, no.name="<nn>") {
 # allow sprof as parameter
   if (inherits(data,"sprof"))   data <- adjacency(data)
-  if (!is.matrix(data)) stop("edgematrix: data must be a matrix")
+  if (!is.matrix(data)) stop("edgedf: data must be a matrix")
 # adj -> edgelist
   #varnames = names(dimnames(data))
   dn <- dimnames(data)

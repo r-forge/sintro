@@ -162,6 +162,12 @@ cp ./sprof.Rcheck/sprof-Ex.pdf ../www/sprof/
 ~/projects/rforge/sintro/pkg/sprof.Rcheck/sprof-Ex.pdf
 #### R cmds for ad hoc construction
 setwd("/Users/gs/projects/rforge/sintro/pkg/sprof/")
+###
+
+a04<-adjacency(sprof)
+el04 <- edgematrix(a04)
+fa <- ftM2graphNEL(as.matrix(el04[,1:2]))
+
 
 ##
 vignette <- function(){ 

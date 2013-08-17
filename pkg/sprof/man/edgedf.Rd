@@ -5,8 +5,8 @@
 %$Author$
 %$Name:$
 \encoding{utf8}
-\name{edgematrix}
-\alias{edgematrix}
+\name{edgedf}
+\alias{edgedf}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Expand adjacency information to an edge table
 }
@@ -14,7 +14,7 @@
 Expand adjacency information from an adjacency matrix or a \code{sprof} data structure to an edge table
 }
 \usage{
-edgematrix(data, counts = TRUE, na.rm = TRUE,  no.name="<nn>")
+edgedf(data, counts = TRUE, na.rm = TRUE,  no.name="<nn>")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -34,4 +34,8 @@ A data frame.
 \item{count}{optional. Frequencies of edges.}
 }
 \author{Günther Sawitzki <gsawitzki@users.r-forge.r-project.org>}
+\examples{
+data(sprof01lm)
+edgedf(sprof01lm)
+}
 \keyword{manip}
