@@ -9,6 +9,7 @@
 
 \usage{
 barplot_s(height, 
+	horiz = FALSE,
 	sort_by, 
 	decreasing = TRUE, 
 	lowtrim, hightrim, trimlegend = TRUE, 
@@ -17,8 +18,9 @@ barplot_s(height,
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-   \item{height}{either a vector or matrix of values describing the
-    bars which make up the plot. See \code{\link{barplot}}.}
+\item{height}{either a vector or matrix of values describing the
+bars which make up the plot. See \code{\link{barplot}}.}
+\item{horiz}{boolean. Arrange bars horizontally.}
     \item{sort_by}{a variable to sort by. Defaults to \code{height}.}
   \item{decreasing}{boolean. Sorting direction.}
   \item{lowtrim}{A optional lower trim value. Observations with \code{sort_by} values up to \code{lowtrim} are discarded.}
@@ -34,7 +36,12 @@ barplot_s(height,
   \item{\dots}{Passed to \code{barplot} 
 }
 }
-\details{To come.
+\details{
+If no names are supplied, they are generated in the form x...
+
+You man want to adjust the scale of the bar labels by using an additional argument such as \code{cex.names =0.5}.
+
+More to come.
 	Plots are from this collection:
 
 \if{html}{\figure{barplots.png}}

@@ -21,7 +21,8 @@
 # barplot(sp4,
 # main="Stacks, by reference count (4 obs. minimum)", ylab="count > 4")
 
-barplot_s <-function(height,
+barplot_s <-function(height, 
+	horiz = FALSE,
 	sort_by, 
 	decreasing=TRUE,
 	lowtrim, hightrim, 
@@ -33,7 +34,8 @@ barplot_s <-function(height,
 {
 	if (!is.numeric(height)) stop("only numeric data supported so far.")
 		lenx <- length(height)
-
+# check & handle matrix
+	if (is.null(names(height))) names(height) <- rownames(height, do.NULL = FALSE, prefix = "x")
 		
 		trimmedlow=0; trimmedhigh=0
 		
@@ -84,11 +86,11 @@ height[is.na(sort_by)] <- NA #! remove from plot. Should be handled by perm.plot
 	h0 <- height[perm]; 
 	h0 <- h0[!is.na(h0)]; 
 		if (usecol){col0 <- col[coli[perm]];col0 <- col0[!is.na(h0)]
-		barplot(h0, main=main, col=col0, ...)
+		barplot(h0, horiz=horiz, main=main, col=col0, ...)
 		if (trimlegend) {legnd(trimmedlow,trimmedhigh)}
 		invisible(data.frame(x=height,perm=perm,coli=coli, col=col ))
 	} else {
-		barplot(h0, main=main,  ...)
+		barplot(h0, horiz=horiz, main=main,  ...)
 		if (trimlegend) {legnd(trimmedlow,trimmedhigh)}
 		invisible(data.frame(x=height,perm=perm,coli=coli ))
 
