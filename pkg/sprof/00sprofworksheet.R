@@ -167,8 +167,9 @@ setwd("/Users/gs/projects/rforge/sintro/pkg/sprof/")
 a04<-adjacency(sprof)
 el04 <- edgematrix(a04)
 fa <- ftM2graphNEL(as.matrix(el04[,1:2]))
-
-
+el04$lwd  <- rkindex(el04$count, maxindex=6, ties.method="min")
+edgeData(fa, from=el04$from, to=el04$to, attr="lwd") <- el04$lwd 
+plot(fa)
 ##
 vignette <- function(){ 
 remove.packages("sprof")
