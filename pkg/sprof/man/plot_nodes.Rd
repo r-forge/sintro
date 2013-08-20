@@ -53,12 +53,10 @@ These displays may be outdated. Please run the examples. Plots are from this col
 \seealso{\code{\link{plot.sprof}}
 }
 \examples{
-\dontrun{
  data(sprof01lm)
  oldpar <- par(mfrow=c(2,2))
  plot_nodes(sprof01lm) 
  par(oldpar)
- }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

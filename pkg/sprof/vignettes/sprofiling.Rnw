@@ -203,7 +203,7 @@ options(warn=1)
 @
 We want a second chance on errors. So we install an error handler.
 <<>>=
-options(error = recover)
+#options(error = recover)
 @
 \smallskip
 Print parameters used here:
@@ -331,12 +331,13 @@ The graph visualisation family is not friendly. We try to get control by using a
 %...
 %}
 <<label=plotviz>>=
-plotviz <- function(x, method="dot", main=NULL, sub=NULL,...)
+plotviz <- function(x, layout="dot", main=NULL, sub=NULL,...)
 {
 	xid <- deparse(substitute(x))
 	xsubid <- NULL
-	
+	class1 <- NULL
 	if (inherits(x,"sprof")) {
+		class1 <- class1 <- paste0("class orig:",class(x))
 		xsubid <- x$info$id
 		sub <- paste0(sub, " ",x$info$id)
 		x <- as(adjacency(x),"graphNEL")
@@ -344,19 +345,29 @@ plotviz <- function(x, method="dot", main=NULL, sub=NULL,...)
 
 	if (!is.null(sub)) sub <- as.character(sub)
 	if (is.null(main)) 
-		main <-paste0("plotviz( ", xid ,", ", method, " )\n", xsubid) else
-		main=paste0(main, "\n plotviz( ", xid ,", ", method, " )\n", xsubid)
+		main <-paste0("plotviz( ", xid ,", ", layout, " )\n", xsubid) else
+		main=paste0(main, "\n plotviz( ", xid ,", ", layout, " )\n", xsubid)
 	
-	plot(x=x,  y=method,
+	if (inherits(x,"Ragraph")) {
+	plot(x=x,  y=layout,
+			cex.main=1.2, 
+		main=main,sub=sub,...)
+	} else {
+		plot(x=x,  y=layout,
 		attrs=list(
 			node=list(cex=4, fontsize=40,  shape="ellipse")), 
 		cex.main=1.2, 
 		main=main,sub=sub,...)
+	}
 		
 #	title(sub = paste0(sub, " ", as.character(class(x)))	)
 		
 	legend("topleft", 
-		legend=c(paste0("class: ",class(x)), paste0("method: ",method)),
+	
+	
+		legend=c(class1,
+			paste0("class: ",class(x)), 
+			paste0("layout: ",layout)),
 		bg="#FFFFE040",
 		seg.len=0
 		)#"lightyellow" =#FFFFE0
@@ -675,7 +686,8 @@ nodeclass[sprof01$nodes$name %in%
 		] <- "x_lm"
 nodeclass[sprof01$nodes$name =="<Anonymous>"] <- "x_Anon"
 nodeclass[sprof01$nodes$name == "Sweave"] <- "x_Sweave"
-nodeclass[sprof01$nodes$name %in% c( "summay" ,"summay.lm")] <- "x_summary"
+nodeclass[sprof01$nodes$name %in% c( "summay" ,"summay.lm")] <-
+	 "x_summary"
 
 @
 % data.frame(sprof01$nodes$name,sprof01$nodes$icol)
@@ -1021,31 +1033,75 @@ Nodes by stack and profile: see \vref{fig:shownodes02}.
 \subsubsection{Trimming}
 \label{sec:trimming}
 
-Note: trimming may be supported by the graph packages.
+Note: trimming may be supported by the graph packages. If you are more familiar with your graph package, you may prefer to handle trimming there.
 
-\todo{This section needs to be reworked}
-
-\todo{trimexample}
-
-\todo{add trim by keyword}
+To decide about trimming, we can use the displays shown above, or we can use some statistics. Global trimming works on the stack level. To make life easy, we can imbed the stack information in a matrix and use marginals.
 
 <<>>=
-trimstacks <- function(sprof, level){
-lapply(sprof$stacks$nodes, function(x) {x[-(1:level)]})
-}
+stackm01 <- list.as.matrix(sprof01$stacks$nodes)
+nr_uniquenodes01 <- apply(stackm01,1, function(x) { length(unique(x))})
+names( nr_uniquenodes01)<- rownames(nr_uniquenodes01,FALSE,"L")
+nr_uniquenodes01
+rm(stackm01, nr_uniquenodes01)
+@
+\todo{This section needs to be reworked}
+
+%<<>>=
+%trimstacks <- function(sprof,  level, trimnode ){
+%	ts <- sprof$stacks$nodes
+%	if (!missing(level)){
+%		ts <- lapply(sprof$stacks$nodes, function(x) {unlist(x)[-(1:level)]})
+%	}
+%	if (!missing(trimnode)){
+%		if (is.character(trimnode)) 
+%		{ trimnode <- match(trimnode,sprof$nodes$name)
+%		  if (is.na(trimnode)) return(ts)
+%		}
+%	ts <- lapply(ts, 
+%		function(x) {wh <- match(trimnode,unlist(x))
+%			if (is.na(wh)) NULL else unlist(x)[-(1:wh)]})
+%	}
+%	return(ts)
+%}
+%<<>>=
+%roots_sprof <- function(sprof, stacks){
+%	if (!missing(stacks)){
+%	} else {stacks <- sprof$stacks$nodes}
+%	rts <- sapply(stacks, function(x) {unlist(x)[1]})
+%	rts <- unlist(unique(rts))
+%	if (!missing(sprof)) names(rts) <- sprof$nodes$name[unclass(rts)]
+%	rts
+%}
 @
 %<<fig=TRUE, label=sREimgprofilesTr>>=
 <<label=sREimgprofilesTr>>=
-sprof01Tr <- trimstacks(sprof01, 11)
-#profile_nodesTr <- profiles_matrix(sprof01Tr)
-#image(x=1:ncol(profile_nodesTr),y=1:nrow(profile_nodesTr), t(profile_nodesTr),xlab="event", ylab="depth", main="nodes by event")
+rsprof01Tr <- trimstacks(sprof01, level=11)
+@
+After trimming, it is worth to inspect the result and to see whether additional trimming is helpful. Function \ircode{roots\_sprof} is handy.
+<<>>=
+roots_sprof(sprof01,stacks=rsprof01Tr)
+@
+Here after trimming we have one root node. This may be esthetically pleasing, but it is more informative that \ircode{summary} is a common root, and cut it off, thus fragmenting the graph.
+<<>>=
+rsprof02Tr <- trimstacks(sprof01, level=12)
+roots_sprof(sprof01,stacks=rsprof02Tr)
+@
+Now this is revealing. We know how our test example was contructed. So we are prepared to find \ircode{lm} and \ircode{summary.lm} at prominent positions. But it is surprising to find \ircode{lazyLoadDBfetch} as dominant node, and with a frequency comparable to that of \ircode{lm}.
+%<<>>=
+%sprof01Tr22 <- trimstacks(sprof01, trimnode=22)
+%roots_sprof(sprof01,stacks=sprof01Tr22)
+%strx(sprof01Tr22)
+%#profile_nodesTr <- profiles_matrix(sprof01Tr)
+%#image(x=1:ncol(profile_nodesTr),y=1:nrow(profile_nodesTr), t(profile_nodesTr),xlab="event", ylab="depth", main="nodes by event")
 
 @
+\todo{move to other section}
 There is no statistics on profiles. Profiles are our elementary data.
 However we can link to our derived data to get a more informative display.
 For example, going one step back we can encode stacks and use these colour codes in the display of a profile.
 
 Or going two steps back, we can encode nodes in colour, giving coloured stacks, and use these in the display of profile data.
+
 
 \subsubsection{Surgery}
 \label{sec:surgery}
@@ -1147,7 +1203,10 @@ nodeclass[sprof04$nodes$name %in%
 		] <- "x_lm"
 nodeclass[sprof04$nodes$name =="<Anonymous>"] <- "x_Anon"
 nodeclass[sprof04$nodes$name == "Sweave"] <- "x_Sweave"
-nodeclass[sprof04$nodes$name %in% c( "summay" ,"summay.lm")] <- sprof04$nodes$icol <-as.factor(nodeclass)
+nodeclass[sprof04$nodes$name %in% c( "summay" ,"summay.lm")] <- 
+	 "x_summary"
+
+sprof04$nodes$icol <-as.factor(nodeclass)
 @
 now gives
 <<fig = TRUE,  label=sREplotnodes04col, width=8, height=12, include=FALSE>>= 
@@ -1445,6 +1504,8 @@ as_graphNEL_sprof <- function(sprof, weight=TRUE){
 	{edgeRenderInfo(a04NEL)$lwd[i] <- el04$lwd[i]}
 	a04NEL
 }
+@
+\todo{Unify the plot functions in this chapter.}
 <<label=plot_graphNEL_sprof>>=
 plot_graphNEL_sprof <- function(graphNEL, 
 	mode="dot", 
@@ -1466,7 +1527,7 @@ plot_graphNEL_sprof <- function(graphNEL,
 	}
 
 nodeDataDefaults(graphNEL, "shape") <- "ellipse"
-
+graphNEL <- layoutGraph(graphNEL)
 	nodeRenderInfo(graphNEL) <- list( #lwd=lwd_list,
 		fill=fill_list,
 		col="#0000FF80",
@@ -1488,13 +1549,14 @@ nodeDataDefaults(graphNEL, "shape") <- "ellipse"
 	title(main=main, sub=sub)
 
 	legend("topleft", 
-		legend=c(class1,paste0("class: ",class(graphNEL)), 
-			paste0("mode: ",mode)),
+		legend=c( class1, paste0("class: ", class(graphNEL)), 
+			paste0("mode: ", mode)),
 		bg="#FFFFE040",
 		seg.len=0
 		)#"lightyellow" =#FFFFE0
 
-	legend("bottomright",legend= c(#"node color: self.time, pwr=0.5", 
+	legend("bottomright",
+		legend= c( #"node color: self.time, pwr=0.5", 
 		#"node lwd: total.time, pwr=0.5",
 		"edge lwd: frequency"), 
 		bty="n", 
@@ -2359,6 +2421,8 @@ plot(sprofadjNEL02,  main="sprof04: graph layout")
 @
 \filledpagebreak
 \subsubsection{igraph package}
+<<echo=FALSE, print=FALSE>>=
+cleanpackages()
 <<>>=
 library(igraph)
 search()
@@ -2366,12 +2430,22 @@ search()
 sprof_igraph <- graph.adjacency(sprofadj02)
 <<fig=TRUE, label=s04ig,width=6, height=6>>=
 #6
-#plot(sprof_igraph, main="sprof04: igraph layout", cex.main=2)
 plot(sprof_igraph, main="sprof04: igraph layout: trimmed data")
+	legend("topleft", 
+		legend=c(paste0("class: ",class(sprof_igraph))),
+		bg="#FFFFE040",
+		seg.len=0
+		)#"lightyellow" =#FFFFE0
 detach("package:igraph")
+@
+%<<>>=
+%strx(sprof_igraph)
 @
 \filledpagebreak
 \subsubsection{network package}
+%:
+<<echo=FALSE, print=FALSE>>=
+cleanpackages()
 <<>>=
 library(network)
 search()
@@ -2417,6 +2491,8 @@ detach("package:network")
 @
 \filledpagebreak
 \subsubsection{Rgraphviz package}
+<<echo=FALSE, print=FALSE>>=
+cleanpackages()
 <<>>=
 library(Rgraphviz)
 search()
@@ -2437,22 +2513,22 @@ plotviz(sprofadjRag02, sub=as.character(sprof$info$id))
 \filledpagebreak
 <<fig=TRUE, label=s04adjvizneato,width=6, height=6>>=
 #6
-plotviz(x=sprofadjRag02,method="neato")
+plotviz(x=sprofadjRag02, layout="neato")
 @
 \filledpagebreak
 <<fig=TRUE, label=s04adjviztwopi,width=6, height=6>>=
 #6
-plotviz(sprofadjRag02,method="twopi")
+plotviz(sprofadjRag02, layout="twopi")
 @
 \filledpagebreak
 <<fig=TRUE, label=sprofadjvizcirco6,width=6, height=6>>=
 #6
-plotviz(sprofadjRag02,method="circo")
+plotviz(sprofadjRag02, layout="circo")
 @
 \filledpagebreak
 <<fig=TRUE, label=s04adjvizfdp,width=6, height=6>>=
 #6
-plotviz(sprofadjRag02, method="fdp")
+plotviz(sprofadjRag02, layout="fdp")
 @
 \section{Template}
 \begin{itemize}

@@ -50,12 +50,11 @@ The \code{plot.sprof} method for \code{sprof} objects concatenates
 \code{\link{plot_profiles}}
 }
 \examples{
-\dontrun{data(sprof01lm)
+data(sprof01lm)
 
 oldpar <- par(mfrow=c(3,4))
 plot.sprof(sprof01lm)
 par(oldpar)
-}
 
 }
 
