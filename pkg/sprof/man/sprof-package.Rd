@@ -17,7 +17,7 @@ Profiling, timing and optimisation utilities}
 Package: \tab sprof\cr
 Type: \tab Package\cr
 Version: \tab 0.0-6\cr
-Date: \tab 2013-08-15\cr
+%Date: \tab 2013-08-15\cr
 License: \tab GPL-2 | GPL-3\cr
 }
 \code{\link{readRprof}()} reads a profile file from \code{\link{Rprof}()} or other profilers and 
