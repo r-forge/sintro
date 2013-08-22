@@ -75,16 +75,18 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
 			if (is.null(xn$icol)){
 				barplot(xn$self.time,
 					main="Nodes: time as last of stack",
-					names.arg = xn$name, sub=src, ylab="count", xpd=FALSE, horiz=horiz, las=lasb, ...);
+					names.arg = xn$name, cex.names=0.5,
+					sub=src, ylab=NULL, xpd=FALSE, horiz=horiz, las=lasb, ...);
 			} else
 			{ 	barplot(xn$self.time,
 					main="Nodes: time as last of stack",
-					names.arg = xn$name, 
-					sub=src, ylab="count",col=col[xn$icol], xpd=FALSE, horiz=horiz,  las=lasb,...)
+					names.arg = xn$name, cex.names=0.5,
+					sub=src, ylab=NULL,col=col[xn$icol], xpd=FALSE, horiz=horiz,  las=lasb,...)
 			}
 
 			legnd(trimmed=trimmed, fulltime=0)
 			}, 
+			
 		#3
 		{   totaltime <- sum(xnodes$self.time)
 			fulltime <- dim(xnodes)[1]
@@ -94,17 +96,19 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
 			if (is.null(xn$icol)){
 				barplot(xn[ordertotal,]$total.time, 
 					main="Nodes: total time in stack",
-					names.arg = xn[ordertotal,]$name, sub=src, ylab="count", xpd=FALSE,
+					names.arg = xn[ordertotal,]$name,cex.names=0.5,
+					 sub=src, ylab=NULL, xpd=FALSE,
 					 horiz=horiz, las=lasb,...)
 				} else {
 				barplot(xn[ordertotal,]$total.time, 
 					main="Nodes: total time in stack",
-					names.arg = xn[ordertotal,]$name, 
-					sub=src, ylab="count", col=col[xn[ordertotal,]$icol], xpd=FALSE,
+					names.arg = xn[ordertotal,]$name, cex.names=0.5,
+					sub=src, ylab=NULL, col=col[xn[ordertotal,]$icol], xpd=FALSE,
 					horiz=horiz, las=lasb,...)
 				}
 			
 			legnd(trimmed=trimmed, fulltime=fulltime)},
+			
 		#4 scatterplot log total ~ log (self+1)
 		{ if (is.null(xnodes$icol)){
 			plot(xnodes$self.time+1, xnodes$total.time, 
