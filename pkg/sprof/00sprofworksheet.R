@@ -32,17 +32,6 @@ packages Matrix, SparseMatrix
 #
 str(profile_nodes_rle, max.level=2, vec.len=3, nchar.max=40, list.len=6 ,width=70, strict.width="wrap")
 
-##source('~/Documents/lectures/src/insider/profile_pkgs/profr_0.2/R/parse.r', chdir = TRUE)
-nodepackage <- function(node)
-{where <- getAnywhere(node)$where
-	if (length(where)==0) return("<not found>") else{
-	where <- strsplit(where,':')
-	if (is.null(where)) return("<??>") else
-		if (where[[1]][1] == "package") return(where[[1]][2]) else
-		{print(where); return("nn")}
-		}
-}
-
 # edit(file="~/Documents/lectures/src/insider/profile/sprof/pkg/man/nodei.Rd")
 # source('~/projects/rforge/sintro/pkg/sprof/R/nodei.R', chdir = TRUE)
 # file.edit('~/projects/rforge/sintro/pkg/sprof/R/nodei.R', chdir = TRUE)
@@ -97,10 +86,6 @@ complete cycle
 - massage // delete top & last
 ##
 revise strategy: use <Rprof Ctrl> replacement for controls
-##
-plot_nodes(rpo)
-plot_stacks(rpo)
-plot_profiles(rpo)
 
 ###
                                                                                                                                                   prompt <- function(name){
