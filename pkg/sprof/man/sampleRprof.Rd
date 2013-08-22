@@ -18,7 +18,7 @@ sampleRprof(expr, runs = NULL, gcFirst = TRUE, interval = 0.001, ...)
 \arguments{
   \item{expr}{an expression to be profiled.}
   \item{runs}{nr of runs to profile.}
-  \item{gcFirst}{boolean. Profile GC.}
+  \item{gcFirst}{boolean. Bracket the total simulation with calls to \code{GC()}. If \code{TRUE}, the garbage collection information will be reported as components \code{gcin}, code{gcout}.}
    \item{interval}{Real: time interval between samples, in s.}
    \item{\dots}{additional parameters, passed to \code{Rprof}}
 }

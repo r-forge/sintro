@@ -34,7 +34,7 @@ sampleRprof <- function(expr, runs=NULL, gcFirst = TRUE, interval = 0.001, ...){
 	if (gcFirst) 
         gcout <- gc(FALSE)
 	if (!is.null(gcin)) {sprof_out$gcin <- gcin;sprof_out$gcout <- gcout}
-	browser()
+	# browser()
 		if (is.null(sprof_out) || is.null(sprof_out$info) ||(sprof_out$info$nrrecords==0)) warning("No event data recorded.")
 	return(sprof_out)
 }# sampleRprof
