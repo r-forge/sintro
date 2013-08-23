@@ -282,6 +282,15 @@ prxt <- function (x, digits=2, cut=TRUE, caption=NULL,
 	
 	if (cut) {margin <- 10
 	if (nrow(x)> 2*margin+3) x <-xcutrows(x, margin=margin)}
+
+#special sanitising for xtable
+xr <- rownames(x)
+#for (i in (1:length(xr))) {xr[i] <- sub(xr[i],"\\[","$[$", fixed=TRUE)}
+ #xr <- paste("$",xr,"$")
+xr <- gsub("[","{[}",xr, fixed=TRUE)
+xr <- gsub("_","\\_",xr, fixed=TRUE)
+xr <- gsub("^","\\^",xr, fixed=TRUE)
+rownames(x)<- xr
 	
 	pr <- print(
 		xtable(x, digits=digits, caption=caption, 
@@ -1002,10 +1011,12 @@ view, here is just one example. More are in \vref{sec:graph} and
 vref{sec:moregraph}. But before changing to the graph perspective, we 
 recommend to see the next sections, not to skip them. 
 
-The preview, at this point, taking package \ircode{graph} as an example
-\footnote{Package ‘graph’ was removed from the CRAN repository.
+The preview, at this point, taking package \ircode{graph} as an 
+example\footnote{Package ‘graph’ was removed from the CRAN repository.
 
-This package is now available from Bioconductor only, see \url{http://
+This package is now available from Bioconductor only. 
+
+See \url{http://
 www.bioconductor.org/packages/release/bioc/html/graph.html}.}. 
 \ircode{graph} on its side has an undocumented feature: it needs  
 \ircode{Rgraphviz} to handle graph attributes\footnote{Package ‘Rgraphviz’ 
@@ -1242,72 +1253,53 @@ We can avoid this by replacing a short sequence.
 
 \ircode{"[" "lapply" ".getXlevels"  -> "<.getXlevels\_[>"}
 
-\todo{Implement. Currently best handled on source=text level}
-If the node does not exist, we want to add it to our global variable. For now, we do it 
-using expressions on the \R{} basic level and avoid tricks like simulating ``call by reference''.
-\todo{function addnode using ``call by reference'' to be added}
-<<>>=
-sprof03 <- sprof02; sprof03$info$id <- "sprof03: surgery"
-node <- "<.getXlevels_[>"
-#nodei <- function(sprofx, node, warn = TRUE)
-{
-	i <- match(node, sprof03$nodes$name, nomatch=0)
-	if (i==0){
-		sprof03$nodes$name <- as.character(sprof03$nodes$name)
-		sprof03$nodes <- rbind(sprof03$nodes,NA)
-		i <- length(sprof03$nodes$name)
-		sprof03$nodes$name[i] <- node
-	if (as.logical(options("warn"))) 
-		message("node added. An updateRprof() may be necessary.")
-	}
-	nodei <- i
-}
-
-# sprof <- sprof01; nodei(sprof,"kiki"); sprof$nodes
-@
-Now we have to identify the stacks that may get a replacement.
-First find the candidates.
-<<>>=
-targeti <- match("lapply", sprof03$nodes$name, nomatch=0)
-found <- lapply(sprof03$stacks$nodes, function(X) match(targeti,X))
-found <- data.frame(stack=1:length(found), position=as.matrix(found))
-found[!is.na(found$position),]
-@
-For now, these are just candidates.
-
 Other candidates are:\\
 \ircode{"as.list" "vapply" "model.frame.default" -> "<model\_as.list>"}\\
 or\\
 \ircode{"as.list" "vapply" "model.matrix.default" -> "<model\_matrix\_as.list>"}
 
-\todo{xreplacenodes: improve implement}
+\todo{Implement. Currently best handled on source=text level}
+If the node does not exist, we want to add it to our global variable. For now, we do it 
+using expressions on the \R{} basic level and avoid tricks like simulating ``call by reference''.
+\todo{function addnode using ``call by reference'' to be added}
 <<>>=
-newchopnode <- function(nodenames, chop) {
-tmpname <- paste("<",as.character(nodenames[chop]),">")
-# chec for existing.
-# add if necessary
-tmpname
-}
-chopstack <- function(x , chop, replacement) 
+addnode <- function(nodes, newnode, warn = options("warn"))
 {
-# is chop in x`
-# y: cut x.
-# merge x <- head + replacement + tiail
-return(x)
+	i <- match(newnode, nodes$name, nomatch=0)
+	if (i==0){
+		nodes$name <- as.character(nodes$name)
+		nodes <- rbind(nodes,NA)
+		i <- length(nodes$name)
+		nodes$name[i] <- newnode
+		rownames(nodes) <- nodes$name
+	if (as.logical(warn)) 
+		message("addnode: node added. An updateRprof() may be necessary.")
+	}
+	return(nodes)
 }
+<<>>=
+sprof03 <- sprof02; sprof03$info$id <- "sprof03: surgery"
+nodes <- addnode(sprof03$nodes, "<.getXlevels_[>", warn=FALSE)
+nodes <- addnode(nodes, "<model_as.list>", warn=FALSE)
+sprof03$nodes <- addnode(nodes, "<model_matrix_as.list>", warn=FALSE)
+@
 
-x <-sprof01$stacks$nodes[1]
+\todo{xreplacenodes: improve implement}
+
 @
 So far, we use factor indices only.
 \todo{clean up factor handling}
 <<>>=
 xwhere <- function(oldseq, x){
+	x <- unlist(x)
 	firstpos <- 1; lastpos <-  length(x) -  length(oldseq) +1
 
 	if (lastpos <1) return(0)
 	l <- length(oldseq)-1
 	while (firstpos <= lastpos) {
-		if ( isTRUE(all.equal(oldseq , x[firstpos:(firstpos+l)])) )
+		if ( isTRUE (
+		all.equal(oldseq , x[firstpos:(firstpos+l)], check.attributes=FALSE)
+		) )
 			{return(firstpos) }
 		firstpos <- firstpos+1
 		}
@@ -1331,18 +1323,75 @@ if (is.character(names))
 		  #if (is.na(trimnode)) return(ts)
 		} else names
 }
-
-<<>>=
-nodenames2index(c("[","lapply",".getXlevels" ), sprof01)
+@
+%<<>>=
+%nodenames2index(c("[","lapply",".getXlevels" ), sprof01)
 <<>>=
 xreplacenodes <- function(sprof, oldseq, newseq)
 {
 	if (is.character(oldseq)) oldseq <- nodenames2index(oldseq,sprof)
 	if (is.character(newseq)) newseq <- nodenames2index(newseq,sprof)
 	stacks <- sprof$stacks$nodes
-	sapply(stacks, function(x){xreplace(oldseq, newseq, x)})
+	sapply(stacks, function(x){xreplace(oldseq, newseq, unlist(x))})
 }
 @
+\todo{ stackssrc, collstacksdictrev etc. now out of date}
+%<<>>=
+%sprof03$stacks$nodes <- xreplacenodes(sprof03, 
+%	c("[", "lapply", ".getXlevels"),
+%	"<.getXlevels_[>")
+%sprof03$stacks$nodes <- xreplacenodes(sprof03, 
+%	c("as.list", "vapply", "model.frame.default" ),
+%	 "<model_as.list>")
+%sprof03$stacks$nodes <- xreplacenodes(sprof03, 
+%	c("as.list", "vapply", "model.matrix.default"),
+%	 "<model_matrix_as.list>")
+<<>>=
+xfactor <- function(x, from) {
+	if (is.factor(from)) {
+		levels <- levels(from)
+		labels <- labels(from)
+		ordered <- is.ordered(from)
+	} else if  (is.character(from)) {
+		levels <- 1: length(from)
+		labels <- from
+		ordered = is.ordered(from)
+	}
+	
+	if (is.list(x)) {
+		sapply(x, factor, 
+		levels, 
+		labels) 
+		} else {		
+		factor(x, 
+		levels=1: length(from), 
+		labels=from)
+	}
+}
+<<>>=
+#xfactor(sprof03$stacks$nodes, sprof03$nodes$name)
+<<>>=
+sprof03$stacks$nodes <- xreplacenodes(sprof03, 
+	c(".getXlevels", "lapply", "["),
+	"<.getXlevels_[>")
+sprof03$stacks$nodes <- xreplacenodes(sprof03, 
+	c("model.frame.default", "vapply", "as.list"),
+	 "<model_as.list>")
+sprof03$stacks$nodes <- xreplacenodes(sprof03, 
+	c("model.matrix.default", "vapply", "as.list"),
+	 "<model_matrix_as.list>")
+	
+sprof03 <- updateRprof(sprof03)
+<<>>=
+#xfactor(sprof03$stacks$nodes, sprof03)
+
+@
+%sprof03$stacks$nodes <- xreplacenodes(sprof03, 
+%	c("lapply", "[", "[.data.frame"),
+%	 "<model_matrix_as.list>")
+
+% sa3 <- sapply(sprof03$stacks$nodes, function(x) {factor(x,  levels=1:length(sprof03$nodes$name), labels=sprof03$nodes$name)})
+\todo{warn about undefined vars, e.g. rle, class, \ldots}
 %<<>>=
 %xreplacenodes(sprof01, c(10, 23, 55),999)
 %<<>>=
@@ -1351,6 +1400,9 @@ xreplacenodes <- function(sprof, oldseq, newseq)
 %xreplacenodes(sprof01, c("[","lapply",".getXlevels" ),1000)
 
 @
+This surgery gives no additional information on the profile data. It only helps the graph representation, by extending the one-step information given by the edges to two or omre step information at some critical points.
+
+\todo{replace by sprof03}
 We use a prepared sanitised version of our data set.
 
 
@@ -1507,27 +1559,8 @@ nn <- profile_nodes_rlearray["model.frame", , ]
 print.table(addmargins(nn), zero.print = ".")
 @
 
-<<>>=
-amt <- nodesrunlength(sprof02)
-#   print.table(as.table(amt[,1:9]), zero.print = ".") 
-## ??? print.table changes format when col.10 is present.
-@
-%????????? tex error in xtable.
-%cannot handle [. Needs to be replaced by $[$.
-
-But \ircode{print.xtable} has no \ircode{zero.print} \ldots
-\todo{ $[$ needs to be hidden for print.xtable}
-
 <<print = FALSE, results = tex, label=tab:pramt4>>=
-#special sanitising for xtable
-xr <- rownames(amt)
-#for (i in (1:length(xr))) {xr[i] <- sub(xr[i],"\\[","$[$", fixed=TRUE)}
- #xr <- paste("$",xr,"$")
-xr <- gsub("[","{[}",xr, fixed=TRUE)
-xr <- gsub("_","\\_",xr, fixed=TRUE)
-xr <- gsub("^","\\^",xr, fixed=TRUE)
-rownames(amt)<- xr
-
+amt <- nodesrunlength(sprof02)
 prxt(amt,
 	 caption=paste0("Marginal statistics on nodes by run length, ",
 		 "sorted by total time used"), 
@@ -1537,8 +1570,6 @@ prxt(amt,
 @
 See \vref{tab:pramt4}: Marginal statistics on nodes by run length.
 
-%<<>>=
-%prop.table(profile_nodes_rlearray, margin = c(1,3))
 @
 \todo{hack. keep length in nodesrunlength}
 We can add this information to our base and use it to enhance 
@@ -2637,12 +2668,14 @@ toLatex(sessionInfo())
 %\RequirePackage{layouts}
 \LaTeX{} information:
 {\tiny
+
 \currentpage 
 textwidth: \printinunitsof{in}\prntlen{\textwidth} \qquad 
 linewidth:\printinunitsof{in}\prntlen{\linewidth}\\
 textheight: \printinunitsof{in}\prntlen{\textheight}\\
 }
 @
+
 Svn repository information:
 
 {\tiny%
@@ -2660,7 +2693,7 @@ Svn repository information:
 \verb+$Id$+\\
 \verb+$Revision$+\\
 \verb+$Date$+\\
-\verb+$name:  $+\\
+\verb+$Name:  $+\\
 \verb+$Author$+
 }
 \typeout{**** $Id$ done ****}
