@@ -78,7 +78,7 @@
 }
 \email{gs@statlab.uni-heidelberg.de}
 \urladdr{http://sintro.r-forge.r-project.org/}
-\keywords{R programming, profiling, optimisation, R program language}
+\keywords{R programming, profiling, optimisation, R programming language}
 
 \date{May 2013.
 %\svnInfoFile \svnInfoRevision
@@ -320,29 +320,6 @@ This is to be used with
 
 The graph visualisation family is not friendly. We try to get control by using a wrapper which is at least used to the members of the \ircode{graphviz} clan. This will be used in later sections.
 %:  plotviz
-%nodeDataDefaults(x, "shape") <- "ellipse"
-%nodeDataDefaults(x, "cex") <- 0.6
-%nodeDataDefaults(x, "cex.main") <- 0.6
-%nodeDataDefaults(x, "fontsize") <- 10
-%nodeDataDefaults(x, "weigth") <- 1
-%nodeDataDefaults(x, "fill") <- "green"
-%nodeDataDefaults(x, "col") <- "yellow"
-%	nodeAttrs=list(node=list(cex=4, fontsize=40,  
-%	shape="ellipse")),
-
-%<<label=plotviz>>=
-%plotviz <- function(x,y="dot", main=NULL, sub=NULL,...)
-%{	xid <- deparse(substitute(x))
-%	if (inherits(x,"sprof")) {
-%		sub <- paste0(sub, " ",x$info$id)
-%		x <- as(adjacency(x),"graphNEL")
-%	}
-%...
-%...	
-%	title(sub=sub) 
-%	# lost ???
-%...
-%}
 <<label=plotviz>>=
 plotviz <- function(x, layout="dot", main=NULL, sub=NULL,...)
 {
@@ -350,10 +327,10 @@ plotviz <- function(x, layout="dot", main=NULL, sub=NULL,...)
 	xsubid <- NULL
 	class1 <- NULL
 	if (inherits(x,"sprof")) {
-		class1 <- class1 <- paste0("class orig:",class(x))
+		class1 <- paste0("class orig:",class(x))
 		xsubid <- x$info$id
-		sub <- paste0(sub, " ",x$info$id)
-		x <- as(adjacency(x),"graphNEL")
+		sub <- paste0(sub, " ", x$info$id)
+		x <- as(adjacency(x), "graphNEL")
 	}
 
 	if (!is.null(sub)) sub <- as.character(sub)
@@ -374,7 +351,7 @@ plotviz <- function(x, layout="dot", main=NULL, sub=NULL,...)
 	}
 		
 #	title(sub = paste0(sub, " ", as.character(class(x)))	)
-		
+		title(sub = "xx try sub xx")
 	legend("topleft", 
 	
 	
@@ -544,7 +521,7 @@ a millisecond (ms) base, whereas \R{} in general uses seconds as a base.
 nodes <- sprof01$nodes[order(sprof01$nodes$self.time, 
 decreasing=TRUE),]
 prxt(nodes[nodes$self.time>4,],
-caption="splot result: by.self, self time > 4ms", 
+caption="sprof result: by.self, self time > 4ms", 
 	label="tab:prspbtself")
 @
 At this level, it is helpful to note the expectations, and only then inspect the timing results. Since we are using a linear model, we are not surprised to see functions related to linear models on the top of the list. We may however be surprised to see functions related to data access and to character conversion very high on the list. The sizeable amount of time spent on NA handling is another aspect that is surprising.
@@ -552,7 +529,7 @@ At this level, it is helpful to note the expectations, and only then inspect the
 << print = FALSE, results = tex, label=tab:prspbt>>=
 nodes <- sprof01$nodes[order(sprof01$nodes$total.time, decreasing=TRUE),]
 prxt(nodes[nodes$total.time>4,],
-caption="splot result: by.total, total time > 4ms", 
+caption="sprof result: by.total, total time > 4ms", 
 	label="tab:prspbt")
 @
 \todo{remove text vdots from string/name columns}
@@ -1084,7 +1061,7 @@ basetrim <- 13
 sprof02$stacks$nodes <- sapply(sprof02$stacks$nodes, 
 	function (x){if (length(x)> basetrim) x[-(1:basetrim)] })
 @
-We have noted burn in/fade out. This is on the profile level. Taking the big knife is not advisable, since time information and stack data must be synchronised. So we are more cautious.
+We have noted burn in/fade out. This is on the profile level. Taking the big knife is not advisable, since time information and stack data must be synchronised. So we are more cautious, and instead of cutting off the stacks we replace them by an empty mark.
 \todo{should this be NA or NULL?}
 <<>>=
 sprof02$profiles$data[1:3] <- NA
@@ -1749,71 +1726,229 @@ as_graphNEL_sprof <- function(sprof, weight=TRUE){
 	a04NEL
 }
 @
-\todo{Unify the plot functions in this chapter.}
+%:   plot_graphNEL_sprof
 <<label=plot_graphNEL_sprof>>=
-plot_graphNEL_sprof <- function(graphNEL, 
-	mode="dot", 
-	fill_list=NULL,
-	main=NULL, sub=NULL,...)
+plot_graphNEL_sprof <- function(sprof04,
+#	mode="dot", nodeattrs = c("default", "time", "runs"),
+	layout = "dot", nodeattrs,
+	fill_list = NULL,
+	main = NULL, sub = NULL,...)
 {
-	main1 <- deparse(substitute(graphNEL))
+	main1 <- deparse(substitute(sprof04))
 	xsubid <- NULL
 	y<-NULL
 	class1 <- NULL
 	
-	if (inherits(graphNEL, "sprof")) {
-		class1 <- paste0("class orig:",class(graphNEL))
-		main1 <- graphNEL$info$id
+
+	if (missing(nodeattrs)) nodeattrs <- "default"
+	#nodeattrs <- match.arg(nodeattrs)
+	# cat(nodeattrs)
+	
+	if (inherits(sprof04, "sprof")) {
+		class1 <- paste0("class orig:",class(sprof04))
+		main1 <- sprof04$info$id
 		graphNEL <- 	
-			as_graphNEL_sprof(graphNEL, weight=FALSE)
-		# layout(graphNEL,mode)
-		y <- mode
+			as_graphNEL_sprof(sprof04, weight=FALSE)
+		y <- layout
+	} else graphNEL <- sprof04
+
+ 	if (!is.null(sub)) sub <- as.character(sub) 
+	
+	if (is.null(main)) {
+		main <-paste0("plot_graphNEL_sprof( ",
+			main1 , ", ", 
+			layout, " )\n", 
+			xsubid) } else
+		{
+		main=paste0(main, "\n plot_graphNEL_sprof( ", 
+			main1 , ", ", 
+			layout, " )\n", xsubid)
+		}
+# functions
+	legattributes <- function(legnd){
+		legend("bottomright",
+				legend= legnd, 
+				bg="#FFFFE040",
+				seg.len=0,
+				bty="n", 
+				text.font=3)
+			#bg="#00004040",
 	}
+#nDD0 <- (nodeRenderInfo(graphNEL))
+#graphNEL <- layoutGraph(graphNEL)
+#nDD1 <- (nodeRenderInfo(graphNEL))# fill & col corrupted
+
+#nodeDataDefaults(graphNEL, "cex") <- 1.0
+#nodeDataDefaults(graphNEL, "weigth") <- 1
+#nodeDataDefaults(graphNEL, "fill") <- "green"
+#nodeDataDefaults(graphNEL, "col") <- "yellow"
+
+#nodeDataDefaults(graphNEL, "shape") <- "ellipse"
+nDD2 <- (nodeRenderInfo(graphNEL))
+
+graphNEL <- layoutGraph(graphNEL) 
 
 nodeDataDefaults(graphNEL, "shape") <- "ellipse"
-graphNEL <- layoutGraph(graphNEL)
-	nodeRenderInfo(graphNEL) <- list( #lwd=lwd_list,
-		fill=fill_list,
-		col="#0000FF80",
+
+if (nodeattrs == "runs"){
+	amt04 <- nodesrunlength(sprof04, clean=FALSE)
+
+	# node attributes
+	#sprof04$nodes$self.time -> fill
+	fill_list <- heat.colors(12)[
+		rkindex(-amt04[,"avg_time"], 
+			pwr=0.5, maxindex=12, ties.method="min")]
+	names(fill_list) <- sprof04$nodes$name
+
+	#sprof04$nodes$total.time -> lwd
+	lwd_list  <-  rkindex(amt04[,"nr_runs"], 
+		pwr=0.5, maxindex=6, ties.method="min")
+	names(lwd_list) <- sprof04$nodes$name
+
+	#strx(nodeRenderInfo(graphNEL))
+	nDD3 <- (nodeRenderInfo(graphNEL))
+
+	nodeDataDefaults(graphNEL, "shape") <- "ellipse"
+
+	nodeRenderInfo(graphNEL) <- list(lwd=lwd_list, 
+		fill=fill_list, 
+		col="#0000FF80", 
 		shape="ellipse",
 		weight=1)
-	
-	edgeRenderInfo(graphNEL) <- list(col= "#80808080")
-	
-	renderGraph(graphNEL)
-	if (!is.null(sub)) sub <- as.character(sub)
-	if (is.null(main)) 
-		main <-paste0("plot_graphNEL_sprof( ",
-			main1 ,", ", 
-			mode, " )\n", xsubid) else
-		main=paste0(main, "\n plot_graphNEL_sprof( ", 
-			main1 ,", ", 
-			mode, " )\n", xsubid)
+	#strx(nodeRenderInfo(graphNEL))
+}	else if (nodeattrs == "time"){
+	# node attributes
+	#sprof04$nodes$self.time -> fill
+	fill_list <- heat.colors(12)[
+		rkindex(-sprof04$nodes$self.time, 
+			pwr=0.5, maxindex=12, ties.method="min")]
+	names(fill_list) <- sprof04$nodes$name
 
-	title(main=main, sub=sub)
+	#sprof04$nodes$total.time -> lwd
+	lwd_list  <-  rkindex(sprof04$nodes$total.time, 
+		pwr=0.5, maxindex=6, ties.method="min")
+	names(lwd_list) <- sprof04$nodes$name
 
+	#strx(nodeRenderInfo(graphNEL))
+	nDD3 <- (nodeRenderInfo(graphNEL))
+
+}   else {
+	graphNEL <- layoutGraph(graphNEL)
+	fill_list <- NULL
+	lwd_list <-  NULL
+}
+	nodeDataDefaults(graphNEL, "shape") <- "ellipse"
+
+	nodeRenderInfo(graphNEL) <- list(
+		lwd=lwd_list, 
+		fill=fill_list, 
+		col="#0000FF80", 
+		shape="ellipse",
+		weight=1)
+
+# edge attributes
+# strx(edgeRenderInfo(graphNEL))
+nER01 <- edgeRenderInfo(graphNEL) 
+edgeRenderInfo(graphNEL) <- list(col= "#80808080")
+# strx(edgeRenderInfo(graphNEL))
+
+renderGraph(graphNEL)
+	
 	legend("topleft", 
 		legend=c( class1, paste0("class: ", class(graphNEL)), 
-			paste0("mode: ", mode)),
+			paste0("layout: ", layout)),
 		bg="#FFFFE040",
 		seg.len=0
 		)#"lightyellow" =#FFFFE0
 
-	legend("bottomright",
-		legend= c( #"node color: self.time, pwr=0.5", 
-		#"node lwd: total.time, pwr=0.5",
-		"edge lwd: frequency"), 
-		bty="n", 
-		text.font=3,
-		bg="#00004040",
-		seg.len=0)
 
-}
-
+	 if (nodeattrs == "runs"){
+		 title(main=paste0("nodes (run length)\n", main)	)	
+		 legattributes( c("node color: avg time, pwr=0.5",
+				"node lwd: nr runs, pwr=0.5",
+				"edge lwd: frequency"))
+	} else if (nodeattrs == "time"){	
+		title(main=paste0("nodes (time)\n", main))
+		 legattributes( c("node color: self.time, pwr=0.5", 
+			"node lwd: total.time, pwr=0.5",
+			"edge lwd: frequency"))
+	} else {
+		title(main=main)
+		 legattributes( c(#"node color: ??",
+				#"node lwd: ??",
+				"edge lwd: frequency"))
+	}
+	title( sub=sprof04$info$id, col.sub=grey(0.5))
+	invisible(graphNEL)
+}# %:  plot_graphNEL_sprof(sprof02)
+@
+%%:  plot_graphNEL_sprof0
+%<<label=plot_graphNEL_sprof0>>=
+%plot_graphNEL_sprof0 <- function(graphNEL, 
+%	mode="dot", 
+%	fill_list=NULL,
+%	main=NULL, sub=NULL,...)
+%{
+%	main1 <- deparse(substitute(graphNEL))
+%	xsubid <- NULL
+%	y<-NULL
+%	class1 <- NULL
+%	
+%	if (inherits(graphNEL, "sprof")) {
+%		class1 <- paste0("class orig:",class(graphNEL))
+%		main1 <- graphNEL$info$id
+%		graphNEL <- 	
+%			as_graphNEL_sprof(graphNEL, weight=FALSE)
+%		# layout(graphNEL,mode)
+%		y <- mode
+%	}
+%
+%nodeDataDefaults(graphNEL, "shape") <- "ellipse"
+%graphNEL <- layoutGraph(graphNEL)
+%	nodeRenderInfo(graphNEL) <- list( #lwd=lwd_list,
+%		fill=fill_list,
+%		col="#0000FF80",
+%		shape="ellipse",
+%		weight=1)
+%	
+%	edgeRenderInfo(graphNEL) <- list(col= "#80808080")
+%	
+%	renderGraph(graphNEL)
+%	if (!is.null(sub)) sub <- as.character(sub)
+%	if (is.null(main)) 
+%		main <-paste0("plot_graphNEL_sprof0( ",
+%			main1 ,", ", 
+%			mode, " )\n", xsubid) else
+%		main=paste0(main, "\n plot_graphNEL_sprof0( ", 
+%			main1 ,", ", 
+%			mode, " )\n", xsubid)
+%
+%	title(main=main, sub=sub)
+%
+%	legend("topleft", 
+%		legend=c( class1, paste0("class: ", class(graphNEL)), 
+%			paste0("mode: ", mode)),
+%		bg="#FFFFE040",
+%		seg.len=0
+%		)#"lightyellow" =#FFFFE0
+%
+%	legend("bottomright",
+%		legend= c( #"node color: self.time, pwr=0.5", 
+%		#"node lwd: total.time, pwr=0.5",
+%		"edge lwd: frequency"), 
+%		bty="n", 
+%		text.font=3,
+%		bg="#00004040",
+%		seg.len=0)
+%
+%}
 <<fig=TRUE, label=plot04NEL, width=6, height=6, include=FALSE>>=
-a04NEL <- as_graphNEL_sprof(sprof04)
-plot_graphNEL_sprof(a04NEL)
-# plot_graphNEL_sprof(sprof04)
+plot_graphNEL_sprof(sprof04)
+@
+%<<fig=TRUE, label=plot04NEL, width=6, height=6, include=FALSE>>=
+%a04NEL <- as_graphNEL_sprof(sprof04)
+%plot_graphNEL_sprof0(a04NEL)
+%# plot_graphNEL_sprof0(sprof04)
 @
 Rgraphviz/graph basic plot: see \vref{fig:plot04NEL}.
 \todo{remove global colour; implement local colour}
@@ -1920,64 +2055,69 @@ To use attributes on nodes and edges, we need \ircode{Rgraphviz}.
 %
 %Same data, unweighted edges, and colours, but attributes set after layout.
 \todo{merge with as\_graphNEL\_sprof}
-<<>>=
-library(graph)
-# see help(nodeRenderInfo) for attributes.
-plot_graphNEL_sprof1 <- function(sprof04)
-{
-a04NEL0 <- as_graphNEL_sprof(sprof04, weight=FALSE)
-
-nodeDataDefaults(a04NEL0, "shape") <- "ellipse"
-nDD2 <- (nodeRenderInfo(a04NEL0))
-
-a04NEL0 <- layoutGraph(a04NEL0) 
-
-# node attributes
-#sprof04$nodes$self.time -> fill
-fill_list <- heat.colors(12)[
-	rkindex(-sprof04$nodes$self.time, 
-		pwr=0.5, maxindex=12, ties.method="min")]
-names(fill_list) <- sprof04$nodes$name
-
-#sprof04$nodes$total.time -> lwd
-lwd_list  <-  rkindex(sprof04$nodes$total.time, 
-	pwr=0.5, maxindex=6, ties.method="min")
-names(lwd_list) <- sprof04$nodes$name
-
-#strx(nodeRenderInfo(a04NEL0))
-nDD3 <- (nodeRenderInfo(a04NEL0))
-
-nodeRenderInfo(a04NEL0) <- list(lwd=lwd_list, 
-	fill=fill_list, 
-	col="#0000FF80", 
-	shape="ellipse",
-	weight=1)
-#strx(nodeRenderInfo(a04NEL0))
-	
-# edge attributes
-# strx(edgeRenderInfo(a04NEL0))
-nER01 <- edgeRenderInfo(a04NEL0) 
-edgeRenderInfo(a04NEL0) <- list(col= "#80808080")
-# strx(edgeRenderInfo(a04NEL0))
-
-renderGraph(a04NEL0)
-title(main="nodes (time)", sub=sprof04$info$id, col.sub=grey(0.5))
-legend("bottomright",legend= c("node color: self.time, pwr=0.5", 
-	"node lwd: total.time, pwr=0.5",
-	"edge lwd: frequency"), 
-	bty="n", 
-	text.font=3,
-	bg="#00004040",
-	seg.len=0)
-
-legend("topleft", 
-	legend=c(paste0("class: ",class(a04NEL0)),"dot"),
-	bg="#FFFFE040",
-	seg.len=0)
-}
+%:  plot_graphNEL_sprof1
+%<<>>=
+%library(graph)
+%# see help(nodeRenderInfo) for attributes.
+%plot_graphNEL_sprof1 <- function(sprof04)
+%{
+%a04NEL0 <- as_graphNEL_sprof(sprof04, weight=FALSE)
+%
+%nodeDataDefaults(a04NEL0, "shape") <- "ellipse"
+%nDD2 <- (nodeRenderInfo(a04NEL0))
+%
+%a04NEL0 <- layoutGraph(a04NEL0) 
+%
+%# node attributes
+%#sprof04$nodes$self.time -> fill
+%fill_list <- heat.colors(12)[
+%	rkindex(-sprof04$nodes$self.time, 
+%		pwr=0.5, maxindex=12, ties.method="min")]
+%names(fill_list) <- sprof04$nodes$name
+%
+%#sprof04$nodes$total.time -> lwd
+%lwd_list  <-  rkindex(sprof04$nodes$total.time, 
+%	pwr=0.5, maxindex=6, ties.method="min")
+%names(lwd_list) <- sprof04$nodes$name
+%
+%#strx(nodeRenderInfo(a04NEL0))
+%nDD3 <- (nodeRenderInfo(a04NEL0))
+%
+%nodeRenderInfo(a04NEL0) <- list(lwd=lwd_list, 
+%	fill=fill_list, 
+%	col="#0000FF80", 
+%	shape="ellipse",
+%	weight=1)
+%#strx(nodeRenderInfo(a04NEL0))
+%	
+%# edge attributes
+%# strx(edgeRenderInfo(a04NEL0))
+%nER01 <- edgeRenderInfo(a04NEL0) 
+%edgeRenderInfo(a04NEL0) <- list(col= "#80808080")
+%# strx(edgeRenderInfo(a04NEL0))
+%
+%renderGraph(a04NEL0)
+%title(main="nodes (time)", sub=sprof04$info$id, col.sub=grey(0.5))
+%legend("bottomright",legend= c("node color: self.time, pwr=0.5", 
+%	"node lwd: total.time, pwr=0.5",
+%	"edge lwd: frequency"), 
+%	bty="n", 
+%	text.font=3,
+%	bg="#00004040",
+%	seg.len=0)
+%
+%legend("topleft", 
+%	legend=c(paste0("class: ",class(a04NEL0)),"dot"),
+%	bg="#FFFFE040",
+%	seg.len=0)
+%}#%:  plot_graphNEL_sprof1
 <<fig=TRUE, label=sprofadj04NEL04, width=6, height=6, include=FALSE>>=
 #6 6
-plot_graphNEL_sprof1(sprof04)
+plot_graphNEL_sprof(sprof04, nodeattrs="time")
+@
+%<<fig=TRUE, label=sprofadj04NEL04, width=6, height=6, include=FALSE>>=
+%#6 6
+%plot_graphNEL_sprof1(sprof04)
 @
 Rgraphviz/graph plot with attributes: see \vref{fig:sprofadj04NEL02}. This plot gives us the traditional view, highlighting nodes and edges with overall time presence.
 
@@ -1989,77 +2129,97 @@ Rgraphviz/graph plot with attributes: see \vref{fig:sprofadj04NEL02}. This plot 
 \end{center}
 \end{figure}
 
-
-<<>>=
-detach(package:Rgraphviz)
+%:        cleanpackages() try detach
+<<echo=FALSE, print=FALSE>>=
+cleanpackages()
 @
-We should not overload the plot. We could use colour encoding for the edges, but this would conflict visually with the colour encoding of the nodes. We could use different colours for classes of nodes, but then we would need an additional display to explain the shape information. 
+
+We should not overload the plot. We could use colour encoding for the edges, but this would conflict visually with the colour encoding of the nodes. We could use different shapes for classes of nodes, but then we would need an additional display to explain the shape information. 
 
 But within the choice of attributes used, we still can select the information shown. To close this round, instead of showing the node information from the rough summary, we can show the information from the run length discussed in \vref{sec:rle}.
 
-<<fig=TRUE, label=sprofadj04NEL02rle, width=6, height=6, include=FALSE>>=
-#6 6
-amt04 <- nodesrunlength(sprof04)
-
-library(graph)
-library(Rgraphviz)
-
-# see help(nodeRenderInfo) for attributes.
-
-a04NEL0rle <- as_graphNEL_sprof(sprof04, weight=FALSE)
-#nDD0 <- (nodeRenderInfo(a04NEL0rle))
-#a04NEL0rle <- layoutGraph(a04NEL0rle)
-#nDD1 <- (nodeRenderInfo(a04NEL0rle))# fill & col corrupted
-nodeDataDefaults(a04NEL0rle, "shape") <- "ellipse"
-#nodeDataDefaults(a04NEL0rle, "cex") <- 1.0
-#nodeDataDefaults(a04NEL0rle, "weigth") <- 1
-#nodeDataDefaults(a04NEL0rle, "fill") <- "green"
-#nodeDataDefaults(a04NEL0rle, "col") <- "yellow"
-nDD2 <- (nodeRenderInfo(a04NEL0rle))
-a04NEL0rle <- layoutGraph(a04NEL0rle) 
-# node attributes
-#sprof04$nodes$self.time -> fill
-fill_list <- heat.colors(12)[rkindex(-amt04[,"avg_time"], pwr=0.5, maxindex=12, ties.method="min")]
-names(fill_list) <- sprof04$nodes$name
-
-#sprof04$nodes$total.time -> lwd
-lwd_list  <-  rkindex(amt04[,"nr_runs"], pwr=0.5,maxindex=6, ties.method="min")
-names(lwd_list) <- sprof04$nodes$name
-
-#strx(nodeRenderInfo(a04NEL0rle))
-nodeRenderInfo(a04NEL0rle) <- list(lwd=lwd_list, 
-	fill=fill_list, 
-	col="#0000FF80", 
-	shape="ellipse",
-	weight=1)
-#strx(nodeRenderInfo(a04NEL0rle))
-	
-# edge attributes
-# strx(edgeRenderInfo(a04NEL0rle))
-edgeRenderInfo(a04NEL0rle) <- list(col= "#80808080")
-# strx(edgeRenderInfo(a04NEL0rle))
-
-renderGraph(a04NEL0rle)
-title(main="nodes (run length)", sub=sprof04$info$id, col.sub=grey(0.5))
-legend("bottomright",
-	legend= c("node lwd: nr runs, pwr=0.5", 
-	"node color: avg time, pwr=0.5",
-	"edge lwd: frequency"), 
-			bg="#FFFFE040",
-		seg.len=0,
-	bty="n", 
-	text.font=3)
-	
-legend("topleft", 
-		legend=paste0("class: ",class(a04NEL0rle)),
-		bg="#FFFFE040",
-		seg.len=0
-		)
-
-detach(package:Rgraphviz)
+@
+%:  plot_graphNEL_sprof2
+%<<>>=
+%
+%# see help(nodeRenderInfo) for attributes.
+%
+%plot_graphNEL_sprof2 <- function(sprof04)
+%{
+%amt04 <- nodesrunlength(sprof04)
+%a04NEL0rle <- as_graphNEL_sprof(sprof04, weight=FALSE)
+%#nDD0 <- (nodeRenderInfo(a04NEL0rle))
+%#a04NEL0rle <- layoutGraph(a04NEL0rle)
+%#nDD1 <- (nodeRenderInfo(a04NEL0rle))# fill & col corrupted
+%
+%nodeDataDefaults(a04NEL0rle, "shape") <- "ellipse"
+%#nodeDataDefaults(a04NEL0rle, "cex") <- 1.0
+%#nodeDataDefaults(a04NEL0rle, "weigth") <- 1
+%#nodeDataDefaults(a04NEL0rle, "fill") <- "green"
+%#nodeDataDefaults(a04NEL0rle, "col") <- "yellow"
+%nDD2 <- (nodeRenderInfo(a04NEL0rle))
+%a04NEL0rle <- layoutGraph(a04NEL0rle) 
+%# node attributes
+%#sprof04$nodes$self.time -> fill
+%fill_list <- heat.colors(12)[rkindex(-amt04[,"avg_time"], pwr=0.5, maxindex=12, ties.method="min")]
+%names(fill_list) <- sprof04$nodes$name
+%
+%#sprof04$nodes$total.time -> lwd
+%lwd_list  <-  rkindex(amt04[,"nr_runs"], pwr=0.5,maxindex=6, ties.method="min")
+%names(lwd_list) <- sprof04$nodes$name
+%
+%#strx(nodeRenderInfo(a04NEL0rle))
+%nodeRenderInfo(a04NEL0rle) <- list(lwd=lwd_list, 
+%	fill=fill_list, 
+%	col="#0000FF80", 
+%	shape="ellipse",
+%	weight=1)
+%#strx(nodeRenderInfo(a04NEL0rle))
+%	
+%# edge attributes
+%# strx(edgeRenderInfo(a04NEL0rle))
+%edgeRenderInfo(a04NEL0rle) <- list(col= "#80808080")
+%# strx(edgeRenderInfo(a04NEL0rle))
+%
+%renderGraph(a04NEL0rle)
+%title(main="nodes (run length)", sub=sprof04$info$id, col.sub=grey(0.5))
+%legend("bottomright",
+%	legend= c("node lwd: nr runs, pwr=0.5", 
+%	"node color: avg time, pwr=0.5",
+%	"edge lwd: frequency"), 
+%			bg="#FFFFE040",
+%		seg.len=0,
+%	bty="n", 
+%	text.font=3)
+%	
+%legend("topleft", 
+%		legend=paste0("class: ",class(a04NEL0rle)),
+%		bg="#FFFFE040",
+%		seg.len=0
+%		)
+%}# %:  plot_graphNEL_sprof2
 @
 
-Nodes marked by run length and run count: see \vref{fig:sprofadj04NEL02rle}.  This plot gives us a more informative  view, highlighting nodes by number of runs and average run length and edges with overall time presence. It puts the information in place, showing us the context where the resources are consumed. Some are consumed with good reason, since here work is done. Others are very doubtful and seem to be mere administration. These are candidates for improvement.
+Nodes marked by run length and run count: see \vref{fig:sprofadj04NEL02rle}.
+
+<<fig=TRUE, label=sprofadj04NEL02rle, width=6, height=6, include=FALSE>>=
+#6 6
+library(Rgraphviz)
+
+plot_graphNEL_sprof(sprof04, nodeattrs="runs")
+@
+%<<fig=TRUE, label=sprofadj04NEL02rle, width=6, height=6, include=FALSE>>=
+%#6 6
+%plot_graphNEL_sprof2(sprof04)
+%detach(package:Rgraphviz)
+%@
+
+This plot gives us a more informative  view, highlighting nodes by number of 
+runs and average run length and edges with overall time presence. It puts 
+the information in place, showing us the context where the resources are 
+consumed. Some are consumed with good reason, since here work is done. 
+Others are very doubtful and seem to be mere administration. These are 
+candidates for improvement.
 
 \begin{figure}[htbp]
 \begin{center}
@@ -2069,6 +2229,9 @@ Nodes marked by run length and run count: see \vref{fig:sprofadj04NEL02rle}.  Th
 \end{center}
 \end{figure}
 
+The bottom line is: graph layout ist best left to graph representation packages. You can help by trimming and surgery. As far as attributes are concened, the current recommendation is to start with run time lenghts and run time frequencies by node and level:
+
+\ircode{plot\_graphNEL\_sprof3( x, nodeattrs = "runs")}
 
 @
 %edge.lwd<-sprofadj02
@@ -2080,6 +2243,7 @@ Nodes marked by run length and run count: see \vref{fig:sprofadj04NEL02rle}.  Th
 %a04NEL <- layoutGraph(a04NEL,  edgeAttrs=list(lwd=edge.lwd))
 
 %plot(ag, attrs=list(node=list(cex=2,fontsize=40), edge=list(lwd=2,color=c("red","yellow"))), sub="xx", cex=2)
+\clearpage
 \section{Standard output}
 
 For a reference, here are  the standard functions.
@@ -2200,7 +2364,7 @@ par(oldpar)
 \section{More Graphs}
 \label{sec:moregraph}
 \emph{Note: This section is collecting experiments  with various graph 
-packages. It is only of interest for you, if you have a preference for some 
+packages. So far, none of the experiments looks too promising. This section is only of interest for you, if you have a preference for some 
 graphic package and want to look up a wrapper here. On the other side: 
 contributions and suggestions are welcome.}
 
@@ -2262,16 +2426,20 @@ sprofedgel02$lwd  <- rkindex(sprofedgel02$count,
 Package ‘graph’ was removed from the CRAN repository.
 
 This package is now available from Bioconductor only, see \url{http://www.bioconductor.org/packages/release/bioc/html/graph.html}.
+%:        cleanpackages() try detach
+<<echo=FALSE, print=FALSE>>=
+cleanpackages()
 
 <<fig=TRUE, label=sprofadjNEL02,width=8, height=8>>=
 library(graph)
-#search() 
 plotviz(sprof)
-detach("package:graph")
 @
 \filledpagebreak
 \subsubsection{igraph package}
-
+%:        cleanpackages() try detach
+<<echo=FALSE, print=FALSE>>=
+cleanpackages()
+@
 Attributes for \ircode{igraph} are documented in \ircode{help(igraph.plotting)}.
 
 Layouts available for \ircode{igraph}:
