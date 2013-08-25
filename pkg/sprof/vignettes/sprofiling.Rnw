@@ -83,7 +83,7 @@
 \date{May 2013.
 %\svnInfoFile \svnInfoRevision
 %For quotation, please use the general reference \cite{gs94oned}.\\
-\emph{Revised:} July 2013\\
+\emph{Revised:} Aug. 2013\\
 \indent \emph{Typeset}, with minor revisions: \today\  from SVN $Revision$ \svnInfoDate}  
 %bottom of title page
 %\thanks{\emph{URL:} \url{http://sintro. r-forge.r-project.org/}}
@@ -908,6 +908,7 @@ nrnodes <- apply(stacks_nodes,1,function(x) {length(unique(x))})
 cat("nr unique nodes per stack level\n")
 nrnodes
 @
+
 Nr. of unique nodes by stack level: See \vref{fig:nrunique}. 
 
 <<fig = TRUE, echo = TRUE, print = FALSE, label=nrunique, width=3, height=6, include = FALSE>>= 
@@ -1203,10 +1204,12 @@ stacks, and use these in the display of profile data.
 \subsubsection{Surgery}
 \label{sec:surgery}
 
-Note: surgery may be supported by the graph packages. Use the 
+\emph{\textbf{Note:} surgery may be supported by the graph packages. Use the 
 implementation you are more familiar with. Surgery can also been done 
-conveniently on the source level, using simple replace statements.
+conveniently on the source level, using simple replace statements.}
 
+\emph{The surgery functions will be moved to the package 
+in the next release.}
 
 Looking at nodes gives you a point-wise horizon. Looking at edges gives you 
 a one step horizon. The stacks give a wider horizon, typically a step size of 
@@ -1324,30 +1327,6 @@ xreplacenodes <- function(sprof, oldseq, newseq)
 %	c("as.list", "vapply", "model.matrix.default"),
 %	 "<model_matrix_as.list>")
 <<>>=
-xfactor <- function(x, from) {
-	if (is.factor(from)) {
-		levels <- levels(from)
-		labels <- labels(from)
-		ordered <- is.ordered(from)
-	} else if  (is.character(from)) {
-		levels <- 1: length(from)
-		labels <- from
-		ordered = is.ordered(from)
-	}
-	
-	if (is.list(x)) {
-		sapply(x, factor, 
-		levels, 
-		labels) 
-		} else {		
-		factor(x, 
-		levels=1: length(from), 
-		labels=from)
-	}
-}
-<<>>=
-#xfactor(sprof03$stacks$nodes, sprof03$nodes$name)
-<<>>=
 sprof03$stacks$nodes <- xreplacenodes(sprof03, 
 	c(".getXlevels", "lapply", "["),
 	"<.getXlevels_[>")
@@ -1359,8 +1338,7 @@ sprof03$stacks$nodes <- xreplacenodes(sprof03,
 	 "<model_matrix_as.list>")
 	
 sprof03 <- updateRprof(sprof03)
-<<>>=
-#xfactor(sprof03$stacks$nodes, sprof03)
+#asfactormodel(sprof03$stacks$nodes, sprof03$nodes$name)
 
 @
 %sprof03$stacks$nodes <- xreplacenodes(sprof03, 
