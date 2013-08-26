@@ -1,8 +1,8 @@
-%$HeadURL: svn+ssh://gsawitzki@svn.r-forge.r-project.org/svnroot/sintro/pkg/sprof/man/sprof-package.Rd $
-%$Id: sprof-package.Rd 214 2013-08-20 18:21:08Z gsawitzki $
-%$Revision: 214 $
-%$Date: 2013-08-20 20:21:08 +0200 (Tue, 20 Aug 2013) $
-%$Author: gsawitzki $
+%$HeadURL$
+%$Id$
+%$Revision$
+%$Date$
+%$Author$
 %$Name:$
 \encoding{utf8}
 \name{stacksasfactor}
