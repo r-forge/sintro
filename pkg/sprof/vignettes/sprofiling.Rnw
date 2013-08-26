@@ -123,8 +123,8 @@ Known issues:
 }
 \section*{Profiling facilities in \R{}}
 
-\emph{For the impatient: \vref{tab:prSRREbs} and \vref{tab:prSRREbt} give you information from profiling $100$ runs of a simple linear regression. 
-You get another view of the same information by \vref{fig:sprofadj04NEL02rle}. If you want to know more, please have some patience.
+\emph{For the impatient: \vref{tab:prSRREbs} and \vref{tab:prSRREbt} give you the conventional information from profiling $100$ runs of a simple linear regression. 
+You get a different view of the same information by \vref{fig:sprofadj04NEL02}. The additional information we derive is summarised in \vref{tab:pramt4} and illustrated in \vref{fig:sprofadj04NEL02rle}. If you want to know more, please have some patience.
 }
 
 \R{} provides the basic instruments for profiling, both for time based samplers as for 
@@ -769,6 +769,7 @@ the node level in \vref{subsec:sprof}.
 
 
 \subsection{The internal details}
+
 For each recorded event, the protocol records one line with a text string 
 showing the sampled  stack 
 (in reverse order: most recent first). The stack lines may be preceded by 
@@ -776,7 +777,7 @@ header lines with event
 specific information. The protocol may be interspersed with control 
 information, such as information about the timing interval used. 
 %Examples of the protocol format used by the common profilers in in 
-\ref{sec:formats} on page \pageref{sec:formats}.
+%\ref{sec:formats} on page \pageref{sec:formats}.
 
 We know that the structural information, static information as well as 
 dynamic information, can be represented with the
@@ -971,7 +972,17 @@ as separators between distinct profiles rather than as part of the general
 dynamics. Again we may use some indicator nodes to be used as marker for 
 special stacks.
 \todo{example}
+<<>>=
+stacksasfactor <- function(sprof, sel, events){
+	if (!missing(events) & !missing(sel) )  stop("stacksasfactor: stacks can be selected by index of by event, not both.")
+	if (!missing(events)) sel <- sprof$profiles$data[events] else {
+	 if (missing(sel)) sel <- seq(along=sprof$stacks$nodes)}
+	 src <- sprof$stacks$nodes[sel]
+	 asfactormodel(src, factormodel = as.character(sprof$nodes$name))
+}
+#stacksasfactor(sprof01, c(1,2,3,10))
 
+@
 Stable framework effects sometimes are obvious and can be detected 
 automatically. ``burn in'' or ``fade out' may need a closer look, and special 
 stacks need and individual inspection on low frequency stacks.  Tools for 
@@ -2089,6 +2100,9 @@ To use attributes on nodes and edges, we need \ircode{Rgraphviz}.
 %	bg="#FFFFE040",
 %	seg.len=0)
 %}#%:  plot_graphNEL_sprof1
+
+Rgraphviz/graph plot with attributes: see \vref{fig:sprofadj04NEL02}. This plot gives us the traditional view, highlighting nodes and edges with overall time presence.
+
 <<fig=TRUE, label=sprofadj04NEL04, width=6, height=6, include=FALSE>>=
 #6 6
 plot_graphNEL_sprof(sprof04, nodeattrs="time")
@@ -2097,7 +2111,6 @@ plot_graphNEL_sprof(sprof04, nodeattrs="time")
 %#6 6
 %plot_graphNEL_sprof1(sprof04)
 @
-Rgraphviz/graph plot with attributes: see \vref{fig:sprofadj04NEL02}. This plot gives us the traditional view, highlighting nodes and edges with overall time presence.
 
 \begin{figure}[htbp]
 \begin{center}
