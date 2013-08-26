@@ -119,7 +119,7 @@ svn propset svn:keywords "Date Author Id Revision HeadURL Name" sprof/man/*.Rd
 svn propset svn:keywords "Date Author Id Revision HeadURL  Name" sprof/R/*.R
 svn propset svn:keywords "Date Author Id Revision HeadURL Name" sprof/vignettes/*.Rnw
 svn propset svn:keywords "Date Author Id Revision HeadURL Name"  sprof/tests/*.R
-xexport _R_CHECK_TIMINGS_=0
+export _R_CHECK_TIMINGS_=0
 export _R_CHECK_ALWAYS_LOG_VIGNETTE_OUTPUT_=TRUE
 # svn propset svn:keywords "Date Author Id Revision HeadURL" sprof/work/*.R
 
