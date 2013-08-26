@@ -970,18 +970,18 @@ At a closer look, we may find stack patterns (maybe marked by specific
 nodes) that indicate administrative intervention and rather should be handled 
 as separators between distinct profiles rather than as part of the general 
 dynamics. Again we may use some indicator nodes to be used as marker for 
-special stacks.
-\todo{example}
-<<>>=
-stacksasfactor <- function(sprof, sel, events){
-	if (!missing(events) & !missing(sel) )  stop("stacksasfactor: stacks can be selected by index of by event, not both.")
-	if (!missing(events)) sel <- sprof$profiles$data[events] else {
-	 if (missing(sel)) sel <- seq(along=sprof$stacks$nodes)}
-	 src <- sprof$stacks$nodes[sel]
-	 asfactormodel(src, factormodel = as.character(sprof$nodes$name))
-}
-#stacksasfactor(sprof01, c(1,2,3,10))
+special stacks. In our example, \ircode{lm} or \ircode{summary.lm} may be convinient markers.
 
+%<<>>=
+%stacksasfactor <- function(sprof, sel, events){
+%	if (!missing(events) & !missing(sel) )  stop("stacksasfactor: stacks can be selected by index of by event, not both.")
+%	if (!missing(events)) sel <- sprof$profiles$data[events] else {
+%	 if (missing(sel)) sel <- seq(along=sprof$stacks$nodes)}
+%	 src <- sprof$stacks$nodes[sel]
+%	 asfactormodel(src, factormodel = as.character(sprof$nodes$name))
+%}
+%#stacksasfactor(sprof01, c(1,2,3,10))
+%
 @
 Stable framework effects sometimes are obvious and can be detected 
 automatically. ``burn in'' or ``fade out' may need a closer look, and special 
