@@ -1,4 +1,5 @@
 profiles_matrix <- function(x){
+	if (is.null(x)) return(NULL)
 	sm <-  list.as.matrix(x$stacks$nodes)
 
 

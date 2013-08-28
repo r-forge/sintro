@@ -17,7 +17,7 @@ str_prof <- function(x){
 		# data= collencstacks, 
 		# timesRLE
 		# freq=table(collencstacks))
-
+	if (is.null(x)) {cat("## str_prof: NULL"); return(0)}
 	cat("First line:", x$firstline,"\n")
 	cat(length(x$data),"Sampling intervals ")
 	if (length(x$timesRLE[1])==1) cat(" at",x$timesRLE[[2]],"micros\n") else {cat("in micros: ");print(x$timesRLE)}
@@ -33,9 +33,15 @@ str_prof <- function(x){
 
 
 summary_nodes <- function(x){
+	if (is.null(x)) {print("## summary_nodes: NULL"); return(NULL)}
+	if (is.null(x$info)) {print("## summary_nodes: NULL info"); return(NULL)}
 	nrstacks <- x$info$nrstacks
+	if (nrstacks==0) {print("## summary_nodes: no stacks"); return(NULL)}
 	nrnodes <- x$info$nrnodes
+	if (nrnodes ==0) {print("## summary_nodes: no nodes"); return(NULL)}
 	nrprofs <- x$info$nrrecords
+	if (nrprofs ==0) {print("## summary_nodes: no records"); return(NULL)}
+	
 	ishead <- rep("-",nrnodes); ishead[x$stacks$stackheadnodes] <- "ROOT"
 	isleaf <- rep("-",nrnodes); isleaf[x$stacks$stackleafnodes]  <- "LEAF"
 	self.time <- rep(0,nrnodes); 
@@ -55,6 +61,9 @@ summary_nodes <- function(x){
 } # summary_nodes
 
 summary_stacks <- function(x){
+	if (is.null(x))return(NULL)
+	if (is.null(x$stacks)) return(NULL)
+	if (is.null(x$stacks$nodes)) return(NULL)
 	stacks_nodes <- list.as.matrix(x$stacks$nodes)
 	list(nrstacks = x$info$nrstacks,
 	stacklength = range(x$stacks$stacklength),
@@ -76,6 +85,8 @@ summary_terminals<- function(x){
 #sum(!is.na(unique(stacks_nodes[1,])))	
 #apply(stacks_nodes,1, function(x){sum(!is.na(unique(x)))})
 summary_profiles <- function(x){
+	if (is.null(x)) {return(0)}
+	if (is.null(x$profiles)) return(NULL)
 	if (is.null(x$id)) id <- paste("Profile Summary", date()) else id <- x$id
 	len <- length(x$profiles$data)
 	uniquestacks <- length(unique(x$profiles$data))
