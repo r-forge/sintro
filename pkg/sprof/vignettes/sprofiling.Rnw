@@ -510,26 +510,34 @@ data frames.
 <<>>=
 strx(sprof01)
 @
+<<>>=
+str(sprof01$nodes)
+@
 
 The nodes do not come in a specific order. Access via a permutation vector 
 is preferred. This allows different views on the same data set. For example, 
 \vref{tab:prspbt} uses a permutation by total time, and a selection (compare 
-to \vref{tab:prSRREbt}). The only difference is that \ircode{sprof} works uses 
-a millisecond (ms) base, whereas \R{} in general uses seconds as a base. 
+to \vref{tab:prSRREbt}). One difference is that \ircode{sprof} works uses 
+an event count as base, usually sampled by milliseconds (ms), whereas \R{} in general uses seconds as a base. Another difference is in two additional variables, teh number of runs \ircode{nr\_runs} and  the average run length \ircode{avg\_time}. These are discussed in \label{sec:rle}.
 
 << print = FALSE, results = tex, label=tab:prspbtself>>=
 nodes <- sprof01$nodes[order(sprof01$nodes$self.time, 
 decreasing=TRUE),]
+rownames(nodes) <- NULL
 prxt(nodes[nodes$self.time>4,],
+digits=c(0,0,0,2,0,2,0,2),
 caption="sprof result: by.self, self time > 4ms", 
 	label="tab:prspbtself")
 @
 At this level, it is helpful to note the expectations, and only then inspect the timing results. Since we are using a linear model, we are not surprised to see functions related to linear models on the top of the list. We may however be surprised to see functions related to data access and to character conversion very high on the list. The sizeable amount of time spent on NA handling is another aspect that is surprising.
 
 << print = FALSE, results = tex, label=tab:prspbt>>=
-nodes <- sprof01$nodes[order(sprof01$nodes$total.time, decreasing=TRUE),]
+nodes <- sprof01$nodes[order(sprof01$nodes$total.time, 	
+	decreasing=TRUE),]
+rownames(nodes) <- NULL
 prxt(nodes[nodes$total.time>4,],
-caption="sprof result: by.total, total time > 4ms", 
+	digits=c(0,0,0,2,0,2,0,2),
+	caption="sprof result: by.total, total time > 4ms", 
 	label="tab:prspbt")
 @
 \todo{remove text vdots from string/name columns}
@@ -644,8 +652,11 @@ table(nodepackages)
 <<>>=
 sprof01$nodes$icol <-as.factor(nodepackages)
 @
+
+Nodes by package, colours by RColorBrewer: see \vref{fig:sREplotnodes01packcol1}.
+
 %: floating figure
-<<fig = TRUE, echo = FALSE, print = FALSE, include=FALSE, label=sREplotnodes01packcol1, png=TRUE, width=10, height=15>>= 
+<<fig = TRUE, echo = TRUE, print = FALSE, include=FALSE, label=sREplotnodes01packcol1, png=TRUE, width=10, height=15>>= 
 oldpar <- par(mfrow=c(3,2))
 
 if (require(RColorBrewer)) colpack <- brewer.pal(length(levels(sprof01$nodes$icol)), "Paired") else 
@@ -663,8 +674,7 @@ par(oldpar)
 \end{center}
 \end{figure}
 
-Nodes by package, colours by RColorBrewer: see \vref{fig:sREplotnodes01packcol1}.
-
+If you want to, you can use your own classification to group variables.
 % floating figure end
 <<>>=
 x_apply <- c("apply", "lapply", "vapply", "sapply")
@@ -710,6 +720,9 @@ nodeclasscol <- c("red", "green", "blue", "yellow",
 # gold cyan4 aquamarine pink violet orchid hotpink salmon turquoise1
 @
 \todo{Defaults by class}
+Nodes by class, user defined colors: see \vref{fig:sREplotnodes01col}.
+\todo{classes need separate colour palette, distinct from package or keyword.}
+
 <<fig = TRUE,  label=sREplotnodes01col, width=8, height=12, include=FALSE>>= 
 #8 12
 oldpar <- par(mfrow=c(3,2))
@@ -717,8 +730,6 @@ plot_nodes(sprof01, which=1:6, col=nodeclasscol)
 par(oldpar)
 @
 
-Nodes by class, user defined colors: see \vref{fig:sREplotnodes01col}.
-\todo{classes need separate colour palette}
 
 % floating figure
 \begin{figure}[htbp]
@@ -732,6 +743,8 @@ Nodes by class, user defined colors: see \vref{fig:sREplotnodes01col}.
 
 % floating figure end
 %: floating figure
+Nodes by class: default colour selection: see \vref{fig:sREplotnodes01colcb}.
+
 <<fig = TRUE,  label=sREplotnodes01colcb, width=8, height=12, include=FALSE>>= 
 #8 12
 oldpar <- par(mfrow=c(3,2))
@@ -739,7 +752,6 @@ plot_nodes(sprof01, which=1:6)
 par(oldpar)
 @
 
-Nodes by class: default colour selection: see \vref{fig:sREplotnodes01colcb}.
 
 \begin{figure}[htbp]
 \begin{center}
@@ -1084,10 +1096,11 @@ At this point, it is a decision whether to adapt the timing information, or keep
 <<>>=
 strx(sprof02$info)
 <<print=FALSE,  results=tex, label=tab:sprof02info1>>=
-prxt(sprof02$nodes,  
+nodes<- sprof02$nodes[,-8]; rownames(nodes) <- NULL
+prxt(nodes,  
 	caption="sprof02, before update",
 	label="tab:sprof02info1",
-	digits=c(0,0,0,2,0,2,0),
+	digits=c(0,0,0,2,0,2,0,2),
 	zero.print=" . "
 	)
 	
@@ -1104,14 +1117,17 @@ sprof02$info$id <- "sprof02 updated"
 <<>>=
 strx(sprof02$info)
 <<print=FALSE, results=tex, label=tab:sprof02info2>>=
-prxt(sprof02$nodes, 
+nodes<- sprof02$nodes[,-8]; rownames(nodes) <- NULL
+prxt(nodes, 
 	caption="sprof02, after update", 
 	label="tab:sprof02info2",
-	digits=c(0,0,0,2,0,2,0),
+	digits=c(0,0,0,2,0,2,0,2),
 	zero.print=" . "
 )
 	
 @
+Nodes by stack and profile: see \vref{fig:shownodes02}.
+
 %: floating figure
 <<fig = TRUE, echo = TRUE, print = FALSE, label=shownodes02, png=TRUE, width=8, height=8, include=FALSE>>= 
 #8 8
@@ -1126,7 +1142,6 @@ shownodes(sprof02)
 \end{center}
 \end{figure}
 
-Nodes by stack and profile: see \vref{fig:shownodes02}.
 
 % floating figure end
 
@@ -1141,6 +1156,7 @@ To decide about trimming, we can use the displays shown above, or we can use som
 stackm01 <- list.as.matrix(sprof01$stacks$nodes)
 nr_uniquenodes01 <- apply(stackm01,1, function(x) { length(unique(x))})
 names( nr_uniquenodes01)<- rownames(nr_uniquenodes01,FALSE,"L")
+cat("Nr of unique nodes by level\n")
 nr_uniquenodes01
 rm(stackm01, nr_uniquenodes01)
 @
@@ -2459,8 +2475,9 @@ Layouts available for \ircode{igraph}:
 
 \ircode{layout.svd(graph, d=shortest.paths(graph), ...)}
 
-\ircode{layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
-      zmin = NULL, zmax = NULL)}
+\ircode{layout.norm(layout, 
+	xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
+      	zmin = NULL, zmax = NULL)}
 <<>>=
 library(igraph)
 search() 
@@ -2481,14 +2498,16 @@ as_igraph_sprof <- function(sprof, layoutfun, params=NULL,...){
 
 <<>>=
 sprof_igraph <- graph.adjacency(adjacency(sprof))
-sprof_igraph <- set.graph.attribute(sprof_igraph, "layout", layout.kamada.kawai(sprof_igraph))
+sprof_igraph <- set.graph.attribute(sprof_igraph, 
+	"layout", layout.kamada.kawai(sprof_igraph))
 V(sprof_igraph)$color <- "yellow"
 #E(sprof_igraph)$width <- c(1,2)
 E(sprof_igraph)$color <- "#0000FF40"
 E(sprof_igraph)$width <- c(1,2)
 # see 
 <<fig=TRUE, label=sprof_igraphkamada,width=8, height=8>>=
-plot(sprof_igraph, main=paste0("igraph kamada.kawai layout\n", sprof$info$id))
+plot(sprof_igraph, 
+	main=paste0("igraph kamada.kawai layout\n", sprof$info$id))
 	legend("topleft", 
 		legend= paste0("class: ",class(sprof_igraph)),
 		bg="#FFFFE040",
@@ -2507,7 +2526,8 @@ Experiments with various layouts for \ircode{igraph} follow.
 <<fig=TRUE, label=sprof_ig_igraph_auto,width=8, height=8>>=
 #8 8
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.auto)
-plot(sprof_ig_auto, main=paste0("igraph auto layout\n", sprof$info$id))
+plot(sprof_ig_auto, 
+	main=paste0("igraph auto layout\n", sprof$info$id))
 	legend("topleft", 
 		legend= paste0("class: ",class(sprof_ig_auto)),
 		bg="#FFFFE040",
@@ -2519,7 +2539,8 @@ plot(sprof_ig_auto, main=paste0("igraph auto layout\n", sprof$info$id))
 <<fig=TRUE, label=sprof_ig_igraph_random,width=6, height=6>>=
 #6 6
 sprof_ig_random <- as_igraph_sprof(sprof, layout.random)
-plot(sprof_ig_random, main=paste0("igraph random layout\n", sprof$info$id))
+plot(sprof_ig_random, 
+	main=paste0("igraph random layout\n", sprof$info$id))
 	legend("topleft", 
 		legend= paste0("class: ",class(sprof_ig_random)),
 		bg="#FFFFE040",
@@ -2532,7 +2553,8 @@ plot(sprof_ig_random, main=paste0("igraph random layout\n", sprof$info$id))
 <<fig=TRUE, label=sprof_ig_igraph_circle,width=6, height=6>>=
 #6 6
 sprof_ig_circle <- as_igraph_sprof(sprof, layout.circle)
-plot(sprof_ig_circle, main=paste0("igraph circle layout\n", sprof$info$id))
+plot(sprof_ig_circle, 
+	main=paste0("igraph circle layout\n", sprof$info$id))
 	legend("topleft", 
 		legend= paste0("class: ",class(sprof_ig_circle)),
 		bg="#FFFFE040",
@@ -2544,7 +2566,8 @@ plot(sprof_ig_circle, main=paste0("igraph circle layout\n", sprof$info$id))
 <<fig=TRUE, label=sprof_ig_igraph_sphere,width=6, height=6>>=
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.sphere)
-plot(sprof_ig_auto, main=paste0("igraph sphere layout\n", sprof$info$id))
+plot(sprof_ig_auto, 
+	main=paste0("igraph sphere layout\n", sprof$info$id))
 	legend("topleft", 
 		legend= paste0("class: ",class(sprof_ig_auto)),
 		bg="#FFFFE040",
@@ -2556,7 +2579,8 @@ plot(sprof_ig_auto, main=paste0("igraph sphere layout\n", sprof$info$id))
 <<fig=TRUE, label=sprof_ig_igraph_fruchterman_reingold,width=6, height=6>>=
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.fruchterman.reingold)
-plot(sprof_ig_auto, main=paste0("igraph fruchterman.reingold layout\n", sprof$info$id))
+plot(sprof_ig_auto, 
+	main=paste0("igraph fruchterman.reingold layout\n", sprof$info$id))
 	legend("topleft", 
 		legend= paste0("class: ",class(sprof_ig_auto)),
 		bg="#FFFFE040",
@@ -2569,7 +2593,8 @@ plot(sprof_ig_auto, main=paste0("igraph fruchterman.reingold layout\n", sprof$in
 <<fig=TRUE, label=sprof_ig_igraph_kamada_kawai,width=6, height=6>>=
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.kamada.kawai)
-plot(sprof_ig_auto, main=paste0("igraph kamada.kawai layout\n", sprof$info$id))
+plot(sprof_ig_auto, 
+	main=paste0("igraph kamada.kawai layout\n", sprof$info$id))
 	legend("topleft", 
 		legend= paste0("class: ",class(sprof_ig_auto)),
 		bg="#FFFFE040",
@@ -2582,7 +2607,8 @@ plot(sprof_ig_auto, main=paste0("igraph kamada.kawai layout\n", sprof$info$id))
 <<fig=TRUE, label=sprof_ig_igraph_spring,width=6, height=6>>=
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.spring)
-plot(sprof_ig_auto, main=paste0("igraph spring layout\n", sprof$info$id))
+plot(sprof_ig_auto, 
+	main=paste0("igraph spring layout\n", sprof$info$id))
 	legend("topleft", 
 		legend= paste0("class: ",class(sprof_ig_auto)),
 		bg="#FFFFE040",
@@ -2600,7 +2626,8 @@ plot(sprof_ig_auto, main=paste0("igraph spring layout\n", sprof$info$id))
 <<fig=TRUE, label=sprof_ig_igraph_fruchterman_reingold_grid,width=6, height=6>>=
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.fruchterman.reingold.grid)
-plot(sprof_ig_auto, main=paste0("igraph fruchterman.reingold.grid layout\n", sprof$info$id))
+plot(sprof_ig_auto, 
+	main=paste0("igraph fruchterman.reingold.grid layout\n", sprof$info$id))
 	legend("topleft", 
 		legend= paste0("class: ",class(sprof_ig_auto)),
 		bg="#FFFFE040",
@@ -2613,7 +2640,8 @@ plot(sprof_ig_auto, main=paste0("igraph fruchterman.reingold.grid layout\n", spr
 <<fig=TRUE, label=sprof_ig_igraph_lgl,width=6, height=6>>=
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.lgl)
-plot(sprof_ig_auto, main=paste0("igraph lgl layout\n", sprof$info$id))
+plot(sprof_ig_auto, 
+	main=paste0("igraph lgl layout\n", sprof$info$id))
 	legend("topleft", 
 		legend= paste0("class: ",class(sprof_ig_auto)),
 		bg="#FFFFE040",
@@ -2626,7 +2654,8 @@ plot(sprof_ig_auto, main=paste0("igraph lgl layout\n", sprof$info$id))
 <<fig=TRUE, label=sprof_ig_igraph_graphopt,width=6, height=6>>=
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.graphopt)
-plot(sprof_ig_auto, main=paste0("igraph graphopt layout\n", sprof$info$id))
+plot(sprof_ig_auto, 
+	main=paste0("igraph graphopt layout\n", sprof$info$id))
 	legend("topleft", 
 		legend= paste0("class: ",class(sprof_ig_auto)),
 		bg="#FFFFE040",
@@ -2638,7 +2667,8 @@ plot(sprof_ig_auto, main=paste0("igraph graphopt layout\n", sprof$info$id))
 <<fig=TRUE, label=sprof_ig_igraph_svd,width=6, height=6>>=
 #6 6
 sprof_ig_auto <- as_igraph_sprof(sprof, layout.svd)
-plot(sprof_ig_auto, main=paste0("igraph svd layout\n", sprof$info$id))
+plot(sprof_ig_auto, 
+	main=paste0("igraph svd layout\n", sprof$info$id))
 	legend("topleft", 
 		legend= paste0("class: ",class(sprof_ig_auto)),
 		bg="#FFFFE040",
@@ -2673,7 +2703,8 @@ as_network_sprof <- function(sprof) {
 }
 <<>>=
 plot_network_sprof <- function( nwsprof, 
-	mode = "fruchtermanreingold", main=NULL, label=NULL, sub=NULL,...) 
+	mode = "fruchtermanreingold", 
+	main=NULL, label=NULL, sub=NULL,...) 
 {
 	classnwsprof <- class(nwsprof)
 	xid <- deparse(substitute(nwsprof))
@@ -2704,7 +2735,9 @@ plot_network_sprof <- function( nwsprof,
 		cex.main=1.5,...)
 	
 	legend("topleft", 
-		legend=c(paste0("class: ",classnwsprof),paste0("mode: ",mode)),		bg="#FFFFE040",
+		legend=c(paste0("class: ",classnwsprof), 
+			paste0("mode: ",mode)),		
+		bg="#FFFFE040",
 		seg.len=0
 		)
 	
@@ -2724,7 +2757,8 @@ plot_network_sprof(nwsprof02, label=rownames(sprofadj02))
 Experiments to include weight. \todo{maximum edge.lwd?}
 <<fig=TRUE, label=nwsprof02e,width=8, height=8>>=
 edge.lwd<- sprofadj02
-edge.lwd[edge.lwd>0]<- rkindex(edge.lwd[edge.lwd>0], maxindex=12, ties.method="min")
+edge.lwd[edge.lwd>0]<- rkindex(edge.lwd[edge.lwd>0], 
+	maxindex=12, ties.method="min")
 
 plot_network_sprof(nwsprof02, label=rownames(sprofadj02), 
  edge.lwd=edge.lwd)
@@ -2951,8 +2985,9 @@ barplot(sp[stacksnrobsok[stacksperm]],
 prxt(sprof01$nodes,
 	caption="nodes", 
 	label="tab:prSREnodes", 
-	max.level=2, vec.len=3,nchar.max=40,
-	digits=c(0,0,0,2,0,2,0))
+	max.level=2, vec.len=3,nchar.max=40
+	#, digits=c(0,0,0,2,0,2,0)
+	)
 @
 %<<print = FALSE, results = tex, label=tab:prSREstacks>>=
 %prxt(sprof01$stacks,

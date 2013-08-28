@@ -274,7 +274,7 @@ readRprof <- function(filename = "Rprof.out",
 		stacks= stacks,
 		# profiles
 		# these are conceptually a data frame and must be line aligned
-        # shoule be improved to allow multiple profile collections 	
+        #! should be improved to allow multiple profile collections 	
         profiles =list(
 			data= profile_lines,	# references to stacksrenc
 			mem = collmemcounts, # additional, line-synced  --- merge to data
@@ -285,6 +285,21 @@ readRprof <- function(filename = "Rprof.out",
 		}
 		
 		class(Rprofdata) <- c("sprof","list")
+		
+		#! roll out
+		if (!is.null(Rprofdata$nodes)) {
+		nrl <- nodesrunlength(Rprofdata, clean=FALSE)
+		#Rprofdata$nodes <- cbind(Rprofdata$nodes,
+		#	nr_runs=nrl[,"nr_runs"],
+		#	avg_time=nrl[,"avg_time"])
+			
+		#sprof$nodes <- cbind(sprof$nodes,
+		#	nr_runs=nrl[,"nr_runs"],
+		#	avg_time=nrl[,"avg_time"])
+		Rprofdata$nodes$nr_runs <- nrl[,"nr_runs"]
+		Rprofdata$nodes$avg_time <- nrl[,"avg_time"]
+}
+		rownames(Rprofdata) <- NULL
 	return(Rprofdata)
 
 }# readRprof

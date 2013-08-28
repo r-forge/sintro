@@ -70,7 +70,16 @@ updateRprof <- function(sprof, id){
 	sprof$info$nrstacks <-nrstacks
 	sprof$info$nrrecords <-length(sprof$profiles$data)
 	
+	#! roll out
+		nrl <- nodesrunlength(sprof, clean=FALSE)
+		#sprof$nodes <- cbind(sprof$nodes,
+		#	nr_runs=nrl[,"nr_runs"],
+		#	avg_time=nrl[,"avg_time"])
+		sprof$nodes$nr_runs <- nrl[,"nr_runs"]
+		sprof$nodes$avg_time <- nrl[,"avg_time"]
+			
+			rownames(sprof) <- NULL
 	return(sprof)
-}
+}# updateRprof
 
 # updateRprof(sprof02)

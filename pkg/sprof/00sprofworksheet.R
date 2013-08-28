@@ -124,11 +124,11 @@ export _R_CHECK_ALWAYS_LOG_VIGNETTE_OUTPUT_=TRUE
 # svn propset svn:keywords "Date Author Id Revision HeadURL" sprof/work/*.R
 
 cd ~/projects/rforge/sintro/pkg/
-R CMD CHECK sprof  --no-multiarch  --timings
+R CMD CHECK sprof  --no-multiarch  --timings --as-cran
 cd ~/projects/rforge/sintro/pkg/
 R CMD BUILD --compact-vignettes=gs+qpdf sprof --no-multiarch --md5
 cd ~/projects/rforge/sintro/pkg/
-svn log -r 189:HEAD -v > ChangeLog0
+svn log -r 224:HEAD -v  --incremental  > ChangeLog0
 cat sprof/ChangeLog >> ChangeLog0
 ##  check here !!!
 mv ChangeLog0  sprof/ChangeLog
@@ -158,7 +158,7 @@ plot(fa)
 ##
 vignette <- function(){ 
 remove.packages("sprof")
-install.packages("/Users/gs/projects/rforge/sintro/pkg/sprof_0.0-6.tar.gz", repos=NULL, type="source")
+install.packages("/Users/gs/projects/rforge/sintro/pkg/sprof_0.1-0.tar.gz", repos=NULL, type="source")
 options(width=72); setwd("/Users/gs/projects/rforge/sintro/pkg/sprof/work/vignettes/" )
 Sweave(file= "../../vignettes/sprofiling.Rnw", output="sprofiling.tex", keep.source=TRUE)
 # debug=TRUE, eps=FALSE, pdf=TRUE, keep.source=TRUE
