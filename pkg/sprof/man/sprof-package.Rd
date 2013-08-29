@@ -16,8 +16,8 @@ Profiling, timing and optimisation utilities}
 \tabular{ll}{
 Package: \tab sprof\cr
 Type: \tab Package\cr
-Version: \tab 0.0-6\cr
-%Date: \tab 2013-08-15\cr
+Version: \tab 0.1-0\cr
+%Date: \tab 2013-08-19\cr
 License: \tab GPL-2 | GPL-3\cr
 }
 \code{\link{readRprof}()} reads a profile file from \code{\link{Rprof}()} or other profilers and 
@@ -31,6 +31,7 @@ information such as traces \cr
 \tab of the memory management.\cr
 \code{profiles} \tab collected records of a profile, encoded as references to stacks
 }
+The data structure is subject to change. For more details, see the documentation of \code{\link{readRprof}()}.
 
 To create a profile on the fly, use \code{\link{sampleRprof}}.
 

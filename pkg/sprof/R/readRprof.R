@@ -146,7 +146,6 @@ readRprof <- function(filename = "Rprof.out",
 # NUll structure -- fallback result. Keep this aligned with final struct.
 {Rprofdata <- list(
 		# diagnostics support
-		firstline=firstline, 
 		ctllines=collcontrols,
 		ctllinenr=collcontrollinenr,
 		nodes=NULL,
@@ -259,7 +258,6 @@ readRprof <- function(filename = "Rprof.out",
 			sample.interval = sampleinterval/1e3,
 			sampling.time = nrrecords * sampleinterval/1e3,
 		   # diagnostics support
-		   # firstline=firstline, 
 			ctllines=collcontrols,
 			ctllinenr=collcontrollinenr,
 			stringsAsFactors=FALSE

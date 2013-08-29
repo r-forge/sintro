@@ -128,7 +128,7 @@ R CMD CHECK sprof  --no-multiarch  --timings --as-cran
 cd ~/projects/rforge/sintro/pkg/
 R CMD BUILD --compact-vignettes=gs+qpdf sprof --no-multiarch --md5
 cd ~/projects/rforge/sintro/pkg/
-svn log -r 224:HEAD -v  --incremental  > ChangeLog0
+svn log -r 229:HEAD -v  --incremental  > ChangeLog0
 cat sprof/ChangeLog >> ChangeLog0
 ##  check here !!!
 mv ChangeLog0  sprof/ChangeLog
