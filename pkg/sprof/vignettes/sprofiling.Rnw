@@ -1121,7 +1121,8 @@ nodes<- sprof02$nodes[,-8]; rownames(nodes) <- NULL
 prxt(nodes, 
 	caption="sprof02, after update", 
 	label="tab:sprof02info2",
-	digits=c(0,0,0,2,0,2,0,2,0,2),
+	#digits=c(0,0,0,2,0,2,0,2,0,2),
+	digits=c(0,0,0,2,0,2,0,2),
 	zero.print=" . "
 )
 	

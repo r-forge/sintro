@@ -52,6 +52,17 @@ Temporarily: A list with components
 \item{stacks}{Stacks, represented as reference list to nodes, and stack frequencies.}
 \item{profiles}{Recorded data, as reference to stacks, and possibly additional data per reference.}
 
+\code{nodes} is (conceptually) a data frame with entries
+\tabular{ll}{name \tab node name\cr
+self.time \tab nr of events with node as terminal leaf\cr
+self.time \tab proportion of self.time with node as terminal leaf\cr
+total.time \tab nr of events with node in stack\cr
+self.time \tab proportion of total time with node as terminal leaf\cr
+nr.runs \tab number of runs, over all run lengths and levels\cr
+nr.runs \tab average of run length, over all run lengths and levels\cr
+icol \tab current colour index
+}
+
 %{A vector of unique stacks found in input, stored as verbatim copies.}
 %\item{stacksrenc}{A list of unique stacks in top down order (top first), 
 %	encoded as vectors or references to \code{stacks}.}

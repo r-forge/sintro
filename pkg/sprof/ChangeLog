@@ -1,4 +1,112 @@
 ------------------------------------------------------------------------
+r224 | gsawitzki | 2013-08-26 21:55:39 +0200 (Mon, 26 Aug 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/R/asfactormodel.R
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+
+sync
+------------------------------------------------------------------------
+r225 | gsawitzki | 2013-08-26 22:07:47 +0200 (Mon, 26 Aug 2013) | 1 line
+Changed paths:
+   A /pkg/sprof/R/stacksasfactor.R
+   A /pkg/sprof/man/stacksasfactor.Rd
+
+sync
+------------------------------------------------------------------------
+r226 | gsawitzki | 2013-08-26 22:09:31 +0200 (Mon, 26 Aug 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/R/stacksasfactor.R
+   M /pkg/sprof/man/stacksasfactor.Rd
+
+sync
+------------------------------------------------------------------------
+r227 | gsawitzki | 2013-08-27 19:52:32 +0200 (Tue, 27 Aug 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/R/sampleRprof.R
+   M /pkg/sprof/man/sampleRprof.Rd
+   A /pkg/sprof/tests/sampleRprof.R
+
+sampleRprof.R example made don't run
+------------------------------------------------------------------------
+r228 | gsawitzki | 2013-08-28 21:56:07 +0200 (Wed, 28 Aug 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/00sprofworksheet.R
+   M /pkg/sprof/ChangeLog
+   M /pkg/sprof/DESCRIPTION
+   M /pkg/sprof/R/profiles_matrix.R
+   M /pkg/sprof/R/readRprof.R
+   M /pkg/sprof/R/summary.sprof.R
+   M /pkg/sprof/R/updateRprof.R
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+   M /www/sprof/sprof-Ex.pdf
+   M /www/sprof/sprof_internal.pdf
+
+0.1 start. RLE inclued in  prime node info
+------------------------------------------------------------------------
+r229 | gsawitzki | 2013-08-28 22:07:26 +0200 (Wed, 28 Aug 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+   M /pkg/sprof/vignettes/sprofiling.pdf
+   M /www/sprof/sprof-Ex.pdf
+   M /www/sprof/sprof_internal.pdf
+   M /www/sprof/sprofiling.pdf
+
+sync
+------------------------------------------------------------------------
+r224 | gsawitzki | 2013-08-26 21:55:39 +0200 (Mon, 26 Aug 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/R/asfactormodel.R
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+
+sync
+------------------------------------------------------------------------
+r225 | gsawitzki | 2013-08-26 22:07:47 +0200 (Mon, 26 Aug 2013) | 1 line
+Changed paths:
+   A /pkg/sprof/R/stacksasfactor.R
+   A /pkg/sprof/man/stacksasfactor.Rd
+
+sync
+------------------------------------------------------------------------
+r226 | gsawitzki | 2013-08-26 22:09:31 +0200 (Mon, 26 Aug 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/R/stacksasfactor.R
+   M /pkg/sprof/man/stacksasfactor.Rd
+
+sync
+------------------------------------------------------------------------
+r227 | gsawitzki | 2013-08-27 19:52:32 +0200 (Tue, 27 Aug 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/R/sampleRprof.R
+   M /pkg/sprof/man/sampleRprof.Rd
+   A /pkg/sprof/tests/sampleRprof.R
+
+sampleRprof.R example made don't run
+------------------------------------------------------------------------
+r228 | gsawitzki | 2013-08-28 21:56:07 +0200 (Wed, 28 Aug 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/00sprofworksheet.R
+   M /pkg/sprof/ChangeLog
+   M /pkg/sprof/DESCRIPTION
+   M /pkg/sprof/R/profiles_matrix.R
+   M /pkg/sprof/R/readRprof.R
+   M /pkg/sprof/R/summary.sprof.R
+   M /pkg/sprof/R/updateRprof.R
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+   M /www/sprof/sprof-Ex.pdf
+   M /www/sprof/sprof_internal.pdf
+
+0.1 start. RLE inclued in  prime node info
+------------------------------------------------------------------------
+r229 | gsawitzki | 2013-08-28 22:07:26 +0200 (Wed, 28 Aug 2013) | 1 line
+Changed paths:
+   M /pkg/sprof/vignettes/sprofiling.Rnw
+   M /pkg/sprof/vignettes/sprofiling.pdf
+   M /www/sprof/sprof-Ex.pdf
+   M /www/sprof/sprof_internal.pdf
+   M /www/sprof/sprofiling.pdf
+
+sync
+------------------------------------------------------------------------
 r227 | gsawitzki | 2013-08-27 19:52:32 +0200 (Tue, 27 Aug 2013) | 1 line
 sampleRprof.R example made don't run
 ------------------------------------------------------------------------

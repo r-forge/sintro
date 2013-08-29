@@ -7,20 +7,15 @@
 # setwd("")
 # source('~/Documents/lectures/src/insider/profile/sprof/pkg/R/summary_prof.R', chdir = TRUE)
 #! To Do
-#!
+#! check for reference definition
 
-str_prof <- function(x){
-		# Rprofdata <- list(firstline=firstline, 
-		# nodes=nodenames, 
-		# stacks= colluniques, 
-		# stacksrenc =  stacksnode,
-		# data= collencstacks, 
-		# timesRLE
-		# freq=table(collencstacks))
+str_prof <- function(x)
+{
 	if (is.null(x)) {cat("## str_prof: NULL"); return(0)}
-	cat("First line:", x$firstline,"\n")
+	
 	cat(length(x$data),"Sampling intervals ")
-	if (length(x$timesRLE[1])==1) cat(" at",x$timesRLE[[2]],"micros\n") else {cat("in micros: ");print(x$timesRLE)}
+	if (length(x$timesRLE[1])==1) cat(" at",x$timesRLE[[2]],"micros\n") else 
+		{cat("in micros: ");print(x$timesRLE)}
 	cat(length(x$nodes$name),"nodes in",length(x$stacks$stacks), "stacks\n")	
 	cat(length(unique(x$stacks$stackleafnodes)),"Terminals ", "\n")
 
