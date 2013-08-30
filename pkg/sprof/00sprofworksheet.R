@@ -119,6 +119,7 @@ svn propset svn:keywords "Date Author Id Revision HeadURL Name" sprof/man/*.Rd
 svn propset svn:keywords "Date Author Id Revision HeadURL  Name" sprof/R/*.R
 svn propset svn:keywords "Date Author Id Revision HeadURL Name" sprof/vignettes/*.Rnw
 svn propset svn:keywords "Date Author Id Revision HeadURL Name"  sprof/tests/*.R
+svn propset svn:keywords "Date Author Id Revision HeadURL Name"  sprof/demo/*.R
 export _R_CHECK_TIMINGS_=0
 export _R_CHECK_ALWAYS_LOG_VIGNETTE_OUTPUT_=TRUE
 # svn propset svn:keywords "Date Author Id Revision HeadURL" sprof/work/*.R
@@ -130,7 +131,7 @@ R CMD BUILD --compact-vignettes=gs+qpdf sprof --no-multiarch --md5
 R CMD REMOVE sprof
 R CMD INSTALL sprof_0.1-0.tar.gz
 cd ~/projects/rforge/sintro/pkg/
-svn log -r 229:HEAD -v  --incremental  > ChangeLog0
+svn log -r 231:HEAD -v  --incremental  > ChangeLog0
 cat sprof/ChangeLog >> ChangeLog0
 ##  check here !!!
 mv ChangeLog0  sprof/ChangeLog
