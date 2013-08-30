@@ -1,8 +1,8 @@
-#$HeadURL: svn+ssh://gsawitzki@svn.r-forge.r-project.org/svnroot/sintro/pkg/sprof/tests/rrle.R $
-#$Id: rrle.R 178 2013-07-23 19:13:13Z gsawitzki $
-#$Revision: 178 $
-#$Date: 2013-07-23 21:13:13 +0200 (Tue, 23 Jul 2013) $
-#$Author: gsawitzki $
+#$HeadURL$
+#$Id$
+#$Revision$
+#$Date$
+#$Author$
 
 # source('~/projects/rforge/sintro/pkg/sprof/tests/igraphKK.R', chdir = TRUE)
 
