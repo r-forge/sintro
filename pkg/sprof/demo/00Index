@@ -1,1 +1,12 @@
 igraphKK	igraph kamada kawai layout
+igraphKK2	igraph kamada kawai layout alternate
+igraphauto	igraph auto layout
+igraphrandom	igraph random layout
+igraphcircle	igraph circle layout
+igraphsphere	igraph sphere layout
+igraphspring	igraph spring layout
+igraphlgl	igraph lgl layout
+igraphsvd	igraph svd layout
+igraphgraphopt	igraph graphopt layout
+igraphFrRein	igraph Fruchtermann-Reingold layout
+igraphFrReingrid	igraph Fruchtermann-Reingold grid layout

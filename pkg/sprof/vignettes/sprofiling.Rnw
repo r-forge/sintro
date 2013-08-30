@@ -2499,222 +2499,262 @@ Layouts available for \ircode{igraph}:
 \ircode{layout.norm(layout, 
 	xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
       	zmin = NULL, zmax = NULL)}
-<<>>=
-library(igraph)
-search() 
 @
-%:   as_igraph_sprof
+The output of \ircode{igraph} gives problems when rendered with Adobe on OS X Maverick. These examples have been moved to the \ircode{demo} section.
 <<>>=
-as_igraph_sprof <- function(sprof, layoutfun, params=NULL,...){
-	adj <- adjacency(sprof)
-	adj[adj!=0] <-1
-	sprof_igraph <- graph.adjacency(adj)
-	sprof_igraph <- set.graph.attribute(sprof_igraph, "layout", 
-		layoutfun(sprof_igraph,params=params,...),...)
-	V(sprof_igraph)$color <- "yellow"
-	E(sprof_igraph)$color <- "#0000FF20"
-	E(sprof_igraph)$width <- c(1,2)
-	return(sprof_igraph)
-}
-
-<<>>=
-sprof_igraph <- graph.adjacency(adjacency(sprof))
-sprof_igraph <- set.graph.attribute(sprof_igraph, 
-	"layout", layout.kamada.kawai(sprof_igraph))
-V(sprof_igraph)$color <- "yellow"
-#E(sprof_igraph)$width <- c(1,2)
-E(sprof_igraph)$color <- "#0000FF40"
-E(sprof_igraph)$width <- c(1,2)
-# see 
-<<fig=TRUE, label=sprof_igraphkamada,width=8, height=8>>=
-plot(sprof_igraph, 
-	main=paste0("igraph kamada.kawai layout\n", sprof$info$id))
-	legend("topleft", 
-		legend= paste0("class: ",class(sprof_igraph)),
-		bg="#FFFFE040",
-		seg.len=0
-		)
+demo(,"sprof")
 @
+%\subsubsection{igraph package}
+%%:        cleanpackages() try detach
+%<<echo=FALSE, print=FALSE>>=
+%cleanpackages()
+%@
+%Attributes for \ircode{igraph} are documented in \ircode{help(igraph.plotting)}.
+%
+%Layouts available for \ircode{igraph}:
+%
+%\ircode{layout.auto(graph, dim=2, ...)}
+%
+%\ircode{layout.random(graph, params, dim=2)}
+%
+%\ircode{layout.circle(graph, params)}
+%
+%\ircode{layout.sphere(graph, params)}
+%
+%\ircode{layout.fruchterman.reingold(graph, ..., dim=2, params)}
+%
+%\ircode{layout.kamada.kawai(graph, ..., dim=2, params)}
+%
+%\ircode{layout.spring(graph, ..., params)}
+%
+%\ircode{layout.reingold.tilford(graph, ..., params)}
+%
+%\ircode{layout.fruchterman.reingold.grid(graph, ..., params)}
+%
+%\ircode{layout.lgl(graph, ..., params)}
+%
+%\ircode{layout.graphopt(graph, ..., params=list())}
+%
+%\ircode{layout.svd(graph, d=shortest.paths(graph), ...)}
+%
+%\ircode{layout.norm(layout, 
+%	xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
+%      	zmin = NULL, zmax = NULL)}
+%<<>>=
+%library(igraph)
+%search() 
+%@
+%%:   as_igraph_sprof
+%<<>>=
+%as_igraph_sprof <- function(sprof, layoutfun, params=NULL,...){
+%	adj <- adjacency(sprof)
+%	adj[adj!=0] <-1
+%	sprof_igraph <- graph.adjacency(adj)
+%	sprof_igraph <- set.graph.attribute(sprof_igraph, "layout", 
+%		layoutfun(sprof_igraph,params=params,...),...)
+%	V(sprof_igraph)$color <- "yellow"
+%	E(sprof_igraph)$color <- "#0000FF20"
+%	E(sprof_igraph)$width <- c(1,2)
+%	return(sprof_igraph)
+%}
+%
 %<<>>=
 %sprof_igraph <- graph.adjacency(adjacency(sprof))
-%sprof_igraph <- set.graph.attribute(sprof_igraph, "layout", layout.auto(sprof_igraph))
+%sprof_igraph <- set.graph.attribute(sprof_igraph, 
+%	"layout", layout.kamada.kawai(sprof_igraph))
+%V(sprof_igraph)$color <- "yellow"
+%#E(sprof_igraph)$width <- c(1,2)
+%E(sprof_igraph)$color <- "#0000FF40"
+%E(sprof_igraph)$width <- c(1,2)
+%# see 
+%<<fig=TRUE, label=sprof_igraphkamada,width=8, height=8>>=
+%plot(sprof_igraph, 
+%	main=paste0("igraph kamada.kawai layout\n", sprof$info$id))
+%	legend("topleft", 
+%		legend= paste0("class: ",class(sprof_igraph)),
+%		bg="#FFFFE040",
+%		seg.len=0
+%		)
 %@
-
-Experiments with various layouts for \ircode{igraph} follow.
-
-\filledpagebreak
-@
-<<fig=TRUE, label=sprof_ig_igraph_auto,width=8, height=8>>=
-#8 8
-sprof_ig_auto <- as_igraph_sprof(sprof, layout.auto)
-plot(sprof_ig_auto, 
-	main=paste0("igraph auto layout\n", sprof$info$id))
-	legend("topleft", 
-		legend= paste0("class: ",class(sprof_ig_auto)),
-		bg="#FFFFE040",
-		seg.len=0
-		)
-@
-\filledpagebreak
-
-<<fig=TRUE, label=sprof_ig_igraph_random,width=6, height=6>>=
-#6 6
-sprof_ig_random <- as_igraph_sprof(sprof, layout.random)
-plot(sprof_ig_random, 
-	main=paste0("igraph random layout\n", sprof$info$id))
-	legend("topleft", 
-		legend= paste0("class: ",class(sprof_ig_random)),
-		bg="#FFFFE040",
-		seg.len=0
-		)
-
-@
-\filledpagebreak
-
-<<fig=TRUE, label=sprof_ig_igraph_circle,width=6, height=6>>=
-#6 6
-sprof_ig_circle <- as_igraph_sprof(sprof, layout.circle)
-plot(sprof_ig_circle, 
-	main=paste0("igraph circle layout\n", sprof$info$id))
-	legend("topleft", 
-		legend= paste0("class: ",class(sprof_ig_circle)),
-		bg="#FFFFE040",
-		seg.len=0
-		)
-@
-\filledpagebreak
-
-<<fig=TRUE, label=sprof_ig_igraph_sphere,width=6, height=6>>=
-#6 6
-sprof_ig_auto <- as_igraph_sprof(sprof, layout.sphere)
-plot(sprof_ig_auto, 
-	main=paste0("igraph sphere layout\n", sprof$info$id))
-	legend("topleft", 
-		legend= paste0("class: ",class(sprof_ig_auto)),
-		bg="#FFFFE040",
-		seg.len=0
-		)
-@
-\filledpagebreak
-
-<<fig=TRUE, label=sprof_ig_igraph_fruchterman_reingold,width=6, height=6>>=
-#6 6
-sprof_ig_auto <- as_igraph_sprof(sprof, layout.fruchterman.reingold)
-plot(sprof_ig_auto, 
-	main=paste0("igraph fruchterman.reingold layout\n", sprof$info$id))
-	legend("topleft", 
-		legend= paste0("class: ",class(sprof_ig_auto)),
-		bg="#FFFFE040",
-		seg.len=0
-		)
-
-@
-\filledpagebreak
-
-<<fig=TRUE, label=sprof_ig_igraph_kamada_kawai,width=6, height=6>>=
-#6 6
-sprof_ig_auto <- as_igraph_sprof(sprof, layout.kamada.kawai)
-plot(sprof_ig_auto, 
-	main=paste0("igraph kamada.kawai layout\n", sprof$info$id))
-	legend("topleft", 
-		legend= paste0("class: ",class(sprof_ig_auto)),
-		bg="#FFFFE040",
-		seg.len=0
-		)
-
-@
-\filledpagebreak
-
-<<fig=TRUE, label=sprof_ig_igraph_spring,width=6, height=6>>=
-#6 6
-sprof_ig_auto <- as_igraph_sprof(sprof, layout.spring)
-plot(sprof_ig_auto, 
-	main=paste0("igraph spring layout\n", sprof$info$id))
-	legend("topleft", 
-		legend= paste0("class: ",class(sprof_ig_auto)),
-		bg="#FFFFE040",
-		seg.len=0
-		)
-
-@
-%<<fig=TRUE, label=sprof_ig_igraph_reingold.tilford,width=6, height=6>>=
+%%<<>>=
+%%sprof_igraph <- graph.adjacency(adjacency(sprof))
+%%sprof_igraph <- set.graph.attribute(sprof_igraph, "layout", layout.auto(sprof_igraph))
+%%@
+%
+%Experiments with various layouts for \ircode{igraph} follow.
+%
+%\filledpagebreak
+%@
+%<<fig=TRUE, label=sprof_ig_igraph_auto,width=8, height=8>>=
+%#8 8
+%sprof_ig_auto <- as_igraph_sprof(sprof, layout.auto)
+%plot(sprof_ig_auto, 
+%	main=paste0("igraph auto layout\n", sprof$info$id))
+%	legend("topleft", 
+%		legend= paste0("class: ",class(sprof_ig_auto)),
+%		bg="#FFFFE040",
+%		seg.len=0
+%		)
+%@
+%\filledpagebreak
+%
+%<<fig=TRUE, label=sprof_ig_igraph_random,width=6, height=6>>=
 %#6 6
-%sprof_ig_auto <- as_igraph_sprof(sprof, layout.reingold.tilford)
-%plot(sprof_ig_auto, main="sprof01: igraph reingold.tilford layout")
-@
-\filledpagebreak
-
-<<fig=TRUE, label=sprof_ig_igraph_fruchterman_reingold_grid,width=6, height=6>>=
-#6 6
-sprof_ig_auto <- as_igraph_sprof(sprof, layout.fruchterman.reingold.grid)
-plot(sprof_ig_auto, 
-	main=paste0("igraph fruchterman.reingold.grid layout\n", sprof$info$id))
-	legend("topleft", 
-		legend= paste0("class: ",class(sprof_ig_auto)),
-		bg="#FFFFE040",
-		seg.len=0
-		)
-
-@
-\filledpagebreak
-
-<<fig=TRUE, label=sprof_ig_igraph_lgl,width=6, height=6>>=
-#6 6
-sprof_ig_auto <- as_igraph_sprof(sprof, layout.lgl)
-plot(sprof_ig_auto, 
-	main=paste0("igraph lgl layout\n", sprof$info$id))
-	legend("topleft", 
-		legend= paste0("class: ",class(sprof_ig_auto)),
-		bg="#FFFFE040",
-		seg.len=0
-		)
-
-@
-\filledpagebreak
-
-<<fig=TRUE, label=sprof_ig_igraph_graphopt,width=6, height=6>>=
-#6 6
-sprof_ig_auto <- as_igraph_sprof(sprof, layout.graphopt)
-plot(sprof_ig_auto, 
-	main=paste0("igraph graphopt layout\n", sprof$info$id))
-	legend("topleft", 
-		legend= paste0("class: ",class(sprof_ig_auto)),
-		bg="#FFFFE040",
-		seg.len=0
-		)
-@
-\filledpagebreak
-
-<<fig=TRUE, label=sprof_ig_igraph_svd,width=6, height=6>>=
-#6 6
-sprof_ig_auto <- as_igraph_sprof(sprof, layout.svd)
-plot(sprof_ig_auto, 
-	main=paste0("igraph svd layout\n", sprof$info$id))
-	legend("topleft", 
-		legend= paste0("class: ",class(sprof_ig_auto)),
-		bg="#FFFFE040",
-		seg.len=0
-		)
-@
-%<<fig=TRUE, label=sprof_ig_igraph_norm,width=6, height=6>>=
+%sprof_ig_random <- as_igraph_sprof(sprof, layout.random)
+%plot(sprof_ig_random, 
+%	main=paste0("igraph random layout\n", sprof$info$id))
+%	legend("topleft", 
+%		legend= paste0("class: ",class(sprof_ig_random)),
+%		bg="#FFFFE040",
+%		seg.len=0
+%		)
+%
+%@
+%\filledpagebreak
+%
+%<<fig=TRUE, label=sprof_ig_igraph_circle,width=6, height=6>>=
 %#6 6
-%sprof_ig_auto <- as_igraph_sprof(sprof, layout.norm)
-%plot(sprof_ig_auto, main="sprof01: igraph norm layout")
-%detach("package:igraph")
+%sprof_ig_circle <- as_igraph_sprof(sprof, layout.circle)
+%plot(sprof_ig_circle, 
+%	main=paste0("igraph circle layout\n", sprof$info$id))
+%	legend("topleft", 
+%		legend= paste0("class: ",class(sprof_ig_circle)),
+%		bg="#FFFFE040",
+%		seg.len=0
+%		)
+%@
+%\filledpagebreak
+%
+%<<fig=TRUE, label=sprof_ig_igraph_sphere,width=6, height=6>>=
+%#6 6
+%sprof_ig_auto <- as_igraph_sprof(sprof, layout.sphere)
+%plot(sprof_ig_auto, 
+%	main=paste0("igraph sphere layout\n", sprof$info$id))
+%	legend("topleft", 
+%		legend= paste0("class: ",class(sprof_ig_auto)),
+%		bg="#FFFFE040",
+%		seg.len=0
+%		)
+%@
+%\filledpagebreak
+%
+%<<fig=TRUE, label=sprof_ig_igraph_fruchterman_reingold,width=6, height=6>>=
+%#6 6
+%sprof_ig_auto <- as_igraph_sprof(sprof, layout.fruchterman.reingold)
+%plot(sprof_ig_auto, 
+%	main=paste0("igraph fruchterman.reingold layout\n", sprof$info$id))
+%	legend("topleft", 
+%		legend= paste0("class: ",class(sprof_ig_auto)),
+%		bg="#FFFFE040",
+%		seg.len=0
+%		)
+%
+%@
+%\filledpagebreak
+%
+%<<fig=TRUE, label=sprof_ig_igraph_kamada_kawai,width=6, height=6>>=
+%#6 6
+%sprof_ig_auto <- as_igraph_sprof(sprof, layout.kamada.kawai)
+%plot(sprof_ig_auto, 
+%	main=paste0("igraph kamada.kawai layout\n", sprof$info$id))
+%	legend("topleft", 
+%		legend= paste0("class: ",class(sprof_ig_auto)),
+%		bg="#FFFFE040",
+%		seg.len=0
+%		)
+%
+%@
+%\filledpagebreak
+%
+%<<fig=TRUE, label=sprof_ig_igraph_spring,width=6, height=6>>=
+%#6 6
+%sprof_ig_auto <- as_igraph_sprof(sprof, layout.spring)
+%plot(sprof_ig_auto, 
+%	main=paste0("igraph spring layout\n", sprof$info$id))
+%	legend("topleft", 
+%		legend= paste0("class: ",class(sprof_ig_auto)),
+%		bg="#FFFFE040",
+%		seg.len=0
+%		)
+%
+%@
+%%<<fig=TRUE, label=sprof_ig_igraph_reingold.tilford,width=6, height=6>>=
+%%#6 6
+%%sprof_ig_auto <- as_igraph_sprof(sprof, layout.reingold.tilford)
+%%plot(sprof_ig_auto, main="sprof01: igraph reingold.tilford layout")
+%@
+%\filledpagebreak
+%
+%<<fig=TRUE, label=sprof_ig_igraph_fruchterman_reingold_grid,width=6, height=6>>=
+%#6 6
+%sprof_ig_auto <- as_igraph_sprof(sprof, layout.fruchterman.reingold.grid)
+%plot(sprof_ig_auto, 
+%	main=paste0("igraph fruchterman.reingold.grid layout\n", sprof$info$id))
+%	legend("topleft", 
+%		legend= paste0("class: ",class(sprof_ig_auto)),
+%		bg="#FFFFE040",
+%		seg.len=0
+%		)
+%
+%@
+%\filledpagebreak
+%
+%<<fig=TRUE, label=sprof_ig_igraph_lgl,width=6, height=6>>=
+%#6 6
+%sprof_ig_auto <- as_igraph_sprof(sprof, layout.lgl)
+%plot(sprof_ig_auto, 
+%	main=paste0("igraph lgl layout\n", sprof$info$id))
+%	legend("topleft", 
+%		legend= paste0("class: ",class(sprof_ig_auto)),
+%		bg="#FFFFE040",
+%		seg.len=0
+%		)
+%
+%@
+%\filledpagebreak
+%
+%<<fig=TRUE, label=sprof_ig_igraph_graphopt,width=6, height=6>>=
+%#6 6
+%sprof_ig_auto <- as_igraph_sprof(sprof, layout.graphopt)
+%plot(sprof_ig_auto, 
+%	main=paste0("igraph graphopt layout\n", sprof$info$id))
+%	legend("topleft", 
+%		legend= paste0("class: ",class(sprof_ig_auto)),
+%		bg="#FFFFE040",
+%		seg.len=0
+%		)
+%@
+%\filledpagebreak
+%
+%<<fig=TRUE, label=sprof_ig_igraph_svd,width=6, height=6>>=
+%#6 6
+%sprof_ig_auto <- as_igraph_sprof(sprof, layout.svd)
+%plot(sprof_ig_auto, 
+%	main=paste0("igraph svd layout\n", sprof$info$id))
+%	legend("topleft", 
+%		legend= paste0("class: ",class(sprof_ig_auto)),
+%		bg="#FFFFE040",
+%		seg.len=0
+%		)
+%@
+%%<<fig=TRUE, label=sprof_ig_igraph_norm,width=6, height=6>>=
+%%#6 6
+%%sprof_ig_auto <- as_igraph_sprof(sprof, layout.norm)
+%%plot(sprof_ig_auto, main="sprof01: igraph norm layout")
+%%detach("package:igraph")
 @
 \filledpagebreak
 \subsubsection{network package}
-<<>>=
-detach("package:igraph")
+%:        cleanpackages() try detach
+<<echo=FALSE, print=FALSE>>=
+cleanpackages()
 #detach("package:sna")
 
-search()
-library(network)
-search()
 @
 %:   as_network_sprof
 \todo{propagate}
 <<>>=
+library(network)
 as_network_sprof <- function(sprof) {
 	sprofadj02 <- adjacency(sprof)
 	nwsprof02 <- as.network(sprofadj02)
@@ -2783,7 +2823,7 @@ edge.lwd[edge.lwd>0]<- rkindex(edge.lwd[edge.lwd>0],
 
 plot_network_sprof(nwsprof02, label=rownames(sprofadj02), 
  edge.lwd=edge.lwd)
-detach("package:network")
+@
 @
 \filledpagebreak
 \subsubsection{Rgraphviz package}
@@ -3144,11 +3184,10 @@ detach("package:igraph")
 %:
 <<echo=FALSE, print=FALSE>>=
 cleanpackages()
-<<>>=
-library(network)
-search()
 <<fig=TRUE, label=s04nwsprof02,width=6, height=6>>=
 #6
+library(network)
+
 nwsprof02 <- as.network(sprofadj02) # names is not imported 
 network.vertex.names(nwsprof02) <- rownames(sprofadj02) # not honoured by plot
 plot(nwsprof02, label=rownames(sprofadj02), 
@@ -3185,7 +3224,6 @@ plot(nwsprof02, label=rownames(sprofadj02),
 	mode="fruchtermanreingold",
 	cex.main=2, edge.lwd=edge.lwd)
 
-detach("package:network")
 @
 \filledpagebreak
 \subsubsection{Rgraphviz package}

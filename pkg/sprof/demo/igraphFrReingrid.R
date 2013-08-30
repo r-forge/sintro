@@ -27,21 +27,15 @@ as_igraph_sprof <- function(sprof, layoutfun, params=NULL,...){
 	return(sprof_igraph)
 }
 
-#<<>>=
-sprof_igraph <- graph.adjacency(adjacency(sprof))
-sprof_igraph <- set.graph.attribute(sprof_igraph, 
-	"layout", layout.kamada.kawai(sprof_igraph))
-V(sprof_igraph)$color <- "yellow"
-#E(sprof_igraph)$width <- c(1,2)
-E(sprof_igraph)$color <- "#0000FF40"
-E(sprof_igraph)$width <- c(1,2)
 # see 
 #<<fig=TRUE, label=sprof_igraphkamada,width=8, height=8>>=
-plot(sprof_igraph, 
-	main=paste0("igraph kamada.kawai layout\n", sprof$info$id))
+sprof_ig_auto <- as_igraph_sprof(sprof, layout.fruchterman.reingold.grid)
+plot(sprof_ig_auto, 
+	main=paste0("igraph fruchterman.reingold.grid layout\n", sprof$info$id))
 	legend("topleft", 
-		legend= paste0("class: ",class(sprof_igraph)),
+		legend= paste0("class: ",class(sprof_ig_auto)),
 		bg="#FFFFE040",
 		seg.len=0
 		)
+		
 } else warning("could not load igraph", immediate=TRUE)
