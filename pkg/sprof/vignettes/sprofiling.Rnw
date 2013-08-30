@@ -1555,7 +1555,9 @@ See \vref{tab:pramt4}: Marginal statistics on nodes by run length.
 
 @
 \todo{hack. keep length in nodesrunlength}
-We can add this information to our base and use it to enhance 
+From the summary information, \ircode{nr\_runs} and \ircode{avg\_time} are
+ included in the node information by default. We can use this information
+ to enhance 
 graphical displays. See: nodes marked by run length and run count, 
 \vref{fig:sprofadj04NEL02rle}.
 
@@ -1585,14 +1587,14 @@ linear model algorithm, e.g. by introducing a ``has.na'' flag.
 
 Walking further down, we see other candidates such as \ircode{as.character} that may be avoidable in this problem.
 
-<<>>=
- nr <- nodesrunlength(sprof02, clean=FALSE)
- #nr <- rbind(nr,0) ## hack. keep length in nodesrunlength
- rownames(nr) <- sprof02$nodes$name
-
- sprof02$nodes <- cbind(sprof02$nodes, nr)
- 
- rownames(sprof02$nodes) <- sprof02$nodes$name
+%<<>>=
+% nr <- nodesrunlength(sprof02, clean=FALSE)
+% #nr <- rbind(nr,0) ## hack. keep length in nodesrunlength
+% rownames(nr) <- sprof02$nodes$name
+%
+% sprof02$nodes <- cbind(sprof02$nodes, nr)
+% 
+% rownames(sprof02$nodes) <- sprof02$nodes$name
 @
 \todo{table:  node \#runs  min  median run length  max}
 
@@ -2239,7 +2241,25 @@ candidates for improvement.
 
 The bottom line is: graph layout ist best left to graph representation packages. You can help by trimming and surgery. As far as attributes are concened, the current recommendation is to start with run time lenghts and run time frequencies by node and level:
 
-\ircode{plot\_graphNEL\_sprof3( x, nodeattrs = "runs")}
+\ircode{plot\_graphNEL\_sprof( x, nodeattrs = "runs")}
+
+Here is a run-down of the previous stages of our example, using this plot.
+\filledpagebreak
+<<fig=TRUE, label=pgs01, width=6, height=6, >>=
+plot_graphNEL_sprof(sprof01, nodeattrs="runs")
+@
+\filledpagebreak
+<<fig=TRUE, label=pgs02, width=6, height=6, >>=
+plot_graphNEL_sprof(sprof02, nodeattrs="runs")
+@
+\filledpagebreak
+<<fig=TRUE, label=pgs03, width=6, height=6, >>=
+plot_graphNEL_sprof(sprof03, nodeattrs="runs")
+@
+\filledpagebreak
+<<fig=TRUE, label=pgs04, width=6, height=6, >>=
+plot_graphNEL_sprof(sprof04, nodeattrs="runs")
+@
 
 @
 %edge.lwd<-sprofadj02
