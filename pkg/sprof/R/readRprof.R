@@ -229,7 +229,7 @@ readRprof <- function(filename = "Rprof.out",
    # stacks
 	stacks <- data.frame(
 		nodes = as.matrix(stacks_nodes),
-		shortname = abbreviate(collstacksdictrev), 
+		# shortname = abbreviate(collstacksdictrev), 
 		# headers and control lines removed
 		
 		# a convenience for accounting

@@ -21,20 +21,19 @@ barplot_s(height,
 \item{height}{either a vector or matrix of values describing the
 bars which make up the plot. See \code{\link{barplot}}.}
 \item{horiz}{boolean. Arrange bars horizontally.}
-    \item{sort_by}{a variable to sort by. Defaults to \code{height}.}
-  \item{decreasing}{boolean. Sorting direction.}
-  \item{lowtrim}{A optional lower trim value. Observations with \code{sort_by} values up to \code{lowtrim} are discarded.}
-  \item{hightrim}{A optional upper trim value. Observations with \code{sort_by} values from \code{lowtrim} are discarded.}  
-  \item{trimlegend}{Boolean. Show a legend about trimmed values.}
-  \item{col}{a vector of colors for the bars or bar components.
+\item{sort_by}{a variable to sort by. Defaults to \code{height}.}
+\item{decreasing}{boolean. Sorting direction.}
+\item{lowtrim}{A optional lower trim value. Observations with \code{sort_by} values up to \code{lowtrim} are discarded.}
+\item{hightrim}{A optional upper trim value. Observations with \code{sort_by} values from \code{lowtrim} are discarded.}  
+\item{trimlegend}{Boolean. Show a legend about trimmed values.}
+\item{col}{a vector of colors for the bars or bar components.
     By default, grey is used if \code{height} is a vector, and a
     gamma-corrected grey palette if \code{height} is a matrix.}
     
-  \item{coli}{An index into the  \code{col} table, based on original sorting.}
-  \item{colfun}{A function to generate a \code{col} palette. \code{grey} is rescaled to 1..n.}
-  \item{main}{overall title for the plot}
-  \item{\dots}{Passed to \code{barplot} 
-}
+\item{coli}{An index into the  \code{col} table, based on original sorting. If no index is given, the colour will be allocated after sorting.}
+\item{colfun}{A function or function name to generate a \code{col} palette. \code{"grey"} or \code{"gray"} is rescaled to 1..n.}
+\item{main}{overall title for the plot}
+\item{\dots}{Passed to \code{barplot} }
 }
 \details{
 If no names are supplied, they are generated in the form x...
@@ -42,7 +41,7 @@ If no names are supplied, they are generated in the form x...
 You man want to adjust the scale of the bar labels by using an additional argument such as \code{cex.names =0.5}.
 
 More to come.
-	Plots are from this collection:
+	Plots are among others from this collection:
 
 \if{html}{\figure{barplots.png}}
 \if{latex}{\figure{barplots.pdf}}

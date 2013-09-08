@@ -9,19 +9,18 @@
 \alias{rkindex}
 \title{Index, based on rank.}
 \description{
-Convert \code{x} to an index in 1\ldots maxindex}
+Convert \code{x} to an index in 1\ldots \code{maxindex}}
 \usage{
-rkindex(x, maxindex = length(x), pwr = 1, ties.method = "random")
+rkindex(x, maxindex = length(x), pwr = 1, ties.method = "random", id)
 }
 \arguments{
   \item{x}{
 A vector of data to covert.}
   \item{maxindex}{
 Maximum for result}
-  \item{pwr}{
-See details.}
-  \item{ties.method}{passed to \code{rank}.
-}
+  \item{pwr}{See details.}
+  \item{ties.method}{passed to \code{rank}.}
+  \item{id}{A string to be passed as id argument. If missing, an id will be generated from the arguments.}
 }
 \details{
 \code{x} is transformed to a rank scale, using \code{ties.method}.
@@ -39,22 +38,13 @@ A vector of rescaled values. }
 %\seealso{
 %%% ~~objects to See Also as \code{\link{help}}, ~~~
 %}
-%\examples{
-%##---- Should be DIRECTLY executable !! ----
-%##-- ==>  Define data, use random,
-%##--	or do  help(data=index)  for the standard data sets.
-%
-%## The function is currently defined as
-%function (x, maxindex = length(x), pwr = 1, ties.method = "random") 
-%{
-%    ix <- rank(x, ties.method = ties.method)
-%    rg <- range(ix)
-%    ix <- (ix/rg[2])^pwr
-%    ix <- ix * (maxindex - 1) + 1
-%    ix <- round(ix)
-%    return(ix)
-%  }
-%}
+\examples{
+ x <- runif(7)
+ x
+ str(rkindex(x, maxindex=5))
+ str(rkindex(x, maxindex=5, pwr=0.5))
+ 
+}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{util}
