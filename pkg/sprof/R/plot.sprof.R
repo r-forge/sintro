@@ -31,7 +31,16 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
  	totaltime <- sum(xnodes$self.time)
  	xnodes <- xnodes[xnodes$total.time < totaltime,]
 
-	if (is.null(col)) col <- terrain.colors(nrnodes)
+	if (is.null(col)) {
+		if (is.null(xnodes$icol))
+			col <- terrain.colors(nrnodes) else
+			col <- terrain.colors(max(unclass(xnodes$icol)))
+		}
+	if (is.null(xnodes$icol))
+		colx <- col[1:nrnodes] else
+		colx <- col[xnodes$icol]	
+		
+	
 #	oldpar <- par(no.readonly = TRUE)
 	    if (ask) {
 	oask <- devAskNewPage(TRUE)
@@ -59,7 +68,7 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
 				text(xnodes$self.time, xnodes$total.time,xnodes$name)
 			} else {
 				plot(xnodes$self.time, xnodes$total.time, xlab="self", 
-					ylab="total", pch=16, col= col[xnodes$icol], sub=src, main="Nodes by time")
+					ylab="total", pch=16, col= colx, sub=src, main="Nodes by time")
 				if (require(wordcloud)) textplot(xnodes$self.time, xnodes$total.time,xnodes$name, new=FALSE) else
 				text(xnodes$self.time, xnodes$total.time,xnodes$name)
 		}
@@ -133,7 +142,7 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
 			plot(table(xnodes$icol), type="h", lwd=20, col=col, lend="square", ylab="count")
 		},
 		#6
-		{nodescloud(x, min.freq=mincount, col=col)}
+		{nodescloud(x, min.freq=mincount, col=colx)}
 		
 	
 )#switch

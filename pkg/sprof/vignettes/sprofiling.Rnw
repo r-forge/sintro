@@ -327,7 +327,7 @@ plotviz <- function(x, layout="dot", main=NULL, sub=NULL,...)
 	xsubid <- NULL
 	class1 <- NULL
 	if (inherits(x,"sprof")) {
-		class1 <- paste0("class orig:",class(x))
+		class1 <- paste0("class orig: ", paste(class(x), collapse=" "))
 		xsubid <- x$info$id
 		sub <- paste0(sub, " ", x$info$id)
 		x <- as(adjacency(x), "graphNEL")
@@ -356,7 +356,7 @@ plotviz <- function(x, layout="dot", main=NULL, sub=NULL,...)
 	
 	
 		legend=c(class1,
-			paste0("class: ",class(x)), 
+			paste0("class: ", paste(class(x), collapse=" ")), 
 			paste0("layout: ",layout)),
 		bg="#FFFFE040",
 		seg.len=0
@@ -463,7 +463,21 @@ prxt(sumRprofRegressionExpl$by.self,
 	caption="summaryRprof result: by.self as final stack entry, all records", 
 	label="tab:prSRREbs")
 @
-\todo{improve barplot\_s. Allow vars from matrix or data frame, keep names. Use horizontal names for horiz layout.}
+\todo{improve barplot\_s. Allow vars from matrix or data frame, keep names. Use horizontal names for horizontal layout.}
+\todo{fix colour. Select colours >after< sorting. Explicit override.}
+%figure for help
+<<fig = TRUE, echo = FALSE, print = FALSE, include=FALSE, label=barplots, png=TRUE, width=6, height=9>>= 
+oldpar <- par(mfrow=c(3,2))
+x <- runif(32)
+barplot_s(x)
+barplot_s(x, decreasing=FALSE)
+barplot_s(x, lowtrim=0.1, hightrim=0.8)
+barplot_s(x, lowtrim=0.1, hightrim=0.8, colfun="grey")
+barplot_s(x, lowtrim=0.1, hightrim=0.8, colfun=heat.colors, coli=seq_along(x))
+barplot_s(x, lowtrim=0.1, hightrim=0.8, colfun=heat.colors,
+ coli=seq_along(x), trimlegend=FALSE, horiz=TRUE)
+par(oldpar)
+
 <<fig = TRUE, echo = TRUE, print = FALSE, include=FALSE, label=sRREbpbyself,width=12, height=12 >>= 
 s  <- sumRprofRegressionExpl$by.self$self.time
 names(s) <-  rownames(sumRprofRegressionExpl$by.self)
@@ -489,7 +503,8 @@ prxt(
 <<fig = TRUE, echo = TRUE, print = FALSE, include=FALSE, label=sRREbpbytotal,width=12, height=12 >>= 
 s  <- sumRprofRegressionExpl$by.total$total.time
 names(s) <-  rownames(sumRprofRegressionExpl$by.total)
-barplot_s(s, horiz=TRUE, col=rainbow(length(s)), las=1, main="total.time, by total")
+barplot_s(s, horiz=TRUE, 
+	col=rainbow(length(s)), las=1, main="total.time, by total")
 @
 
 \begin{figure}[htbp]
@@ -504,7 +519,7 @@ barplot_s(s, horiz=TRUE, col=rainbow(length(s)), las=1, main="total.time, by tot
 \filledpagebreak
 \subsubsection{Package sprof}
 \label{subsec:sprof}
-In contrast to the common \R{} packages, in the \ircode{sprof} implementation we take a two step approach. First we read in the profile file to an internal representation. Analysis is done in later steps.
+In contrast to the common \R{} profiling packages, in the \ircode{sprof} implementation we take a two step approach. First we read in the profile file to an internal representation. Analysis is done in later steps.
 
 <<>>=
 sprof01<- readRprof("RprofsRegressionExpl01.out")
@@ -539,7 +554,7 @@ information into their calling context as found in the input profile file. The
 \ircode{profiles} section gives the temporal context. It is implemented as a 
 list, but conceptually it is a data frame. Implementing it as a list allows run 
 length encoding of variables, which unfortunately is not allowed by \R{} in 
-data frames.
+data frames.\todo{variable sampling intervals will not be supported in future versions}
 
 <<>>=
 strx(sprof01)
@@ -552,7 +567,7 @@ The nodes do not come in a specific order. Access via a permutation vector
 is preferred. This allows different views on the same data set. For example, 
 \vref{tab:prspbt} uses a permutation by total time, and a selection (compare 
 to \vref{tab:prSRREbt}). One difference is that \ircode{sprof} uses 
-an event count as base, usually sampled by milliseconds (ms), whereas \R{} in general uses seconds as a base. Another difference is in two additional variables provided by \ircode{sprof}, the number of runs \ircode{nr\_runs} and  the average run length \ircode{avg\_time}. These are discussed in \label{sec:rle}.
+an event count as base, usually sampled by milliseconds (ms), whereas \R{} in general uses seconds as a base. Another difference is in two additional variables provided by \ircode{sprof}, the number of runs \ircode{nr\_runs} and  the average run length \ircode{avg\_time}. These are discussed in \vref{sec:rle}.
 
 << print = FALSE, results = tex, label=tab:prspbtself>>=
 nodes <- sprof01$nodes[order(sprof01$nodes$self.time, 
@@ -622,15 +637,84 @@ par(oldpar)
 \end{figure}
 % floating figure end
 
-We can add colour. To illustrate this, we encode the frequency of the nodes as colour. As a palette, we choose a heat map here. 
+\filledpagebreak
+
+\subsection{Node attributes}
+\label{sec:nodeattr}
+\index{node!attributes}
+
+The node information is kept as a \ircode{data.frame}, and this can be 
+extended as long as the overall structure is preserved. Two variables, 
+\ircode{icol} and \ircode{ilwd} are by convention used to hold graphical 
+attributes. The semantics is not fixed, but up to your choice. \irfunx{misc}
+{rkindex} is provided to derive an index from some variable. If a display may 
+have colour information, \ircode{icol} is to be used as an index into a colour 
+table. If a display has a linewidth attribute, \ircode{ilwd} should be used to set 
+the line width where feasible. The details are left to the plots.
+
+Keeping in mind the limits of perception, \ircode{icol} and \ircode{ilwd} should 
+be kept small. Using 4 colours or hues seems a save choice;  aboout 16 
+colours seem to be the maximum useful in many diplays. For line width, 
+about 3 is a save number, and about 7 seems to be the limit.
+ 
+ 
+For two common models, attributes by time and attributes by run length information, a helper routine is provided to calculate indices.\todo{make call by reference function}
+<<label=funnodeattrs>>=
+nodeattrs <- function(sprof, 
+	nodeattrs, # = c("default", "time", "runs"),
+	maxcol=16, colpwr=0.5,
+	maxlwd=7, lwdpow=0.5)
+{
+	#default
+	if (missing(nodeattrs)) nodeattrs <- "default"
+	icol <- rep(1,length(sprof$nodes$name))
+	ilwd <- icol
+
+	if (nodeattrs == "runs"){
+		# may be skipped. if (is.null(sprof$nodes$avg_time)){
+		nrl <- nodesrunlength(sprof, clean=FALSE)
+		icol <-  rkindex(-nrl[,"avg_time"], 
+				pwr=colpwr, maxindex=maxcol, ties.method="min")
+		ilwd <-  rkindex(nrl[,"nr_runs"], 
+			pwr=lwdpow, maxindex=maxlwd, ties.method="min")
+	} else if (nodeattrs == "time"){
+		icol <- rkindex(-sprof$nodes$self.time, 
+				pwr=colpwr, maxindex=maxcol, ties.method="min")
+		ilwd <-  rkindex(sprof$nodes$total.time, 
+			pwr=lwdpow, maxindex=maxlwd, ties.method="min")
+	}
+	data.frame(icol=icol, ilwd=ilwd)
+}
+@
+
+\todo{propagate nodeattrs}
+
+So we can add colour. To illustrate this, we encode the frequency of the nodes 
+as colour. As a palette, we choose a heat map here. 
 \todo{apply colour to selection?}
 
-Note: we chose a colour palette for the full data set. If we restrict a display to a selection, only a fraction of the palette may be visible. As an alrternative, you can adjust the aplette to focus on your selection.
+Note: we chose a colour palette for the full data set. If we restrict a display to 
+a selection, only a fraction of the palette may be visible. As an alternative, we 
+could adjust the palette to focus on your selection. However the 
+recommendation is not to spend too much energy here. Instead of modifying 
+the display, the recommended way is to extract the core information by 
+trimming the data set (see \vref{sec:trimming}) and surgery (see 
+\vref{sec:surgery}) if necessary, and tune the displays only after these steps.
+
+Function \irfunx{hplot}
+{plot\_nodes}, and most plotting functions of \ircode{sprof}, allow various 
+modes to control the use of colours. The recommended mode is to add a 
+index variable \ircode{icol} giving an index to a colour table. See \irfunx{misc}
+{rkindex} for a choice of modifications. By default, the colour table is the 
+current palette. The plot functions allow to chose a different colour function 
+plot by plot.\todo{add general discussion of colours in \ircode{sprof}}
 <<>>=
-freqrank01 <- rkindex(-sprof01$nodes$total.time, ties.method="random")
+freqrank01 <- rkindex(-sprof01$nodes$total.time, 
+	ties.method="random")
 freqrankcol01 <- heat.colors(length(freqrank01))
 @
-Here is the node view using these choices (Basic information on node level, colour by total time
+Here is the node view, using these choices (Basic information on node level, 
+colour by total time,
 see \vref{fig:sREplotnodes01freqcol}).
 % :floating figure
 <<fig = TRUE, echo = TRUE, print = FALSE, label=sREplotnodes01freqcol, width=10, height=10, include=FALSE>>=
@@ -667,10 +751,34 @@ matrices''
 of package \ircode{bertin}, \url{http://bertin.r-forge.r-project.org}.
 \todo{improve colour: support colour in a structure}
 
+On the node level, the additional information provided by \ircode{sprof} is the 
+information on runs. The total time is broken down to runs. Detailed 
+information is accessible if requested. The nuber of runs, and the average 
+run length are reported by default, giving an inside look into the total time 
+reported conventionally. Making use of this information requires careful 
+reading.
+
+By itself, graphical inspection is not very helpful. The profiling process 
+collapsed the real information to very few run numbers, and many ties in the 
+average run lenght (\vref{fig:run}: Run length information.
+).\todo{add as additional information to classical basics}
+
+<<fig=TRUE, include=FALSE, label=runs>>=
+plot(sprof01$nodes$avg_time,sprof01$nodes$nr_runs)
+@
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics{sprofiling-runs}
+\caption{Run length information.}
+\label{fig:run}
+\end{center}
+\end{figure}
+
 \subsubsection{Node classes}
 We can add attributes to the plots. But we can also add attributes to the 
 nodes, and use these in the plots. In principle, this has been alway available. 
-We are now making explicit use of this possibility.
+In \ircode{sprof}, we are making explicit use of this possibility.
 
 The attribute \ircode{icol} is a special case which we used above. If present, 
 it will be interpreted as an index to a colour table. For example, we can 
@@ -703,7 +811,7 @@ sprof01$nodes$icol <-as.factor(nodepackages)
 Nodes by package, colours by RColorBrewer: see \vref{fig:sREplotnodes01packcol1}.
 
 %: floating figure
-<<fig = TRUE, echo = TRUE, print = FALSE, include=FALSE, label=sREplotnodes01packcol1, png=TRUE, width=10, height=15>>= 
+<<fig = TRUE, echo = TRUE, print = FALSE, include=FALSE, label=sREplotnodes01packcol1, png=TRUE, height=18, width=12>>= 
 oldpar <- par(mfrow=c(3,2))
 
 if (require(RColorBrewer)) colpack <- 
@@ -717,7 +825,7 @@ par(oldpar)
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics{sprofiling-sREplotnodes01packcol1}
-\caption{Nodes by package, colours by RColorBrewer.}
+\caption{12 18 Nodes by package, colours by RColorBrewer.}
 \label{fig:sREplotnodes01packcol1}
 \end{center}
 \end{figure}
@@ -783,7 +891,7 @@ par(oldpar)
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics{sprofiling-sREplotnodes01col}
-\caption{Nodes by class. User defined colours.}
+\caption{8 12 Nodes by class. User defined colours.}
 \label{fig:sREplotnodes01col}
 \end{center}
 \end{figure}
@@ -792,7 +900,7 @@ par(oldpar)
 % floating figure end
 %: floating figure
 Nodes by class: default colour selection: see \vref{fig:sREplotnodes01colcb}.
-
+\todo{check/fix colour for wordcloud}
 <<fig = TRUE,  label=sREplotnodes01colcb, width=8, height=12, include=FALSE>>= 
 #8 12
 oldpar <- par(mfrow=c(3,2))
@@ -913,6 +1021,7 @@ The nodes table keeps the names at the nodes.
 Sometimes, it is more convenient to use a simple representation, such as a 
 matrix. Several extraction routines are provided for this, and the display 
 routines make heavy use of this. See \vref{tab:as.matrix}.
+\todo{data frame conversion?}
 \todo{complete matrix conversion}
 \begin{table}[htdp]
 \caption{Extraction and conversion routines}
@@ -1105,7 +1214,7 @@ plot(sprof01adjNEL,  main="sprof01: graph layout example",
 	attrs=list(node=list(cex=4, fontsize=40,  shape="ellipse")), 
 	cex.main=2)
 	
-rm(sprof01adjNEL)
+rm(sprof01adjNEL) # used for look-ahead example only
 @
 
 %: floating figure
@@ -1117,6 +1226,7 @@ rm(sprof01adjNEL)
 \label{fig:sprofadjNEL026}
 \end{center}
 \end{figure}
+\todo{log scale?}
 
 \subsection{Cheap thrills}
 
@@ -1681,10 +1791,12 @@ par(oldpar)
 \end{center}
 \end{figure}
 
-See \vref{fig:sprofadj01NEL} for a comparison before and after trimming. The 
-scaffold effect are removed from the picture on the right side. This cuts off the 
-uninformative spine, and induces minor changes in the body of the graph. You 
-can do additional trimming, if you want.
+See \vref{fig:sprofadj01NEL} for a comparison before and after trimming. 
+The 
+scaffold effect are removed from the picture on the right side. This cuts off 
+the 
+uninformative spine, and induces minor changes in the body of the graph. 
+You can do additional trimming, if you want to.
 
 % floating figure end
 \R{} is function based, and control structures in general are implemented as 
@@ -1693,7 +1805,9 @@ and seeding to unrelated paths. We can detect these on the stack level and
 replace them by surrogates, introducing new nodes. This is a case for 
 surgery.
 
-We use a prepared sanitised version of our data set. (Sprof graph, after trimming, and after trimming and some sanitising, see \vref{fig:sprofadj0204NEL}.)
+We use a prepared sanitised version of our data set. (Sprof graph, after 
+trimming, and after trimming and some sanitising, see 
+\vref{fig:sprofadj0204NEL}.)
 
 @
 
@@ -1757,7 +1871,7 @@ as_graphNEL_sprof <- function(sprof, weight=TRUE){
 	} #! define lwd first
 	
 	el04 <- edgedf(a04)
-	el04$lwd  <- rkindex(el04$count, maxindex=6, ties.method="min")
+	el04$lwd  <- rkindex(el04$count, maxindex=7, ties.method="min")
 	
 	a04NEL <- as(a04,"graphNEL")
 	nodeDataDefaults(a04NEL, "shape") <- "ellipse"
@@ -1791,115 +1905,130 @@ dependency of \ircode{sprof} on \ircode{graph} and other graph packages.
 
 %:   plot_graphNEL_sprof
 <<label=plot_graphNEL_sprof>>=
-plot_graphNEL_sprof <- function(sprof04,
-#	mode="dot", nodeattrs = c("default", "time", "runs"),
-	layout = "dot", nodeattrs,
+# source('~/projects/rforge/sintro/pkg/sprof/R/pgn.R', chdir = TRUE)
+plot_graphNEL_sprof <- function(sprof,
+	layoutType = "dot", 
+	nodeattrs, # = c("default", "time", "runs"),
 	fill_list = NULL,
+	lwd_list = NULL,
+	srclegend="topleft",
+	attrlegend="bottomright",
 	main = NULL, sub = NULL,...)
 {
-	main1 <- deparse(substitute(sprof04))
+	main1 <- deparse(substitute(sprof))
 	xsubid <- NULL
 	y<-NULL
 	class1 <- NULL
 	
-
 	if (missing(nodeattrs)) nodeattrs <- "default"
 	#nodeattrs <- match.arg(nodeattrs)
 	# cat(nodeattrs)
 	
-	if (inherits(sprof04, "sprof")) {
-		class1 <- paste0("class orig:",class(sprof04))
-		main1 <- sprof04$info$id
+	if (inherits(sprof, "sprof")) {
+		class1 <- paste0("class orig: ", paste(class(sprof), collapse=" "))
+		main1 <- sprof$info$id
 		graphNEL <- 	
-			as_graphNEL_sprof(sprof04, weight=FALSE)
-		y <- layout
-	} else graphNEL <- sprof04
+			as_graphNEL_sprof(sprof, weight=FALSE)
+		y <- layoutType
+	} else graphNEL <- sprof
 
  	if (!is.null(sub)) sub <- as.character(sub) 
 	
-	if (is.null(main)) {
-		main <-paste0("plot_graphNEL_sprof( ",
-			main1 , ", ", 
-			layout, " )\n", 
-			xsubid) } else
-		{
-		main=paste0(main, "\n plot_graphNEL_sprof( ", 
-			main1 , ", ", 
-			layout, " )\n", xsubid)
-		}
+	main=paste0(main, "\n plot_graphNEL_sprof( ", 
+		main1 , ", ", 
+		layoutType, " )\n", xsubid)
+		
 # functions
-	legattributes <- function(legnd){
-		legend("bottomright",
-				legend= legnd, 
-				bg="#FFFFE040",
+	legattributes <- function(legnd=NULL, 
+		nodecol=NULL,  nodelwd=NULL, 
+		edgcol=NULL, edglwd="frequency")
+	{
+		# 
+		llegnd<- legnd
+		if (!is.null(nodecol)) {
+			nodecol <- paste0("node col: ",nodecol, collapse="")
+			if (is.null(llegnd))  llegnd <- nodecol else
+				llegnd <- paste0(llegnd,"\n", nodecol,collapse="")
+		}
+		if (!is.null(nodelwd)) {
+			nodelwd <- paste0("node lwd: ", nodelwd, collapse="")
+			if (is.null(llegnd)) llegnd <- nodelwd else  
+				llegnd <- paste0(llegnd,"\n", nodelwd, collapse="") 
+		}
+		if (!is.null(edgcol)) {
+			edgcol <- paste0("edge col: ", edgcol, collapse="\n")
+			if (is.null(llegnd)) llegnd <- edgcol else 
+				llegnd <- paste0(llegnd,"\n", edgcol,collapse="")
+		}
+		if (!is.null(edglwd)) {
+			edglwd <- paste0("edge lwd: ", edglwd, collapse="")
+			if (is.null(llegnd)) llegnd <- edglwd else 
+				llegnd <- paste0(llegnd, "\n",edglwd,collapse="")
+		}
+		if (!is.null(attrlegend)){
+		if (!is.null(llegnd))		
+		{	llegnd=paste0(llegnd,"\n")
+
+		legend(attrlegend,
+				legend= llegnd, 
+				bg="#FFFFE0",
 				seg.len=0,
 				bty="n", 
 				text.font=3)
-			#bg="#00004040",
-	}
-#nDD0 <- (nodeRenderInfo(graphNEL))
-#graphNEL <- layoutGraph(graphNEL)
-#nDD1 <- (nodeRenderInfo(graphNEL))# fill & col corrupted
-
-#nodeDataDefaults(graphNEL, "cex") <- 1.0
-#nodeDataDefaults(graphNEL, "weigth") <- 1
-#nodeDataDefaults(graphNEL, "fill") <- "green"
-#nodeDataDefaults(graphNEL, "col") <- "yellow"
-
-#nodeDataDefaults(graphNEL, "shape") <- "ellipse"
-nDD2 <- (nodeRenderInfo(graphNEL))
-
-graphNEL <- layoutGraph(graphNEL) 
-
-nodeDataDefaults(graphNEL, "shape") <- "ellipse"
-
-if (nodeattrs == "runs"){
-	amt04 <- nodesrunlength(sprof04, clean=FALSE)
-
-	# node attributes
-	#sprof04$nodes$self.time -> fill
-	fill_list <- heat.colors(12)[
-		rkindex(-amt04[,"avg_time"], 
-			pwr=0.5, maxindex=12, ties.method="min")]
-	names(fill_list) <- sprof04$nodes$name
-
-	#sprof04$nodes$total.time -> lwd
-	lwd_list  <-  rkindex(amt04[,"nr_runs"], 
-		pwr=0.5, maxindex=6, ties.method="min")
-	names(lwd_list) <- sprof04$nodes$name
-
-	#strx(nodeRenderInfo(graphNEL))
-	nDD3 <- (nodeRenderInfo(graphNEL))
-
+			#bg="#0000"
+			}
+			}
+	} # legattributes 
+	
+	graphNEL <- layoutGraph(graphNEL, layoutType=layoutType) 
+	
 	nodeDataDefaults(graphNEL, "shape") <- "ellipse"
-
-	nodeRenderInfo(graphNEL) <- list(lwd=lwd_list, 
-		fill=fill_list, 
-		col="#0000FF80", 
-		shape="ellipse",
-		weight=1)
-	#strx(nodeRenderInfo(graphNEL))
-}	else if (nodeattrs == "time"){
-	# node attributes
-	#sprof04$nodes$self.time -> fill
-	fill_list <- heat.colors(12)[
-		rkindex(-sprof04$nodes$self.time, 
-			pwr=0.5, maxindex=12, ties.method="min")]
-	names(fill_list) <- sprof04$nodes$name
-
-	#sprof04$nodes$total.time -> lwd
-	lwd_list  <-  rkindex(sprof04$nodes$total.time, 
-		pwr=0.5, maxindex=6, ties.method="min")
-	names(lwd_list) <- sprof04$nodes$name
-
-	#strx(nodeRenderInfo(graphNEL))
-	nDD3 <- (nodeRenderInfo(graphNEL))
-
-}   else {
-	graphNEL <- layoutGraph(graphNEL)
-	fill_list <- NULL
-	lwd_list <-  NULL
-}
+	
+	if (nodeattrs == "runs"){
+		amt <- nodesrunlength(sprof, clean=FALSE)
+	
+		#sprof$nodes$self.time -> fill
+		fill_list <- heat.colors(12)[
+			rkindex(-amt[,"avg_time"], 
+				pwr=0.5, maxindex=12, ties.method="min")]
+		names(fill_list) <- sprof$nodes$name
+	
+		#sprof$nodes$total.time -> lwd
+		lwd_list  <-  rkindex(amt[,"nr_runs"], 
+			pwr=0.5, maxindex=7, ties.method="min")
+		names(lwd_list) <- sprof$nodes$name
+	
+		#strx(nodeRenderInfo(graphNEL))
+		nDD3 <- (nodeRenderInfo(graphNEL))
+	
+		nodeDataDefaults(graphNEL, "shape") <- "ellipse"
+	
+		nodeRenderInfo(graphNEL) <- list(lwd=lwd_list, 
+			fill=fill_list, 
+			col="#0000FF80", 
+			shape="ellipse",
+			weight=1)
+		#strx(nodeRenderInfo(graphNEL))
+	} else if (nodeattrs == "time"){
+		# node attributes
+		#sprof$nodes$self.time -> fill
+		fill_list <- heat.colors(12)[
+			rkindex(-sprof$nodes$self.time, 
+				pwr=0.5, maxindex=12, ties.method="min")]
+		names(fill_list) <- sprof$nodes$name
+	
+		#sprof$nodes$total.time -> lwd
+		lwd_list  <-  rkindex(sprof$nodes$total.time, 
+			pwr=0.5, maxindex=7, ties.method="min")
+		names(lwd_list) <- sprof$nodes$name
+	
+		#strx(nodeRenderInfo(graphNEL))
+		nDD3 <- (nodeRenderInfo(graphNEL))
+	}   else {
+		# graphNEL <- layoutGraph(graphNEL, layoutType=layoutType)
+		fill_list <- NULL
+		lwd_list <-  NULL
+	}
 	nodeDataDefaults(graphNEL, "shape") <- "ellipse"
 
 	nodeRenderInfo(graphNEL) <- list(
@@ -1908,40 +2037,38 @@ if (nodeattrs == "runs"){
 		col="#0000FF80", 
 		shape="ellipse",
 		weight=1)
-
-# edge attributes
-# strx(edgeRenderInfo(graphNEL))
-nER01 <- edgeRenderInfo(graphNEL) 
-edgeRenderInfo(graphNEL) <- list(col= "#80808080")
-# strx(edgeRenderInfo(graphNEL))
-
-renderGraph(graphNEL)
 	
-	legend("topleft", 
-		legend=c( class1, paste0("class: ", class(graphNEL)), 
-			paste0("layout: ", layout)),
-		bg="#FFFFE040",
-		seg.len=0
-		)#"lightyellow" =#FFFFE0
-
-
+	# edge attributes
+	# strx(edgeRenderInfo(graphNEL))
+	nER01 <- edgeRenderInfo(graphNEL) 
+	edgeRenderInfo(graphNEL) <- list(col= "#80808080")
+	# strx(edgeRenderInfo(graphNEL))
+	
+	renderGraph(graphNEL)
+	
+	if (!is.null(srclegend))	
+		legend(srclegend, 
+			legend=c( class1, 
+				paste0("class: ", 
+					paste(class(graphNEL), collapse=" ")), 
+				paste0("layout: ", layoutType)),
+			bg="#FFFFE040",
+			seg.len=0
+			)#"lightyellow" =#FFFFE0
+	
 	 if (nodeattrs == "runs"){
 		 title(main=paste0("nodes (run length)\n", main)	)	
-		 legattributes( c("node color: avg time, pwr=0.5",
-				"node lwd: nr runs, pwr=0.5",
-				"edge lwd: frequency"))
+		 legattributes(nodecol="avg run len, pwr=0.5",
+				nodelwd="nr runs, pwr=0.5")
 	} else if (nodeattrs == "time"){	
 		title(main=paste0("nodes (time)\n", main))
-		 legattributes( c("node color: self.time, pwr=0.5", 
-			"node lwd: total.time, pwr=0.5",
-			"edge lwd: frequency"))
+		 legattributes( nodecol="self.time, pwr=0.5", 
+			nodelwd="total.time, pwr=0.5")
 	} else {
 		title(main=main)
-		 legattributes( c(#"node color: ??",
-				#"node lwd: ??",
-				"edge lwd: frequency"))
+		legattributes( )
 	}
-	title( sub=sprof04$info$id, col.sub=grey(0.5))
+	title( sub=sprof$info$id, col.sub=grey(0.5))
 	invisible(graphNEL)
 }# %:  plot_graphNEL_sprof(sprof02)
 @
@@ -2118,7 +2245,7 @@ To use attributes on nodes and edges, we need \ircode{Rgraphviz}.
 %
 %Same data, unweighted edges, and colours, but attributes set after layout.
 \todo{merge with as\_graphNEL\_sprof}
-%:  plot_graphNEL_sprof1
+%:   plot_graphNEL_sprof1
 %<<>>=
 %library(graph)
 %# see help(nodeRenderInfo) for attributes.
@@ -2199,12 +2326,18 @@ plot_graphNEL_sprof(sprof04, nodeattrs="time")
 cleanpackages()
 @
 
-We should not overload the plot. We could use colour encoding for the edges, but this would conflict visually with the colour encoding of the nodes. We could use different shapes for classes of nodes, but then we would need an additional display to explain the shape information. 
+We should not overload the plot. We could use colour encoding for the 
+edges, but this would conflict visually with the colour encoding of the nodes. 
+We could use different shapes for classes of nodes, but then we would need 
+an additional display to explain the shape information. 
 
-But within the choice of attributes used, we still can select the information shown. To close this round, instead of showing the node information from the rough summary, we can show the information from the run length discussed in \vref{sec:rle}.
+But within the choice of attributes used, we still can select the information 
+shown. To close this round, instead of showing the node information from the 
+rough summary, we can show the information from the run length discussed 
+in \vref{sec:rle}.
 
 @
-%:  plot_graphNEL_sprof2
+%:   plot_graphNEL_sprof2
 %<<>>=
 %
 %# see help(nodeRenderInfo) for attributes.
@@ -2307,18 +2440,22 @@ Here for comparison is a run-down of the previous stages of our example, using t
 plot_graphNEL_sprof(sprof01, nodeattrs="runs")
 @
 \filledpagebreak
+
 <<fig=TRUE, label=pgs02, width=6, height=6, >>=
 plot_graphNEL_sprof(sprof02, nodeattrs="runs")
 @
 \filledpagebreak
+
 <<fig=TRUE, label=pgs03, width=6, height=6, >>=
 plot_graphNEL_sprof(sprof03, nodeattrs="runs")
 @
 \filledpagebreak
+
 <<fig=TRUE, label=pgs04, width=6, height=6, >>=
 plot_graphNEL_sprof(sprof04, nodeattrs="runs")
 @
 \filledpagebreak
+
 Now it is time for detailed inspection. We just give hints how to start.
 Our example is very simple. In out example, we just use two functions, 
 \ircode{lm} and \ircode{summary}. We should not be surprised to find them 
@@ -2327,12 +2464,12 @@ at prominent position with dominating weight. The \ircode{lm} and
 
 In the \ircode{lm} branch, \ircode{eval} is prominent. In the overall structure 
 of \R{},  \ircode{eval}  is the central interpreter. So it is expected to be 
-prominent.
+prominent in all records.
 
 \emph{Sorry. This example may be outdated at the time you read it. This is 
 from 
 \R{} 3.0.1. Chances are that it will be outdated soon when the \R{} core 
-people read it.
+people read it. 2013-08-31
 }
 
 \ircode{.getXlevels} is surprising. We have a plain vanilla real numbers 
@@ -2495,9 +2632,10 @@ and the answers will vary with personal preferences.
 
 For some graph layout packages we illustrate an interface here and show a 
 sample result. We use the original profile data here. This is a nasty graph 
-with some \R{} stack peculiarities. The corresponding results for the trimmed 
-profile data are shown in the next \vref{subsec:graphtre}. This is a more 
-realistic example of the kind of graphs you will have to work with.
+with some \R{} stack peculiarities. 
+%The corresponding results for the trimmed 
+%profile data are shown in the next \vref{subsec:graphtre}. This is a more 
+%realistic example of the kind of graphs you will have to work with.
 
 \todo{by graph package: preferred input format?}
 \todo{use attributes. Edge width should be easy.}
@@ -2593,6 +2731,9 @@ Layouts available for \ircode{igraph}:
       	zmin = NULL, zmax = NULL)}
 @
 The output of \ircode{igraph} gives problems when rendered with Adobe Acrobat on OS X Maverick. These examples have been moved to the \ircode{demo} section.
+You can call them using\\
+$\text{\hspace{3em}\ircode{demo(topic=<Item>, package = "sprof")}.}$
+
 <<print=FALSE, results =tex, label=tab:spdemo>>=
 spdemo <- demo(,"sprof")
 prxt(spdemo$results[, c("Item","Title")])
@@ -2870,11 +3011,10 @@ plot_network_sprof <- function( nwsprof,
 		warning("explicit label supplied, but will use vertex names")
 	
 	if (!is.null(sub)) sub <- as.character(sub)
-	if (is.null(main)) 
-		main <-
-			paste0("plot_network_sprof( ", xid ,", ", mode, " )\n", xsubid) else
 		main <- 
-			paste0(main, "\n plot_network_sprof( ", xid ,", ", mode, " )\n", xsubid)
+			paste0(main, 
+				"\n plot_network_sprof( ", xid ,", ", mode, " )\n", 
+				xsubid)
 
 	plot( nwsprof,
 		label = network.vertex.names(nwsprof), 
@@ -2886,7 +3026,8 @@ plot_network_sprof <- function( nwsprof,
 		cex.main=1.5,...)
 	
 	legend("topleft", 
-		legend=c(paste0("class: ",classnwsprof), 
+		legend=c(
+			paste0("class: ",paste(class(classnwsprof), collapse=" ")), 
 			paste0("mode: ",mode)),		
 		bg="#FFFFE040",
 		seg.len=0
@@ -2898,6 +3039,8 @@ plot_network_sprof <- function( nwsprof,
 <<fig=TRUE, label=plotnwsprof02,width=6, height=6>>=
 #6 6
 plot_network_sprof(sprof04)
+@
+\filledpagebreak
 
 <<fig=TRUE, label=nwsprof02,width=8, height=8>>=
 nwsprof02 <- as.network(sprofadj02) # names is not imported 
@@ -2918,6 +3061,10 @@ plot_network_sprof(nwsprof02, label=rownames(sprofadj02),
 \filledpagebreak
 
 \subsubsection{Rgraphviz package}
+%:        cleanpackages() try detach
+<<echo=FALSE, print=FALSE>>=
+cleanpackages()
+@
 
 Package ‘Rgraphviz’ was removed from the CRAN repository.
 
@@ -2925,16 +3072,12 @@ This package is now available from Bioconductor only, see \url{http://www.biocon
 
 <<>>=
 library(Rgraphviz)
-search()
-<<>>=
-sprofadjNEL02 <- as(sprofadj02,"graphNEL")
-sprofadjRag02 <- agopen(sprofadjNEL02, name="Rprof Example")
 @
 \filledpagebreak
 <<fig=TRUE, label=sprofadjvizdot,width=6, height=6>>=
 
 # 6 6
-plotviz(sprofadjRag02,sub=sprof$info$id)
+plot_graphNEL_sprof(sprof02,  layoutType="dot", nodeattrs="runs")
 @
 %agopen(graph, name, nodes, edges, kind = NULL, layout = TRUE,
 %layoutType = "dot",
@@ -2946,33 +3089,37 @@ plotviz(sprofadjRag02,sub=sprof$info$id)
 \filledpagebreak
 <<fig=TRUE, label=sprofadjvizneato,width=6, height=6>>=
 #6 6
-plotviz(sprofadjRag02,"neato", 
-	sub=sprof$info$id)
+plot_graphNEL_sprof(sprof02,  
+	layoutType="neato", nodeattrs="runs", sub=sprof$info$id)
 @
 \filledpagebreak
 <<fig=TRUE, label=sprofadjviztwopi,width=6, height=6>>=
 #6 6
-plotviz(sprofadjRag02,"twopi", 
-	sub=sprof$info$id)
+plot_graphNEL_sprof(sprof02,  
+	layoutType="twopi", nodeattrs="runs", sub=sprof$info$id)
 
 @
 \filledpagebreak
+
 <<fig=TRUE, label=sprofadj02vizcirco6,width=6, height=6>>=
 #6 6
-plotviz(sprofadjRag02,"circo", 
-	sub=sprof$info$id)
+plot_graphNEL_sprof(sprof02,  
+	layoutType="circo", nodeattrs="runs", sub=sprof$info$id)
 
 @
 \filledpagebreak
+
 <<fig=TRUE, label=sprofadjvizfdp,width=6, height=6>>=
 #6  6
-plotviz(sprofadjRag02,"fdp", 
-	sub=sprof$info$id)
+plot_graphNEL_sprof(sprof02,  
+	layoutType="fdp", nodeattrs="runs", sub=sprof$info$id)
 
 @
+\filledpagebreak
+
 \section{Template}
 \begin{itemize}
-	\item{Run a profiling routine to profile your functions. You can do it on the fly}
+	\item{Run a profiling routine to profile your functions. You can do it on the fly.}
 	\item{Read in the profile}
 	\item{Get a survey}
 	\item{Trim base level and burn-in/fade-out}
@@ -3044,130 +3191,7 @@ Svn repository information:
 \typeout{**** $Id$ done ****}
 \filledpagebreak
 \section{xxx  -- lost \& found}
-<<>>=
-nodefreq <- rep(0,length(sprof01$nodes$name))
-for (i in (1:length(sprof01$stacks$nodes))){
-	nodefreq <- nodefreq +   
-		table( factor(sprof01$stacks$nodes[[i]], 
-			levels <- 1:length(sprof01$nodes$name), 
-			ordered=FALSE))
-	}
-names(nodefreq) <- sprof01$nodes$name
-@
-Top frequent nodes.
-<<fig=TRUE, label=sREplotnodefreq>>=
-ndf <- nodefreq[nodefreq>1]
-ondf <- order(ndf,decreasing=TRUE)
-barplot(ndf[ondf])
-<<fig=TRUE, label=sREplotnodefreq1>>=
-barplot(ndf[ondf], col=rainbow(length(ondf)))
-@ 
-Top frequent stacks.
-<<fig=TRUE, label=sREplotstackfreq>>=
-x <- sprof01
-xsrc <- as.matrix(x$stacks$refcount)
-rownames(xsrc) <- rownames(xsrc, do.NULL=FALSE, prefix="S")
-#stf <- x$stacks$refcount[x$stacks$refcount>1]
-#names(stf) <-  x$stacks$shortname[x$stacks$refcount>1]
-stf <- xsrc[xsrc>1]
-names(stf) <- rownames(xsrc)[xsrc>1]
-ostf <- order(stf,decreasing=TRUE)
-barplot(stf[ostf])
 
-<< label=tab:prSREinfo>>=
-# xtable cannot handle posix, so we use print output here
-#  str(profile_nodes_rle, max.level=2, vec.len=3, nchar.max=40, list.len=6)
-strx(sprof01$info)
-@
-
-%As a convention, we do not re-arrange items for ad-hoc choices, but use a permutation 
-%vector instead. 
-%
-%<<fig=TRUE, label= barplotNodes>>=
-%rownames(sprof01$nodes) <- sprof01$nodes$names
-%nodesperm <- order(sprof01$nodes$total.time,decreasing=TRUE)
-%barplot(sprof01$nodes$total.time[nodesperm])
-@
-Selections are recorded as selection vectors, with reference to the original order.
-This needs some caution to align them with the order choices.
-<<fig=TRUE, label= barplotNodes4>>=
-rownames(sprof01$nodes) <- sprof01$nodes$names
-nodesperm <- order(sprof01$nodes$total.time,decreasing=TRUE)
-nodesnrobsok <- sprof01$nodes$total.time > 4
-sp <- sprof01$nodes$total.time[nodesperm][nodesnrobsok[nodesperm]]
-names(sp) <- sprof01$nodes$name[nodesperm][nodesnrobsok[nodesperm]]
-barplot(sp,
- main="Nodes, by total time", ylab="total time")
-@
-%<<fig=TRUE, label= barplotStacks>>=
-%#rownames(sprof01$nodes) <- sprof01$nodes$names
-%stacksperm <- order(sprof01$stacks$refcount,decreasing=TRUE)
-%barplot(sprof01$stacks$refcount[stacksperm],main="Stacks, by reference count", ylab="count")
-
-@
-\filledpagebreak
-On the first look, information on the profile level is not informative. Profile records are just recordings of some step, taken at regular intervals. We get a minimal information, if we encode the stacks in colour.
-\todo{use stack colours}
-
-@
-We now do a step down analysis. Aggregating the information from the profiling events, we have the frequency of stack references. On the stack level, we encode the frequency in colour, and linking propagates this to the profile level.
-\todo{use as\_rkindex}
-<<fig=TRUE, label=sREplotstacks4col>>=
-stackfreqscore <- rank(sprof01$stacks$refcount,ties.method="random")
-stacksperm <- order(sprof01$stacks$refcount,decreasing=TRUE)
-stacksnrobsok <- sprof01$stacks$refcount > 4
-stackfreqscore4<- stackfreqscore[stacksperm][stacksnrobsok[stacksperm]]
-barplot(sp[stacksnrobsok[stacksperm]], 
-	main="Stacks, by reference count (4 obs. minimum)", ylab="count > 4",
-	col=rainbow(80)[stackfreqscore4], sub=sprof01$info$id)
-@
-%<<>>=
-%nodesnrobsok <- sprof01$nodes$total.time > 4
-%sp1 <- as.matrix(sprof01$nodes$total.time)
-%rownames(sp1) <- sprof01$nodes$name
-%sp1 <-  as.matrix(sp1[nodesperm])
-%rownames(sp1) <- sprof01$nodes$name[nodesperm]
-%sp1 <- as.matrix(sp1[nodesnrobsok[nodesperm]])
-%rownames(sp1)<- sprof01$nodes$name[nodesnrobsok[nodesperm]]
-%barplot(t(sp1))
-@
-\filledpagebreak
-
-<<print = FALSE, results = tex, label=tab:prSREnodes>>=
-prxt(sprof01$nodes,
-	caption="nodes", 
-	label="tab:prSREnodes", 
-	max.level=2, vec.len=3,nchar.max=40
-	#, digits=c(0,0,0,2,0,2,0)
-	)
-@
-%<<print = FALSE, results = tex, label=tab:prSREstacks>>=
-%prxt(sprof01$stacks,
-%	caption="stacks", 
-%	label="tab:prSREstacks")
-\filledpagebreak
-<<label=tab:prSREstacks>>=
-#str(sprof01$stacks,  max.level=2, vec.len=6,
-#	nchar.max=40, list.len=20,width=70, strict.width="wrap"
-strx(sprof01$stacks)
-@
-A summary is provided on request.
-<<label=sumsprof01>>=
-sumsprof01 <- summary.sprof(sprof01)
-#str(profile_nodes_rle, max.level=2, vec.len=3, nchar.max=40, list.len=6)
-strx(sumsprof01)
-#str(sumsprof01, max.level=2, vec.len=3, 
-#	nchar.max=40,  list.len=6,
-#	width=70, strict.width="wrap")
-@
-
-The classical approach hides the work that has been done. Actually it breaks down the data 
-to record items. This figure is not reported anywhere. In our case, it can be reconstructed. 
-The profile data have 8456 words in 524 lines.
-
-In our approach, we break down the information. Two lines of control information are split 
-off. We have 522 lines of profile with 50 unique stacks, referencing 62 nodes. Instead of 
-reducing it to a summary, we keep the full information. Information is always kept on its original level. 
 
 On the profiles level, we know the sample interval length, and the id of the stack recorded. On the stack level, for  each stack we have a reference count, with the sample interval lengths used as weights. This reference count is added up for each node in the stack to give the node timings.
 
@@ -3261,7 +3285,7 @@ function(x) print.table(t(x),zero.print = ".") ))
 %		#6
 %		plot(sprof_igraph, main="sprof04: igraph layout: trimmed data")
 %			legend("topleft", 
-%				legend=c(paste0("class: ",class(sprof_igraph))),
+%				legend=c(g0("class: ",class(sprof_igraph))),
 %				bg="#FFFFE040",
 %				seg.len=0
 %				)#"lightyellow" =#FFFFE0

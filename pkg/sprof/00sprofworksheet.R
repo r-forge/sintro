@@ -107,13 +107,7 @@ prompt(object, filename = NULL, name = NULL, ...)
 }
 
 ###
-cscore <- rank(rpo$nodes$total.time,ties.method="random")
-###
 #!/bin/sh
-cd ~/projects/rforge/sintro/pkg/sprof/
-
-lapply(sprofRegressionExpl$stacks$nodes, function(x) {x[-(1:level)]}
-
 cd ~/projects/rforge/sintro/pkg
 svn propset svn:keywords "Date Author Id Revision HeadURL Name" sprof/man/*.Rd
 svn propset svn:keywords "Date Author Id Revision HeadURL  Name" sprof/R/*.R
@@ -160,8 +154,6 @@ edgeData(fa, from=el04$from, to=el04$to, attr="lwd") <- el04$lwd
 plot(fa)
 ##
 vignette <- function(){ 
-remove.packages("sprof")
-install.packages("/Users/gs/projects/rforge/sintro/pkg/sprof_0.1-0.tar.gz", repos=NULL, type="source")
 options(width=72); setwd("/Users/gs/projects/rforge/sintro/pkg/sprof/work/vignettes/" )
 Sweave(file= "../../vignettes/sprofiling.Rnw", output="sprofiling.tex", keep.source=TRUE)
 # debug=TRUE, eps=FALSE, pdf=TRUE, keep.source=TRUE

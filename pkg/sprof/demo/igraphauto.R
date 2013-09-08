@@ -22,8 +22,11 @@ as_igraph_sprof <- function(sprof, layoutfun, params=NULL,...){
 	sprof_igraph <- set.graph.attribute(sprof_igraph, "layout", 
 		layoutfun(sprof_igraph,params=params,...),...)
 	V(sprof_igraph)$color <- "yellow"
-	E(sprof_igraph)$color <- "#0000FF20"
-	E(sprof_igraph)$width <- c(1,2)
+	V(sprof_igraph)$shape <- "circle"
+	#V(sprof_igraph)$size <- 15
+	V(sprof_igraph)$size2 <- 12
+	E(sprof_igraph)$color <- "#0000FF40"
+	E(sprof_igraph)$width <- c(1,5,10)
 	return(sprof_igraph)
 }
 
