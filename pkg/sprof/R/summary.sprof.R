@@ -51,7 +51,8 @@ summary_nodes <- function(x){
 	#shortname=abbreviate(x$nodes$name), 
 	root= ishead, leaf=isleaf, 
 	self.time=self.time, self.pct = self.time/nrprofs*100,
-	total.time=total.time, total.pct= total.time/nrprofs*100)
+	total.time=total.time, total.pct= total.time/nrprofs*100, 
+	stringsAsFactors=FALSE)
 	rownames(nodes)<- x$nodes$name
 	nodes
 } # summary_nodes

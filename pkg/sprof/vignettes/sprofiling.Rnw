@@ -251,15 +251,23 @@ xcutrows <- function(df,  cut, margin=5)
 		}#if
 	}
 	
-	if (!missing(cut))  {df <- cutrng(cut[1],cut[2]); return(df)}
+	if (!missing(cut))  {
+		if (length(cut) ==2) 
+		{df <- cutrng(cut[1],cut[2])
+			return(df)
+		} else {
+		warning("cut ignored. Cut range must be a vector of length 2")
+			return(df)}
+	}
 	if (length(margin)==0) return(df)
-	if (length(margin)==1) margin <-  c(margin,margin)
+	if (length(margin)==1) margin <-  c(margin, margin)
 	if (length(margin)==2) {
 		cut <- c(margin[1]+1,nrow-margin[2])
-		df <-cutrng(cut[1],cut[2]); 
+		df <-cutrng(cutfrom=cut[1],cutto=cut[2]); 
 		return(df)
 	}
 	
+	#len=3: margin low,  center, margin up
 	delta <- (nrow-sum(margin))  %/% 2
 	if (delta<2) return(df)
 	c1 <- margin[1]+1
@@ -465,7 +473,10 @@ prxt(sumRprofRegressionExpl$by.self,
 @
 \todo{improve barplot\_s. Allow vars from matrix or data frame, keep names. Use horizontal names for horizontal layout.}
 \todo{fix colour. Select colours >after< sorting. Explicit override.}
-%figure for help
+%:figure for help
+%\if{html}{\figure{sprofiling-Rdbarplot.png}{options: width=84\%}}
+%\if{latex}{\figure{sprofiling-Rdbarplot.pdf}{options: width=6.0in}}
+
 <<fig = TRUE, echo = FALSE, print = FALSE, include=FALSE, label=barplots, png=TRUE, width=6, height=9>>= 
 oldpar <- par(mfrow=c(3,2))
 x <- runif(32)
@@ -573,7 +584,7 @@ an event count as base, usually sampled by milliseconds (ms), whereas \R{} in ge
 nodes <- sprof01$nodes[order(sprof01$nodes$self.time, 
 decreasing=TRUE),]
 rownames(nodes) <- NULL
-prxt(nodes[nodes$self.time>4,],
+prxt(nodes[nodes$self.time>4,1:7],
 digits=c(0,0,0,2,0,2,0,2),
 caption="sprof result: by.self, self time > 4ms", 
 	label="tab:prspbtself")
@@ -584,7 +595,7 @@ At this level, it is helpful to note the expectations, and only then inspect the
 nodes <- sprof01$nodes[order(sprof01$nodes$total.time, 	
 	decreasing=TRUE),]
 rownames(nodes) <- NULL
-prxt(nodes[nodes$total.time>4,],
+prxt(nodes[nodes$total.time>4,1:7],
 	digits=c(0,0,0,2,0,2,0,2),
 	caption="sprof result: by.total, total time > 4ms", 
 	label="tab:prspbt")
@@ -658,7 +669,9 @@ colours seem to be the maximum useful in many diplays. For line width,
 about 3 is a save number, and about 7 seems to be the limit.
  
  
-For two common models, attributes by time and attributes by run length information, a helper routine is provided to calculate indices.\todo{make call by reference function}
+For two common models, attributes by time and attributes by run length 
+information, a helper routine is provided to calculate indices.\todo{make call 
+by reference function}
 <<label=funnodeattrs>>=
 nodeattrs <- function(sprof, 
 	nodeattrs, # = c("default", "time", "runs"),
@@ -792,7 +805,7 @@ profiles. Grouping nodes may be a mean to clarify the picture.
 Grouping may also help you to focus your attention. ``HOT'' and ``cold''  may 
 be very helpful tags. These can be used in a flexible way.
 
-\todo{Move class attributes to package code}
+%:   \todo{Move class attributes to package code}
 \todo{add class by keyword}
 <<>>=
 nodekeyword0 <- function(node)
@@ -821,6 +834,7 @@ if (require(RColorBrewer)) colpack <-
 plot_nodes(sprof01, which=1:6, col=colpack)
 par(oldpar)
 @
+% plot_nodes(sprof01, which=6, col=colpack)
 
 \begin{figure}[htbp]
 \begin{center}
@@ -1545,7 +1559,6 @@ This surgery gives no additional information on the profile data. It only helps 
 
 \todo{replace by sprof03}
 We use a prepared sanitised version of our data set.
-
 
 \todo{fix null name}
 <<>>=
@@ -2995,7 +3008,9 @@ as_network_sprof <- function(sprof) {
 		rownames(sprofadj02) # not honoured by plot
 	return(nwsprof02)
 }
-<<>>=
+@
+%: plot_network_sprof
+<<label=plot_network_sprof>>=
 plot_network_sprof <- function( nwsprof, 
 	mode = "fruchtermanreingold", 
 	main=NULL, label=NULL, sub=NULL,...) 
@@ -3007,8 +3022,11 @@ plot_network_sprof <- function( nwsprof,
 		xsubid <- nwsprof$info$id
 		nwsprof <-  as_network_sprof(nwsprof)
 		}
-	if (!is.null(label)) 
-		warning("explicit label supplied, but will use vertex names")
+	if (!is.null(label)) {
+		warning("plot_network_sprof: explicit label supplied, but will use vertex names")
+		strx(label)
+		strx(network.vertex.names(nwsprof))
+		}
 	
 	if (!is.null(sub)) sub <- as.character(sub)
 		main <- 
@@ -3074,7 +3092,7 @@ This package is now available from Bioconductor only, see \url{http://www.biocon
 library(Rgraphviz)
 @
 \filledpagebreak
-<<fig=TRUE, label=sprofadjvizdot,width=6, height=6>>=
+<<fig=TRUE, label=sprofadjvizdot, width=6, height=6>>=
 
 # 6 6
 plot_graphNEL_sprof(sprof02,  layoutType="dot", nodeattrs="runs")
@@ -3198,24 +3216,25 @@ On the profiles level, we know the sample interval length, and the id of the sta
 Cheap statistics are collected as the come by. For example, from the stacks table it is cheap to identify root and leaf nodes, and this mark is propagated to the nodes table.
 @
 These are some attempts to recover the factor structures.
-<<>>=
-xfi <- levels(sprof02$nodes$name)
-profile_nodes_rlefac <- lapply(profile_nodes_rle, 
-	function(xl) {xl$values <- factor(xl$values, 
-		levels=1:62, 
-		labels=xfi); xl}) # seems ok
-profile_nodes_rletfac <- lapply(profile_nodes_rle, 
-	function(x) table(x,dnn=c("run length","node")) ) #factors lost again
-	colnames(profile_nodes_rletfac[[1]]) <- 
-		sprof02$nodes$name[ as.integer(colnames(profile_nodes_rletfac[[1]]))] 
-
-profile_nodes_rletfac1 <- lapply(profile_nodes_rletfac,
-	function(xl) {colnames(xl) <- 
-		sprof02$nodes$name[ as.integer(colnames(xl))];
-	xl} )
-
-invisible(lapply(profile_nodes_rletfac1, 
-function(x) print.table(t(x),zero.print = ".") ))
+%<<>>=
+%xfi <- levels(sprof02$nodes$name)
+%profile_nodes_rlefac <- lapply(profile_nodes_rle, 
+%	function(xl) {xl$values <- factor(xl$values, 
+%		levels=1:62, 
+%		labels=xfi); xl}) # seems ok
+%profile_nodes_rletfac <- lapply(profile_nodes_rle, 
+%	function(x) table(x,dnn=c("run length","node")) ) #factors lost again
+%	
+%	colnames(profile_nodes_rletfac[[1]]) <- 
+%sprof02$nodes$name[ as.integer(colnames(profile_nodes_rletfac[[1]]))] 
+%
+%profile_nodes_rletfac1 <- lapply(profile_nodes_rletfac,
+%	function(xl) {colnames(xl) <- 
+%		sprof02$nodes$name[ as.integer(colnames(xl))];
+%	xl} )
+%
+%invisible(lapply(profile_nodes_rletfac1, 
+%function(x) print.table(t(x),zero.print = ".") ))
 @
 %		\subsection{Trimmed example: regression}
 %		\label{subsec:graphtre}

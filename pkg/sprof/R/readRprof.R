@@ -211,14 +211,14 @@ readRprof <- function(filename = "Rprof.out",
 	#stackrefcount profile_lines
 	# browser()
 
-	# nodes <- data.frame(name=nodenames, row.names=1)
+	# nodes <- data.frame(name=nodenames, row.names=1, stringsAsFactors=FALSE)
 	# attr(nodes,"roots") <- rootnodes
 	# attr(nodes,"terminals") <- leafnodes
 	
-	# #stacks <- data.frame(sourcestr= collstacksdict,stacksrenc =  stacks_nodes)
+	# #stacks <- data.frame(sourcestr= collstacksdict,stacksrenc =  stacks_nodes, stringsAsFactors=FALSE)
 	# #attr(stacks, "freq") <- table(profile_lines)
 
-	# data <- data.frame(stack=profile_lines, mem = collmemcounts,malloc = collmalloccounts)
+	# data <- data.frame(stack=profile_lines, mem = collmemcounts,malloc = collmalloccounts, stringsAsFactors=FALSE)
 	# attr(data,"times") <-  rle(collinterval) # expand and add when reading
 	
 	#renc -> reversed  source
@@ -229,6 +229,7 @@ readRprof <- function(filename = "Rprof.out",
    # stacks
 	stacks <- data.frame(
 		nodes = as.matrix(stacks_nodes),
+		# nodes are factors with common levels given by nodes$name
 		# shortname = abbreviate(collstacksdictrev), 
 		# headers and control lines removed
 		
@@ -240,7 +241,7 @@ readRprof <- function(filename = "Rprof.out",
 		stackleafnodes =stackleafnodes, # stacksrenc[last]
 		# a convenience to allow textual matching -- may be removed
 		stackssrc= collstacksdict  # headers and control lines removed
-		)	
+		, stringsAsFactors=FALSE)	
 		row.names(stacks) <- seq_along(stacks$nodes)
 #		row.names(stacks) <- seq_along(stacks)  -- no. gives name by column
 #		rownames(stacks) <- rownames(stacks,do.NULL=FALSE, prefix="s")
@@ -267,7 +268,7 @@ readRprof <- function(filename = "Rprof.out",
 		nodes=data.frame(name=nodenames, 
 			self.time=leafcount, self.pct = round(leafcount/sum(leafcount)*100,2),
 			total.time=totalcount, total.pct = round(totalcount/sum(totalcount)*100,2)
-		),		
+		, stringsAsFactors=FALSE),		
 		
 		stacks= stacks,
 		# profiles
@@ -278,7 +279,7 @@ readRprof <- function(filename = "Rprof.out",
 			mem = collmemcounts, # additional, line-synced  --- merge to data
 			malloc = collmalloccounts, # additional, line-synced  --- merge to data
 			timesRLE = rle(collinterval)  # --- merge to data
-		)
+		, stringsAsFactors=FALSE)
 		)
 		}
 		

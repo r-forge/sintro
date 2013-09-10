@@ -30,6 +30,8 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
  	nrnodes <- dim(xnodes)[1]
  	totaltime <- sum(xnodes$self.time)
  	xnodes <- xnodes[xnodes$total.time < totaltime,]
+ 	xnodes <- xnodes[xnodes$total.time > 0,]
+ 	nrxnodes <- dim(xnodes)[1]
 
 	if (is.null(col)) {
 		if (is.null(xnodes$icol))
@@ -142,7 +144,8 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
 			plot(table(xnodes$icol), type="h", lwd=20, col=col, lend="square", ylab="count")
 		},
 		#6
-		{nodescloud(x, min.freq=mincount, col=colx)}
+		{nodescloud(xnodes, min.freq=mincount, col=col)
+			if (nrnodes!=nrxnodes)title(main=paste0("At most ",nrxnodes, " of ", nrnodes, " nodes shown"),col.sub=grey(0.5),font=3 )}
 		
 	
 )#switch
@@ -231,7 +234,7 @@ plot_profiles <- function(x, which=c(1L,2L,3L, 4L), col,ask = prod(par("mfcol"))
 		if (is.null(src))  src<-deparse(substitute(x))
 	}
 
-	warning("RLE and multiple timings not yet supported")
+	#warning("RLE and multiple timings not yet supported")
 	 #sp <- summary_profiles(x)
 	 nrprof <- length(xprof$data)
 	z <- xprof$data; dim(z)=c(length(z),1)

@@ -23,8 +23,8 @@ plot a plot for the output of class \code{scode}.
 %\if{latex}{\figure{logo.jpg}{options: width=0.5in}}
 These displays may be outdated. Please run the examples. Plots are from this collection:
 
-\if{html}{\figure{plotsprof.png}{options: width=6.0in}}
-\if{latex}{\figure{plotsprof.pdf}}
+\if{html}{\figure{plotsprof.png}{options: width=84\%}}
+\if{latex}{\figure{plotsprof.pdf}{options: width=6.0in}}
 }
 \value{subject to change}
 \references{  \url{http://sintro.r-forge.r-project.org/} }
