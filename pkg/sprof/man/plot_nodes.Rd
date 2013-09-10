@@ -32,8 +32,8 @@ src = NULL, mincount = 5, horiz=FALSE, ...)
 %\if{latex}{\figure{logo.jpg}{options: width=0.5in}}
 These displays may be outdated. Please run the examples. Plots are from this collection:
 
-\if{html}{\figure{sprofiling-sREplotnodes01packcol1.png}{options: width=6.0in}}
-\if{latex}{\figure{sprofiling-sREplotnodes01packcol1.pdf}}
+\if{html}{\figure{sprofiling-sREplotnodes01packcol1.png}{options: width=84\%}}
+\if{latex}{\figure{sprofiling-sREplotnodes01packcol1.pdf}{options: width=6.0in}}
 
 }
 \value{

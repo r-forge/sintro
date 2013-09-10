@@ -1,37 +1,9 @@
 ------------------------------------------------------------------------
-r231 | gsawitzki | 2013-08-30 19:01:23 +0200 (Fri, 30 Aug 2013) | 1 line
-Changed paths:
-   M /pkg/sprof/00sprofworksheet.R
-   M /pkg/sprof/vignettes/sprofiling.Rnw
-
-test for isolating grphic experiments
+r238 | gsawitzki | 2013-09-08 19:22:45 +0200 (Sun, 08 Sep 2013) | 1 line
+Added exception handling in rkindex; fixed range
 ------------------------------------------------------------------------
-r232 | gsawitzki | 2013-08-30 19:02:37 +0200 (Fri, 30 Aug 2013) | 1 line
-Changed paths:
-   A /pkg/sprof/demos
-   A /pkg/sprof/demos/00Index
-   A /pkg/sprof/demos/igraphKK.R
-   A /pkg/sprof/tests/igraphKK.R
-
-test for isolating grphic experiments
-------------------------------------------------------------------------
-r233 | gsawitzki | 2013-08-30 19:05:32 +0200 (Fri, 30 Aug 2013) | 1 line
-Changed paths:
-   A /pkg/sprof/demo (from /pkg/sprof/demos:232)
-   D /pkg/sprof/demos
-
-test for isolating grphic experiments
-------------------------------------------------------------------------
-r234 | gsawitzki | 2013-08-30 19:10:48 +0200 (Fri, 30 Aug 2013) | 1 line
-Changed paths:
-   M /pkg/sprof/ChangeLog
-   M /pkg/sprof/tests/igraphKK.R
-   M /pkg/sprof/tests/sampleRprof.R
-
-sync
-------------------------------------------------------------------------
-r233 | gsawitzki | 2013-08-30 19:05:32 +0200 (Fri, 30 Aug 2013) | 1 line
-test for isolating grphic experiments
+r235 | gsawitzki | 2013-08-30 22:23:25 +0200 (Fri, 30 Aug 2013) | 1 line
+igraph moved to demo
 ------------------------------------------------------------------------
 r230 | gsawitzki | 2013-08-29 21:11:56 +0200 (Thu, 29 Aug 2013) | 2 lines
 special casing for firstline removed. 
