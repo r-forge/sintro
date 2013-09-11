@@ -43,8 +43,8 @@ You man want to adjust the scale of the bar labels by using an additional argume
 More to come.
 	Plots are among others from this collection:
 
-\if{html}{\figure{barplots.png}{options: width=84\%}}
-\if{latex}{\figure{barplots.pdf}{options: width=6.0in}}
+\if{html}{\figure{sprofiling-barplots.png}{options: width=84\%}}
+\if{latex}{\figure{sprofiling-barplots.pdf}{options: width=6.0in}}
 
 }
 \value{Invisible: A data frame with components

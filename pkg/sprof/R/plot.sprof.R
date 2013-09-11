@@ -2,7 +2,7 @@
 # $Id$
 # setwd("")
 #! To Do
-#!
+#! ad warning if icol=NA
 # source('~/projects/rforge/sintro/pkg/sprof/R/plot.sprof.R', chdir = TRUE)
 
 
@@ -36,7 +36,7 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
 	if (is.null(col)) {
 		if (is.null(xnodes$icol))
 			col <- terrain.colors(nrnodes) else
-			col <- terrain.colors(max(unclass(xnodes$icol)))
+			col <- terrain.colors(max(unclass(xnodes$icol), na.rm=TRUE))
 		}
 	if (is.null(xnodes$icol))
 		colx <- col[1:nrnodes] else
@@ -62,17 +62,31 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
 	for (ip in which){
 		switch(ip,
 		
-		#1 scatterplot total ~ self
+		# 1 scatterplot total ~ self
+		#! setting xlim breaks example (hangs) in wordcloud::textplot
+				# { if (is.null(xnodes$icol)){
+			# plot(xnodes$self.time, xnodes$total.time, xlab="self", 
+				# ylab="total", sub=src, main="Nodes by time")
+			# if (require(wordcloud)) textplot(xnodes$self.time, xnodes$total.time,xnodes$name, new=FALSE, xlim= par("usr")[1:2]) else
+				# text(xnodes$self.time, xnodes$total.time,xnodes$name)
+			# } else { # has icol
+				# plot(xnodes$self.time, xnodes$total.time, xlab="self", 
+					# ylab="total", pch=16, col= colx, sub=src, main="Nodes by time", ...)
+				# if (require(wordcloud)) textplot(xnodes$self.time, xnodes$total.time,xnodes$name, new=FALSE, col=col[xnodes$icol], xlim= par("usr")[1:2] ) else
+				# text(xnodes$self.time, xnodes$total.time,xnodes$name, col=col[xnodes$icol])
+		# }
+		
+		# }, 
 		{ if (is.null(xnodes$icol)){
 			plot(xnodes$self.time, xnodes$total.time, xlab="self", 
 				ylab="total", sub=src, main="Nodes by time")
 			if (require(wordcloud)) textplot(xnodes$self.time, xnodes$total.time,xnodes$name, new=FALSE) else
 				text(xnodes$self.time, xnodes$total.time,xnodes$name)
-			} else {
+			} else { # has icol
 				plot(xnodes$self.time, xnodes$total.time, xlab="self", 
-					ylab="total", pch=16, col= colx, sub=src, main="Nodes by time")
-				if (require(wordcloud)) textplot(xnodes$self.time, xnodes$total.time,xnodes$name, new=FALSE) else
-				text(xnodes$self.time, xnodes$total.time,xnodes$name)
+					ylab="total", pch=16, col= colx, sub=src, main="Nodes by time", ...)
+				if (require(wordcloud)) textplot(xnodes$self.time, xnodes$total.time,xnodes$name, new=FALSE, col=col[xnodes$icol] ) else
+				text(xnodes$self.time, xnodes$total.time,xnodes$name, col=col[xnodes$icol])
 		}
 		
 		}, 
@@ -128,7 +142,7 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
 			if (require(wordcloud)) textplot(xnodes$self.time, 
 				xnodes$total.time,xnodes$name, new=FALSE) else
 				text(xnodes$self.time+1, xnodes$total.time,xnodes$name)
-		} else {
+		} else { # has icol
 			plot(xnodes$self.time+1, xnodes$total.time, 
 				xlab="log(self+1)", ylab="log(total)", log="xy",
 				pch=16, col= col[xnodes$icol], sub=src, main="Nodes by time", ...)
@@ -141,11 +155,14 @@ plot_nodes <- function(x, which=c(1L,2L, 3L, 4L), col=NULL,
 		{ if (is.null(xnodes$icol)){
 			frame()
 			legend("center","icol \n is required for this plot")} else
-			plot(table(xnodes$icol), type="h", lwd=20, col=col, lend="square", ylab="count")
+			plot(table(xnodes$icol), type="h", lwd=20, col=col, lend="square", ylab="count", las=2,...)
 		},
 		#6
 		{nodescloud(xnodes, min.freq=mincount, col=col)
-			if (nrnodes!=nrxnodes)title(main=paste0("At most ",nrxnodes, " of ", nrnodes, " nodes shown"),col.sub=grey(0.5),font=3 )}
+			if (nrnodes!=nrxnodes){
+				title(main=paste0("At most ",nrxnodes, " of ", nrnodes, " nodes shown"),col.sub=grey(0.5),font=3 )
+			}
+		}
 		
 	
 )#switch
@@ -239,7 +256,7 @@ plot_profiles <- function(x, which=c(1L,2L,3L, 4L), col,ask = prod(par("mfcol"))
 	 nrprof <- length(xprof$data)
 	z <- xprof$data; dim(z)=c(length(z),1)
 	
-	stackrng <- range(z)
+	stackrng <- range(z,na.rm = TRUE)
 	if (missing(col)) {col <- rainbow(stackrng[2]-stackrng[1]+1)}
 	
 	    if (ask) {

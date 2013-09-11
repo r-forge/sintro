@@ -121,7 +121,7 @@ R CMD BUILD --compact-vignettes=gs+qpdf sprof --no-multiarch --md5
 R CMD REMOVE sprof
 R CMD INSTALL sprof_0.1-0.tar.gz
 cd ~/projects/rforge/sintro/pkg/
-svn log -r 238:HEAD -v  --incremental  > ChangeLog0
+svn log -r 239:HEAD -v  --incremental  > ChangeLog0
 cat sprof/ChangeLog >> ChangeLog0
 ##  check here !!!
 mv ChangeLog0  sprof/ChangeLog
