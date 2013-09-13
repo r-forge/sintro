@@ -1,7 +1,7 @@
 # filename = "Rprofsr01.out"; chunksize = 100, interval = 0.02
-# edit(file="~/Documents/lectures/src/insider/profile/sprof/pkg/man/readProf.Rd")
-# source('~/projects/rforge/sintro/pkg/sprof/R/readProf.R', chdir = TRUE)
-# file.edit('~/projects/rforge/sintro/pkg/sprof/R/readProf.R', chdir = TRUE)
+# edit(file="~/Documents/lectures/src/insider/profile/sprof/pkg/man/readRprof.Rd")
+# source('~/projects/rforge/sintro/pkg/sprof/R/readRprof.R', chdir = TRUE)
+# file.edit('~/projects/rforge/sintro/pkg/sprof/R/readRprof.R', chdir = TRUE)
 
 
 readRprof <- function(filename = "Rprof.out", 
@@ -110,10 +110,11 @@ readRprof <- function(filename = "Rprof.out",
            memprefix <- attr(regexpr(":[0-9]+:[0-9]+:[0-9]+:[0-9]+:", chunk), "match.length")
            
                memstuff <- substr(chunk, 2L, memprefix-1L)
-               chunkmemcounts <- pmax(apply(sapply(strsplit(memstuff, ":"), as.numeric), 1, diff), 0)
+               #chunkmemcounts <- pmax(apply(sapply(strsplit(memstuff, ":"), as.numeric), 1, diff), 0)
+               chunkmemcounts <- t(sapply(strsplit(memstuff, ":"), simplify="array",as.numeric))
                ##  chunkmemcounts <- c(0, rowSums(chunkmemcounts[, 1L:3L]))
                ## convert to bytes.
-               chunkmemcounts <- c(0, rowSums(cbind(chunkmemcounts[, 1L:2L] * 8, chunkmemcounts[, 3L])))
+               # chunkmemcounts <- c(0, rowSums(cbind(chunkmemcounts[, 1L:2L] * 8, chunkmemcounts[, 3L])))
                rm(memstuff)
           
            chunk <- substr(chunk, memprefix+1L, nchar(chunk,  "c"))
@@ -121,7 +122,7 @@ readRprof <- function(filename = "Rprof.out",
                 chunk <- chunk[nc > 0L]
                 chunkmemcounts <- chunkmemcounts[nc > 0L]
            }
-           collmemcounts <- c(collmemcounts, chunkmemcounts)
+           collmemcounts <- rbind(collmemcounts, chunkmemcounts)
        }
 			
 		chunku <- unique(chunk)
@@ -138,6 +139,8 @@ readRprof <- function(filename = "Rprof.out",
 	})
 	
 	close(con)
+	
+	if (!is.null(collmemcounts)) colnames(collmemcounts) <- c("vsize.small.8by", "vsize.large.8by", "nodes", "duplications")
 
 	if (!is.null(collcontrols)) dim(collcontrols) <-NULL
 # end read data	 
@@ -249,6 +252,19 @@ readRprof <- function(filename = "Rprof.out",
 		
 		nrrecords = length(profile_lines)
 		
+		
+		# profiles
+		# these are conceptually a data frame and must be line aligned
+        #! should be improved to allow multiple profile collections 
+		 browser()	
+        profiles =list(
+			data= profile_lines,	# references to stacksrenc
+			mem = collmemcounts, 	# additional, line-synced  --- merge to data
+			malloc = collmalloccounts, # additional, line-synced  --- merge to data
+			timesRLE = rle(collinterval)  # --- remove
+		)
+
+
 	Rprofdata <- list(
 		info= data.frame(
 			id = as.character(id),
@@ -271,17 +287,9 @@ readRprof <- function(filename = "Rprof.out",
 		, stringsAsFactors=FALSE),		
 		
 		stacks= stacks,
-		# profiles
-		# these are conceptually a data frame and must be line aligned
-        #! should be improved to allow multiple profile collections 	
-        profiles =list(
-			data= profile_lines,	# references to stacksrenc
-			mem = collmemcounts, # additional, line-synced  --- merge to data
-			malloc = collmalloccounts, # additional, line-synced  --- merge to data
-			timesRLE = rle(collinterval)  # --- merge to data
-		, stringsAsFactors=FALSE)
-		)
-		}
+		
+       	profiles=profiles)
+       		}
 		
 		class(Rprofdata) <- c("sprof","list")
 		

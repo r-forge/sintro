@@ -445,7 +445,21 @@ Rprof(filename="RprofsRegressionExpl.out", interval = profinterval)
 	for (i in 1:simruns) xxx<- summary(lm(y~x, data=reg0data))
 Rprof(NULL)
 @
+<<label=Rprof01mem, echo=FALSE, print=FALSE>>=
+Rprof(filename="RprofsRegressionExplMem.out", 
+	interval = profinterval, memory.profiling = TRUE)
+	for (i in 1:simruns) xxx<- summary(lm(y~x, data=reg0data))
+Rprof(NULL)
+sumRprofRegressionExplMem <- 
+readRprof("RprofsRegressionExplMem.out")
 
+@
+<<label=Rprof01gc, echo=FALSE, print=FALSE>>=
+Rprof(filename="RprofsRegressionExplGC.out",
+	interval = profinterval, gc.profiling = FALSE)
+	for (i in 1:(simruns*10)) xxx<- summary(lm(y~x, data=reg0data))
+Rprof(NULL)
+@
 We now have the profile data in a file \code{RprofsRegressionExpl.out}.
 For this vignette, we use a frozen version \code{RprofsRegressionExpl01.out}.
 
@@ -1972,6 +1986,8 @@ plot_graphNEL_sprof <- function(sprof,
 		y <- layoutType
 	} else graphNEL <- sprof
 
+	if (!inherits(graphNEL, "graphNEL")) warn("graphNEL data structure needed")
+
  	if (!is.null(sub)) sub <- as.character(sub) 
 	
 	main=paste0(main, "\n plot_graphNEL_sprof( ", 
@@ -3017,6 +3033,7 @@ prxt(spdemo$results[, c("Item","Title")])
 %%plot(sprof_ig_auto, main="sprof01: igraph norm layout")
 %%detach("package:igraph")
 @
+%:  network package
 \filledpagebreak
 \subsubsection{network package}
 %:        cleanpackages() try detach
@@ -3051,8 +3068,9 @@ plot_network_sprof <- function( nwsprof,
 		}
 	if (!is.null(label)) {
 		warning("plot_network_sprof: explicit label supplied, but will use vertex names")
-		strx(label)
-		strx(network.vertex.names(nwsprof))
+		if (!identical(label,network.vertex.names(nwsprof))) {
+			print(strx(label))
+			print(strx(network.vertex.names(nwsprof)))}
 		}
 	
 	if (!is.null(sub)) sub <- as.character(sub)
@@ -3080,28 +3098,30 @@ plot_network_sprof <- function( nwsprof,
 }
 @
 \filledpagebreak
-
-<<fig=TRUE, label=plotnwsprof03,width=6, height=6>>=
-#6 6
-plot_network_sprof(sprof03)
-@
-\filledpagebreak
-
-<<fig=TRUE, label=nwsprof03,width=8, height=8>>=
-nwsprof03 <- as.network(sprofadj) # names is not imported 
-plot_network_sprof(nwsprof03, label=rownames(sprofadj))
-@
-\filledpagebreak
-
-Experiments to include weight. \todo{maximum edge.lwd?}
 <<fig=TRUE, label=nwsprof03e,width=8, height=8>>=
+#8 8 
 edge.lwd<- sprofadj
 edge.lwd[edge.lwd>0]<- rkindex(edge.lwd[edge.lwd>0], 
 	maxindex=12, ties.method="min")
+nwsprof03 <- as.network(sprofadj) # names is not imported 
 
 plot_network_sprof(nwsprof03, label=rownames(sprofadj), 
  edge.lwd=edge.lwd)
+
 @
+\filledpagebreak
+
+<<fig=TRUE, label=nwsprof03circle,width=8, height=8>>=
+plot_network_sprof(nwsprof03,
+	 mode="circle", 
+	 label=rownames(sprofadj), edge.lwd=edge.lwd)
+@
+\filledpagebreak
+
+<<fig=TRUE, label=nwsprof03kamadakawai,width=8, height=8>>=
+plot_network_sprof(nwsprof03,
+	mode="kamadakawai", 
+	label=rownames(sprofadj), edge.lwd=edge.lwd)
 @
 \filledpagebreak
 
