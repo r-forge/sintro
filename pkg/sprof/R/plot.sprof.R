@@ -282,7 +282,27 @@ plot_profiles <- function(x, which=c(1L,2L,3L, 4L), col,ask = prod(par("mfcol"))
 	xlab="event", 
 	ylab="", yaxt="n" , ylim=c(1,nrprof), 
 	col=col, 
-	main="stacks by event", sub=src)
+	main="stacks by event", sub=src),
+	#5
+	{
+		if(!is.null(xprof$mem)) {vsize.small <- xprof$mem[,"vsize.small.8by"]; plot(diff(vsize.small))}
+		
+	},
+	#6
+	{
+		if(!is.null(xprof$mem)) {vsize.large <- xprof$mem[,"vsize.large.8by"]; plot(diff(vsize.large))}
+		
+	},
+	#7
+	{
+		if(!is.null(xprof$mem)) {nodes <- xprof$mem[,"nodes"]; plot(diff(nodes))}
+		
+	},
+	#8
+	{
+		if(!is.null(xprof$mem)) {duplications <- xprof$mem[,"duplications"]; plot(diff(duplications))}
+		
+	}	
 	)#switch
 	}
 	#image(z, xlab="event", ylab="" , xlim=c(1,length(x$data)), yaxs=NULL)
