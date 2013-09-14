@@ -140,7 +140,11 @@ readRprof <- function(filename = "Rprof.out",
 	
 	close(con)
 	
-	if (!is.null(collmemcounts)) colnames(collmemcounts) <- c("vsize.small.8by", "vsize.large.8by", "nodes", "duplications")
+	if (!is.null(collmemcounts)) { dim(collmemcounts) <- c(length(collmemcounts)/4, 4)
+		#print(collmemcounts)
+		#print(str(collmemcounts))
+	if (dim(collmemcounts)[2]==4) colnames(collmemcounts) <- c("vsize.small.8by", "vsize.large.8by", "nodes", "duplications")
+	}
 
 	if (!is.null(collcontrols)) dim(collcontrols) <-NULL
 # end read data	 
@@ -256,7 +260,7 @@ readRprof <- function(filename = "Rprof.out",
 		# profiles
 		# these are conceptually a data frame and must be line aligned
         #! should be improved to allow multiple profile collections 
-		 browser()	
+		# browser()	
         profiles =list(
 			data= profile_lines,	# references to stacksrenc
 			mem = collmemcounts, 	# additional, line-synced  --- merge to data
