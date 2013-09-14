@@ -48,11 +48,12 @@ summary_nodes <- function(x){
 		total.time[whichn] <- total.time[whichn]+x$stacks$refcount[i]
 	}
 	nodes <- data.frame(
-	#shortname=abbreviate(x$nodes$name), 
-	root= ishead, leaf=isleaf, 
-	self.time=self.time, self.pct = self.time/nrprofs*100,
-	total.time=total.time, total.pct= total.time/nrprofs*100, 
-	stringsAsFactors=FALSE)
+		#shortname=abbreviate(x$nodes$name), 
+		root= ishead, leaf=isleaf, 
+		self.time=self.time, self.pct = self.time/nrprofs*100,
+		total.time=total.time, total.pct= total.time/nrprofs*100,
+		nr_runs= x$nodes$nr_runs, avg_time= x$nodes$avg_time,
+		stringsAsFactors=FALSE)
 	rownames(nodes)<- x$nodes$name
 	nodes
 } # summary_nodes
