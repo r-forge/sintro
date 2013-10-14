@@ -177,7 +177,7 @@ You may want to skip this section, unless you want to modify the vignette for yo
 %
 %tab: \cref{tab:prSRREbs}
 To make sure we do not depend on packages collected along the way,
-we clean up packages. Calls to this funtion will be hidden.
+we clean up packages. Calls to this function will be hidden.
 <<>>=
 cleanpackages <- function()
 {
@@ -389,7 +389,7 @@ It is only half of the truth that the control graph can serve as a base for the 
 \item[memory management] Allocation of memory, and garbage collection, may interfere and leave their traces in the stack. While allocation is closely related to the visible control flow, garbage collection is a collective effect largely out of control of the code to execute.
 \item[primitives] Internal functions may escape the usual stack conventions and execute without leaving any identifiable trace on the stack.
 \item[control structures] In \R{}, many control structures are implemented as function.
-Most notably, the \irfunx{misc}{apply} family appears as function calls and can lead to cliques in the graph representation that do not correspond to relevant structures. Since these functions are well know, they can have a special treatment.
+Most notably, the \irfunx{misc}{apply} family appears as function calls and can lead to cliques in the graph representation that do not correspond to relevant structures. Since these functions are well known, they can have a special treatment.
 \end{description}
 
 So while the stack follows an overall well known dynamics, in \R{} there are exceptions from regularity.
@@ -576,7 +576,7 @@ take a sample and create a profile on the fly, as in
 sprof01temp <- sampleRprof(runif(10000), runs=100)
 @
 The basic data structure consists of four data frames. The \code{info} 
-section collects global information from the input file, such as an 
+section collects global information from the input file, such as  
 identification strings and various global matrix. The \code{nodes} section 
 initially gives the same information marginal information as  
 \code{summaryRprof}. The \code{stacks} section puts the node 
@@ -648,7 +648,7 @@ Basic information on node level: see \vref{fig:sREplotnodes01}.
 Information in the time scatterplots may sometimes more accessible
 when using a logarithmic scale, so this is added.
 
-If you prefer, you can have the bar charts in horizontal layout, giving more space for labels (See Basic information on node level - horizontal bars: \vref{fig:sREplotnodes01h}).
+If you prefer, you can have the bar charts in horizontal layout, giving more space for labels (See ``Basic information on node level - horizontal bars'': \vref{fig:sREplotnodes01h}).
 
 %: floating figure
 <<fig = TRUE, echo = TRUE, print = FALSE, label=sREplotnodes01h, width=8, height=8, include=FALSE>>=
@@ -725,7 +725,7 @@ So we can add colour. To illustrate this, we encode the frequency of the nodes
 as colour. As a palette, we choose a heat map here. 
 \todo{apply colour to selection?}
 
-Note: we chose a colour palette for the full data set. If we restrict a display to 
+Note: we choose a colour palette for the full data set. If we restrict a display to 
 a selection, only a fraction of the palette may be visible. As an alternative, we 
 could adjust the palette to focus on your selection. However the 
 recommendation is not to spend too much energy here. Instead of modifying 
@@ -738,7 +738,7 @@ Function \irfunx{hplot}
 modes to control the use of colours. The recommended mode is to add a 
 index variable \code{icol} giving an index to a colour table. See \irfunx{misc}
 {rkindex} for a choice of modifications. By default, the colour table is the 
-current palette. The plot functions allow to chose a different colour function 
+current palette. The plot functions allow to choose a different colour function 
 plot by plot.\todo{add general discussion of colours in \code{sprof}}
 <<>>=
 freqrank01 <- rkindex(-sprof01$nodes$total.time, 
@@ -785,14 +785,14 @@ of package \code{bertin}, \url{http://bertin.r-forge.r-project.org}.
 
 On the node level, the additional information provided by \code{sprof} is the 
 information on runs. The total time is broken down to runs. Detailed 
-information is accessible if requested. The nuber of runs, and the average 
+information is accessible if requested. The number of runs, and the average 
 run length are reported by default, giving an inside look into the total time 
 reported conventionally. Making use of this information requires careful 
 reading.
 
 By itself, graphical inspection is not very helpful. The profiling process 
 collapsed the real information to very few run numbers, and many ties in the 
-average run lenght (\vref{fig:run}: Run length information.
+average run length (\vref{fig:run}: Run length information.
 ).\todo{add as additional information to classical basics}
 
 <<fig=TRUE, include=FALSE, label=runs>>=
@@ -950,7 +950,7 @@ oldpar <- par(mfrow=c(3,2))
 plot_nodes(sprof01, which=1:6, las=2)
 par(oldpar)
 @
-
+       
 
 \begin{figure}[htbp]
 \begin{center}
@@ -1044,7 +1044,7 @@ The top of stack is now on first position.
 
 Several statistics can be accumulated easily as a side effect.
 
-Conceptually, the data structure consist of three tables (the implementation 
+Conceptually, the data structure consists of three tables (the implementation 
 may differ, and is subject to change).
 
 The profiles table is the representation of the input file. Control lines are 
@@ -1328,19 +1328,19 @@ prxt(nodes,
 )
 	
 @
-Nodes by stack and profile: see \vref{fig:shownodes02}.
+Nodes by stack and profile: see \vref{fig:Rdshownodes02}.
 
 %: floating figure
-<<fig = TRUE, echo = TRUE, print = FALSE, label=shownodes02, png=TRUE, resolution=100, width=8, height=8, include=FALSE>>= 
-#8 8
+<<fig = TRUE, echo = TRUE, print = FALSE, label=Rdshownodes02, png=TRUE, resolution=100, width=6, height=6, include=FALSE>>= 
+#6 6
 shownodes(sprof02)
 @
 
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics{sprofiling-shownodes02}
+\includegraphics{sprofiling-Rdshownodes02}
 \caption{sprof02: Nodes by stack and profile}
-\label{fig:shownodes02}
+\label{fig:Rdshownodes02}
 \end{center}
 \end{figure}
 
@@ -1571,7 +1571,7 @@ sprof03$stacks$nodes <- xreplacenodes(sprof03,
 	
 #asfactormodel(sprof03$stacks$nodes, sprof03$nodes$name)
 @
-Another notorious nuisance is create by shortcuts, that is aliases which maybe make programming more convenient, but hide stucture.
+Another notorious nuisance is created by shortcuts, that is aliases which maybe make programming more convenient, but may hide structure.
 <<>>=
 sprof03$nodes <- addnode(sprof03$nodes, 
 	"<in_match>", warn=FALSE)
@@ -1623,7 +1623,7 @@ par(oldpar)
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics{sprofiling-sREplotnodes04col}
-\caption{Sanitised nsodes by user defined class. User defined colours.}
+\caption{Sanitised nodes by user defined class. User defined colours.}
 \label{fig:sREplotnodes04col}
 \end{center}
 \end{figure}
@@ -1766,9 +1766,9 @@ frequency of 100 would not be surprising. A closer look shows that both
 functions occur as isolated events 40 times, but frequency decreases with 
 run length until we see another high at run length 6. We are sampling, and of 
 course sampling can miss some function calls. But this pattern is the 
-oopposite. This is what if occurs if we do not miss a function call, but we 
+opposite. This is what if occurs if we do not miss a function call, but we 
 miss a gap. So several function calls are joined and appear as some longer 
-runs, typically a multiple of the original run lenght.
+runs, typically a multiple of the original run length.
 
 We can improve the hit rate by increasing the sampling rate. But of course 
 this is at the expense of using more space for the log files, and increased 
@@ -1799,7 +1799,7 @@ Walking further down, we see other candidates such as \code{as.character} that m
 \label{sec:graph}
 What we have achieved so far can be seen from the graph representations.
 For our purposes, an edge table is most convenient. To allow for edge 
-attibutes, we can use an \R{} \code{data.frame} as provided by
+attributes, we can use an \R{} \code{data.frame} as provided by
 
 We can make use of any graph mapping package. Unfortunately, each seem 
 to have its own calling convention. So we have to do some translation.
@@ -1896,7 +1896,7 @@ deeper. This would completely separate the \code{lm()} branch from the
 for additional surgery to avoid focusing affects in the graph display. It is your 
 choice to remove them, or live with them.
 
-We know ho to create standard graph displays from this. The next step is to 
+We know how to create standard graph displays from this. The next step is to 
 encode additional information
 we have from the profiles as attribute to the graph. 
 
@@ -2517,7 +2517,7 @@ plot_graphNEL_sprof(sprof03, nodeattrs="runs")
 \filledpagebreak
 
 Now it is time for detailed inspection. We just give hints how to start.
-Our example is very simple. In out example, we just use two functions, 
+Our example is very simple. In our example, we just use two functions, 
 \code{lm} and \code{summary}. We should not be surprised to find them 
 at prominent position with dominating weight. The \code{lm} and 
 \code{summary.lm} are clearly separated and can be inspected separately.
@@ -2604,9 +2604,16 @@ plot_stacks(sprof)
 <<label=rpoplotprofiles, print=FALSE, eval=FALSE>>=
 plot_profiles(sprof)
 @
+<<fig = TRUE, echo = FALSE, print = FALSE, label=Rdrpoplotnodes, png=TRUE, resolution=100,  include=FALSE>>= 
+plot_nodes(sprof)
+<<fig = TRUE, echo = FALSE, print = FALSE, label=Rdrpoplotstacks, png=TRUE, resolution=100,  include=FALSE>>= 
+plot_stacks(sprof)
+<<fig = TRUE, echo = FALSE, print = FALSE, label=Rdrpoplotprofiles, png=TRUE, resolution=100,  include=FALSE>>= 
+plot_profiles(sprof)
+@
 The \irfunx{hplot}{plot.sprof} method for \code{sprof} objects concatenates 
-these three functions, see \vref{fig:plotsprof}. Using the plot functions above allows better control and will be preferred. \irfunx{hplot}{shownodes} may be a sufficient summary, see \vref{fig:shownodes01rb}.
-<<fig = TRUE, echo = TRUE, print = FALSE, label=plotsprof, png=TRUE, resolution=100, width=16, height=12, include=FALSE>>= plot
+these three functions, see \vref{fig:Rdplotsprof}. Using the plot functions above allows better control and will be preferred. \irfunx{hplot}{shownodes} may be a sufficient summary, see \vref{fig:shownodes01rb}.
+<<fig = TRUE, echo = TRUE, print = FALSE, label=Rdplotsprof, png=TRUE, resolution=100, width=16, height=12, include=FALSE>>= 
 #12 16
 oldpar <- par(mfrow=c(3,4))
 plot.sprof(sprof03)
@@ -2614,9 +2621,9 @@ par(oldpar)
 @
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics{sprofiling-plotsprof}
+\includegraphics{sprofiling-Rdplotsprof}
 \caption{\code{plot.sprof(sprof03)}}
-\label{fig:plotsprof}
+\label{fig:Rdplotsprof}
 \end{center}
 \end{figure}
 

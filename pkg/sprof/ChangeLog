@@ -1,4 +1,15 @@
 ------------------------------------------------------------------------
+r243 | gsawitzki | 2013-09-14 15:56:51 +0200 (Sat, 14 Sep 2013) | 1 line
+tests/sampleRprof.R removed
+------------------------------------------------------------------------
+r240 | gsawitzki | 2013-09-11 21:43:49 +0200 (Wed, 11 Sep 2013) | 1 line
+NA handling improved in icol
+------------------------------------------------------------------------
+r239 | gsawitzki | 2013-09-10 18:12:33 +0200 (Tue, 10 Sep 2013) | 3 lines
+corrected col table in nodescloud
+stabilized nodescloud
+scaled images for html help files
+------------------------------------------------------------------------
 r238 | gsawitzki | 2013-09-08 19:22:45 +0200 (Sun, 08 Sep 2013) | 1 line
 Added exception handling in rkindex; fixed range
 ------------------------------------------------------------------------
