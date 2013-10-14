@@ -25,7 +25,7 @@ If \code{clean=TRUE}, zero results and sorting are preserved. Trailing nodes wit
 may have been lost in the process, and are added.
 
 }
-\value{A matrix \code{count[node, run length]} with a column giving the number of runs by run lenght and three additional columns
+\value{A matrix \code{count[node, run length]} with a column giving the number of runs by run length and three additional columns
  \item{nr_runs}{sum of counts over all run lengths.}
  \item{total_time }{sum of \code{count*run length}}
  \item{avg_time }{\code{total_time / count}}

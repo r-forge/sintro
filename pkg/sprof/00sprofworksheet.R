@@ -129,6 +129,7 @@ mv ChangeLog0  sprof/ChangeLog
 
 pdf <- function(){
 cd ~/projects/rforge/sintro/pkg/
+cp sprof/work/vignettes/sprofiling-Rd* sprof/man/figures
 rm sprof_internal.pdf
 R CMD Rd2pdf -o sprof_internal.pdf  --internals --no-clean --title="sprof reference" sprof
 cp sprof_internal.pdf ../www/sprof/

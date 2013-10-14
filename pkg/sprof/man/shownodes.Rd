@@ -24,8 +24,8 @@ Note: these figures may be outdated. Please run the examples.
 
 Plots are from this collection:
 
-\if{html}{\figure{sprofiling-shownodes02.png}{options: width=84\%}}
-\if{latex}{\figure{sprofiling-shownodes02.pdf}{options: width=6.0in}}
+\if{html}{\figure{sprofiling-Rdshownodes02.png}{options: width=84\%}}
+\if{latex}{\figure{sprofiling-Rdshownodes02.pdf}{options: width=6.0in}}
 }
 \value{
 	Used for the side effect of showing the plots.

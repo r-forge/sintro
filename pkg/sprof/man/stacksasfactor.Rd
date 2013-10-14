@@ -25,7 +25,7 @@ stacksasfactor(sprof, sel, events)
 
 If none is selected, all stacks are given.
 }
-\value{A vector, or a list of vectors, repreenting the selected stacks as factors.}
+\value{A vector, or a list of vectors, representing the selected stacks as factors.}
 %%  ~Describe the value returned
 %%  If it is a LIST, use
 %%  \item{comp1 }{Description of 'comp1'}

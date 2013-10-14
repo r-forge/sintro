@@ -29,8 +29,8 @@ passed.
 %\if{latex}{\figure{logo.jpg}{options: width=0.5in}}
 Plots are from this collection:
 
-\if{html}{\figure{rpoplotprofiles.png}{options: width=84\%}}
-\if{latex}{\figure{rpoplotprofiles.pdf}{options: width=6.0in}}
+\if{html}{\figure{sprofiling-Rdrpoplotprofiles.png}{options: width=84\%}}
+\if{latex}{\figure{sprofiling-Rdrpoplotprofiles.pdf}{options: width=6.0in}}
 
 }
 % \value{

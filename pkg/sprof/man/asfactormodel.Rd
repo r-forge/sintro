@@ -27,9 +27,9 @@ a data structure of same type as \code{x}, with numeric vectors converted to fac
 %}
 \author{Günther Sawitzki <gsawitzki@users.r-forge.r-project.org>}
 
-\note{This functionality could ge to  \R base function \code{\link{factor}}.
+\note{This functionality could go to  \R base function \code{\link{factor}}.
 
-Should be exxtended to cover a wide range of data structures, and identify substructures for conversion.}
+Should be extended to cover a wide range of data structures, and identify substructures for conversion.}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
@@ -41,7 +41,7 @@ Should be exxtended to cover a wide range of data structures, and identify subst
 	
 xf <- asfactormodel(sprof01lm$stacks$nodes, sprof01lm$nodes$name)
 
-# To get a charcter listing, use
+# To get a character listing, use
 sapply(xf, function (x) {as.character(x)} )
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

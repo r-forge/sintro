@@ -5,7 +5,7 @@
 #!
 # source('~/projects/rforge/sintro/pkg/sprof/R/rkindex.R', chdir = TRUE)
 
-# recursive run length encoding of a matrix by row, top down
+# create index from data, with gamma correction
 rkindex <- function(x, 
 	maxindex=length(x), 
 	pwr=1, 

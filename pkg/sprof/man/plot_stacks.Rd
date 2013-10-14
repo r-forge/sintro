@@ -32,8 +32,8 @@ Note: these figures may be outdated. Please run the examples.
 
 Plots are from this collection:
 
-\if{html}{\figure{rpoplotstacks.png}{options: width=84\%}}
-\if{latex}{\figure{rpoplotstacks.pdf}{options: width=6.0in}}
+\if{html}{\figure{sprofiling-Rdrpoplotstacks.png}{options: width=84\%}}
+\if{latex}{\figure{sprofiling-Rdrpoplotstacks.pdf}{options: width=6.0in}}
 
 }
 \value{ To come.
