@@ -90,8 +90,8 @@ icol \tab current colour index
 %\code{\link[proftools]{ileData}} and 
 \code{\link[proftools]{flatProfile}} in \code{library(proftools)}.
 
-%\code{\link[profr]{parse_rprof}} in \code{library(profr)}.
 \code{\link[profr]{parse_rprof}} in \code{library(profr)}.
+%\code{parse_rprof} in \code{library(profr)}.
 
 
 The chapter on \dQuote{Tidying and profiling R code} in
