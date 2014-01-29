@@ -550,7 +550,7 @@ barplot_s(s, horiz=TRUE,
 In contrast to the common \R{} profiling packages, in the \code{sprof} implementation we take a two step approach. First we read in the profile file to an internal representation. Analysis is done in later steps.
 
 <<>>=
-sprof01<- readRprof("RprofsRegressionExpl01.out")
+sprof01<- sprof01xx
 @
 The data contain identification information for reference. This will be used in the functions of \code{sprof} and shown in the displays. Here is the summary of this section:
 <<>>=
@@ -2466,6 +2466,13 @@ library(Rgraphviz)
 
 plot_graphNEL_sprof(sprof03, nodeattrs="runs")
 @
+<<fig=TRUE, label=sprofadj04NEL02rlenotit, width=6, height=6, include=FALSE>>=
+#6 6
+library(Rgraphviz)
+
+plot_graphNEL_sprof(sprof03, nodeattrs="runs", main="", sub="")
+@
+
 %<<fig=TRUE, label=sprofadj04NEL02rle, width=6, height=6, include=FALSE>>=
 %#6 6
 %plot_graphNEL_sprof2(sprof03)
