@@ -6,6 +6,8 @@
 %#	$Author$
 %#	$Revision$
 
+%\VignetteIndexEntry{Profile analysis for R}
+%\VignetteKeyword{profile, visualisation}
 \listfiles
 
 % options(width=72); setwd("/Users/gs/projects/rforge/sintro/pkg/sprof/work/vignettes/" )
