@@ -6,6 +6,8 @@
 %#	$Author$
 %#	$Revision$
 
+%\VignetteIndexEntry{Profile analysis for R}
+%\VignetteKeyword{profile, visualisation}
 \listfiles
 
 % options(width=72); setwd("/Users/gs/projects/rforge/sintro/pkg/sprof/work/vignettes/" )
@@ -14,7 +16,7 @@
 %
 %global flags for conditional builds
 %:flags
-\def\private{true}% comment out for public version
+% \def\private{true}% comment out for public version
 \def\solutions{true}% comment out to hide solutions
 \def\usehyperref{true}% comment out to skip hyperref
 
@@ -547,9 +549,15 @@ barplot_s(s, horiz=TRUE,
 \filledpagebreak
 \subsubsection{Package sprof}
 \label{subsec:sprof}
-In contrast to the common \R{} profiling packages, in the \code{sprof} implementation we take a two step approach. First we read in the profile file to an internal representation. Analysis is done in later steps.
+In contrast to the common \R{} profiling packages, in the \code{sprof} 
+implementation we take a two step approach. First we read in the profile file 
+to an internal representation. Analysis is done in later steps.
 
-<<>>=
+This is a bottle neck to provide a point to use other data sets. The data we use for now is:
+<<readRprof>>=
+sprof01xx<- readRprof("RprofsRegressionExpl.out", id="lm")
+@
+<<sprof01xx>>=
 sprof01<- sprof01xx
 @
 The data contain identification information for reference. This will be used in the functions of \code{sprof} and shown in the displays. Here is the summary of this section:
@@ -1724,7 +1732,7 @@ If you need it, you can represent the run length information by
 level as a matrix.
 This is expanding a sparse matrix to full and should be avoided.
  
-<<>>=
+<<profile_nodes_rlearray01>>=
 profile_nodes_rlearray <- nodesprofile(sprof03)
 strx(profile_nodes_rlearray)
 @
@@ -1733,16 +1741,17 @@ strx(profile_nodes_rlearray)
 \todo{add marginals and conditionals. Provide function node\_summary.}
 This allows us to extract marginal from \code{provlev[ node, level, run 
 length]}.
-<<>>=
-nn <- profile_nodes_rlearray["model.frame", , ]
-print.table(addmargins(nn), zero.print = ".")
+<<nn_profile_nodes_rlearray>>=
+# nn <- profile_nodes_rlearray["model.frame", , ]
+# print.table(addmargins(nn), zero.print = ".")
 @
 
 <<print = FALSE, results = tex, label=tab:pramt4>>=
 amt <- nodesrunlength(sprof03)
+amt <- amt[1:20, 1:5]
 prxt(amt,
 	 caption=paste0("Marginal statistics on nodes by run length, ",
-		 "sorted by total time used"), 
+		 "sorted by total time used (table trimmed)"), 
 	label="tab:pramt4", 
 	digits=c(rep(0,dim(amt)[2]) ,2), 
 	zero.print=" . ") #dim(amt)[2]-1, +1 for rownames
@@ -2612,17 +2621,23 @@ plot_stacks(sprof)
 plot_profiles(sprof)
 @
 <<fig = TRUE, echo = FALSE, print = FALSE, label=Rdrpoplotnodes, png=TRUE, resolution=100,  include=FALSE>>= 
+oldpar <- par(mfrow=c(2,2))
 plot_nodes(sprof)
+par(oldpar)
 <<fig = TRUE, echo = FALSE, print = FALSE, label=Rdrpoplotstacks, png=TRUE, resolution=100,  include=FALSE>>= 
+oldpar <- par(mfrow=c(1,2))
 plot_stacks(sprof)
+par(oldpar)
 <<fig = TRUE, echo = FALSE, print = FALSE, label=Rdrpoplotprofiles, png=TRUE, resolution=100,  include=FALSE>>= 
+oldpar <- par(mfrow=c(2,2))
 plot_profiles(sprof)
+par(oldpar)
 @
 The \irfunx{hplot}{plot.sprof} method for \code{sprof} objects concatenates 
 these three functions, see \vref{fig:Rdplotsprof}. Using the plot functions above allows better control and will be preferred. \irfunx{hplot}{shownodes} may be a sufficient summary, see \vref{fig:shownodes01rb}.
-<<fig = TRUE, echo = TRUE, print = FALSE, label=Rdplotsprof, png=TRUE, resolution=100, width=16, height=12, include=FALSE>>= 
+<<fig = TRUE, echo = TRUE, print = FALSE, label=Rdplotsprof, png=TRUE, resolution=100, width=12, height=16, include=FALSE>>= 
 #12 16
-oldpar <- par(mfrow=c(3,4))
+oldpar <- par(mfrow=c(4,3))
 plot.sprof(sprof03)
 par(oldpar)
 @
@@ -3272,6 +3287,8 @@ Svn repository information:
 \verb+$Author$+
 }
 \typeout{**** $Id$ done ****}
+\ifx\private\undefined%
+\else
 \filledpagebreak
 \section{xxx  -- lost \& found}
 
@@ -3281,6 +3298,7 @@ On the profiles level, we know the sample interval length, and the id of the sta
 Cheap statistics are collected as the come by. For example, from the stacks table it is cheap to identify root and leaf nodes, and this mark is propagated to the nodes table.
 @
 These are some attempts to recover the factor structures.
+\fi
 %<<>>=
 %xfi <- levels(sprof03$nodes$name)
 %profile_nodes_rlefac <- lapply(profile_nodes_rle, 
