@@ -2,6 +2,7 @@ export(
     plot.lm,
     text_id,
     summaryRprof,
+    setcolalpha,
     OddOneOut
     )
 
