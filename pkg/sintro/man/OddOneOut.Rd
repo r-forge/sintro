@@ -89,8 +89,10 @@ OddOneOut(runs=5, ncols=3, training=FALSE)
 
 }
 ## The function is currently defined as
-function (goodplot = function(n, ...){plot(rnorm(n))}, badplot = function(n, ...){plot(runif(n))}, n = 100, 
-    runs = 10, nrows = 4, ncols = 4, training = TRUE, ...) 
+function (goodplot = function(n, ...){plot(rnorm(n))}, 
+	badplot = function(n, ...){plot(runif(n))}, 
+	n = 100,  runs = 10, 
+	nrows = 4, ncols = 4, training = TRUE, ...) 
 {
 cat("One plot is out. Please click on the odd panel in the plot. Abort with <esc>.\n")
 cat("There are ",runs, "runs.\n")
