@@ -155,7 +155,7 @@ summaryRprof <-
 
 Rprof_memory_summary <- function(filename, chunksize = 5000,
                                  label = c(1, -1), aggregate = 0, diff = FALSE,
-                                 exclude = NULL, sample.interval,  includeonly = NULL))
+                                 exclude = NULL, sample.interval,  includeonly = NULL)
 {
 
     fnames <- NULL
