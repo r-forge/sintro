@@ -1,16 +1,18 @@
-# a commom worksheet for sitroe
+# a commom worksheet for sintro
+
 cd ~/projects/rforge/ # sintro ## a directory containing sintro
 cd "/Users/gs/projects/rforge/sintro/"
 
 # R cmds for ad hoc construction
 # setwd("/Users/gs/projects/rforge/sintro/")
-# install.packages("/Users/gs/projects/rforge/sintro/sintro.1-1.tar.gz", repos=NULL, type="source")
+# install.packages("/Users/gs/projects/rforge/sintro/sintro_0.1-4.tar.gz", repos=NULL, type="source")
 
 # install package
 
 cd /Users/gs/projects/rforge/sintro
 R CMD CHECK pkg
-R CMD BUILD --compact-vignettes pkg
+R CMD check --as-cran pkg/sintro
+R CMD BUILD --compact-vignettes pkg/sintro
 
 # install package
 R CMD INSTALL sintro

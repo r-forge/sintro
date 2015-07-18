@@ -5,7 +5,7 @@
 
 \description{Set or modify the alpha chanels for colour specification}
 \usage{
-setcolalpha(col, alph~/projects/rforge/sintro/pkg/sintro/man/OddOneOut.Rda = "#40")
+setcolalpha(col, alpha = "#40")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

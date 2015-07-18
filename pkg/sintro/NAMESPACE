@@ -1,6 +1,7 @@
 export(
     plot.lm,
     text_id,
+    parcoord,
     summaryRprof,
     setcolalpha,
     OddOneOut
