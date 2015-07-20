@@ -1,3 +1,4 @@
+%$ID:$
 \name{parcoord}
 \alias{parcoord}
 \title{
@@ -7,7 +8,8 @@ Parallel Coordinates Plot
 Parallel coordinates plot
 }
 \usage{
-parcoord(x, col = 1, lty = 1, var.label = FALSE, group, perm, negate, rep = FALSE, \ldots)
+parcoord(x, col = 1, lty = 1, var.label = FALSE, 
+group, varsel, negate, rep = FALSE, \ldots)
 }
 %
 \arguments{
@@ -26,14 +28,14 @@ If \code{TRUE}, each variable's axis is labelled with maximum and
 minimum values.
 }
   \item{group}{
-A group variable to select colours. \code{col} may superseed this. 
+A group variable to select colours. \code{col} may supersede this. 
 }
-  \item{perm}{
-A list of permutations, selcting th variable to display an thai sequnce.
+  \item{varsel}{
+Indices, selecting the variable to display and their sequence. Repetitions are allowed.
 }
   \item{negate}{
-Variables to be shown in inverse scale. Names are modified to mark ths.
-This is in original (unpermuted) order.
+Variables to be shown in inverse scale. Names are modified to mark this.
+Indices are in original (unpermuted, unselected) order.
 }
   \item{rep}{
 Repeat display cyclically.}

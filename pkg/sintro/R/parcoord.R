@@ -1,9 +1,10 @@
 # adapted, and modified from MASS
+# $Rev$
 
 parcoord <- function (x, col = 1, lty = 1, 
 	var.label = FALSE, 
 	group,
-	perm, negate, 
+	varsel, negate, 
 	rep=FALSE, ...) 
 {
  negmark<- '-'
@@ -12,7 +13,7 @@ parcoord <- function (x, col = 1, lty = 1,
   if (!missing(negate)) 
   	{x[negate] <- - x[negate]; 
 	colnames(x)[negate] <- paste(negmark,colnames(x)[negate], sep='') }
-   if (!missing(perm)) x <- x[,perm]
+   if (!missing(varsel)) x <- x[,varsel]
    if (rep) x <- cbind(x,x)
     rx <- apply(x, 2L, range, na.rm = TRUE)
     x <- apply(x, 2L, function(x) (x - min(x, na.rm = TRUE))/(max(x, 
