@@ -1,5 +1,7 @@
 # a commom worksheet for sintro
 
+svn propset svn:keywords "Date Rev Author Id Header URL ID" *.Rd
+ 
 cd ~/projects/rforge/ # sintro ## a directory containing sintro
 cd "/Users/gs/projects/rforge/sintro/"
 
