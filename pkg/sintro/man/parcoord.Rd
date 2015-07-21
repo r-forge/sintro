@@ -1,3 +1,4 @@
+%$Id$
 %$ID:$
 \name{parcoord}
 \alias{parcoord}
@@ -9,7 +10,7 @@ Parallel coordinates plot
 }
 \usage{
 parcoord(x, col = 1, lty = 1, var.label = FALSE, 
-group, varsel, negate, rep = FALSE, \ldots)
+group, perm, negate, rep = FALSE, \ldots)
 }
 %
 \arguments{
@@ -30,8 +31,8 @@ minimum values.
   \item{group}{
 A group variable to select colours. \code{col} may supersede this. 
 }
-  \item{varsel}{
-Indices, selecting the variable to display and their sequence. Repetitions are allowed.
+  \item{perm}{
+A permutation, or any index sequence, selecting the variable to display and their order. Repetitions are allowed.
 }
   \item{negate}{
 Variables to be shown in inverse scale. Names are modified to mark this.
@@ -83,6 +84,8 @@ Inselberg, A. (2008) \emph{Parallel Coordinates}
 }
 \examples{
 parcoord(state.x77[, c(7, 4, 6, 2, 5, 3)])
+
+parcoord(state.x77, perrm=c(7, 4, 6, 2, 5, 3))
 
 ir <- rbind(iris3[,,1], iris3[,,2], iris3[,,3])
 parcoord(log(ir)[, c(3, 4, 2, 1)], col = 1 + (0:149)\%/\%50)

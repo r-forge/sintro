@@ -1,10 +1,14 @@
 # adapted, and modified from MASS
+# $Date$
+# $Header$
 # $Rev$
+# $Header$
+
 
 parcoord <- function (x, col = 1, lty = 1, 
 	var.label = FALSE, 
 	group,
-	varsel, negate, 
+	perm, negate, 
 	rep=FALSE, ...) 
 {
  negmark<- '-'
@@ -13,7 +17,7 @@ parcoord <- function (x, col = 1, lty = 1,
   if (!missing(negate)) 
   	{x[negate] <- - x[negate]; 
 	colnames(x)[negate] <- paste(negmark,colnames(x)[negate], sep='') }
-   if (!missing(varsel)) x <- x[,varsel]
+   if (!missing(perm)) x <- x[,perm]
    if (rep) x <- cbind(x,x)
     rx <- apply(x, 2L, range, na.rm = TRUE)
     x <- apply(x, 2L, function(x) (x - min(x, na.rm = TRUE))/(max(x, 
