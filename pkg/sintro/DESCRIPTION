@@ -1,8 +1,8 @@
 Package: sintro
 Type: Package
 Title: Introduction to R: sintro
-Version: 0.1-4
-Date: 2015-07-18
+Version: 0.1-5
+Date: 2016-07-11
 Author: G. Sawitzki
 Maintainer: G. Sawitzki <gsawitzki@r-forge.r-project.org>
 Description: Sample code and supplement to G. Sawitzki: Computational Statistics/Introduction to R.
