@@ -1,6 +1,5 @@
 # adapted, and modified from MASS
 # $Date$
-# $Header$
 # $Rev$
 # $Header$
 

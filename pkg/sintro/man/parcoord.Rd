@@ -1,5 +1,4 @@
 %$Id$
-%$ID:$
 \name{parcoord}
 \alias{parcoord}
 \title{

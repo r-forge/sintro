@@ -1,4 +1,5 @@
 export(
+	biplot,
     plot.lm,
     text_id,
     parcoord,
@@ -8,4 +9,18 @@ export(
     )
 
 S3method(plot, lm)
+S3method(biplot, default)
+S3method(biplot, princomp)
+S3method(biplot, prcomp)
 
+  importFrom("grDevices", "as.graphicsAnnot", "dev.flush", "dev.hold",
+             "dev.interactive", "devAskNewPage", "extendrange",
+             "palette", "rainbow")
+  importFrom("graphics", "abline", "arrows", "axis", "box", "frame",
+             "legend", "lines", "locator", "matplot", "mtext",
+             "panel.smooth", "par", "plot", "plot.window", "points",
+             "strheight", "strwidth", "text", "title")
+  importFrom("stats", "coef", "cooks.distance", "deviance",
+             "df.residual", "lm.influence", "model.frame", "predict",
+             "qqnorm", "residuals", "rnorm", "rstudent", "runif",
+             "terms", "weights")

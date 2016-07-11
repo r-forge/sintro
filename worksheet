@@ -13,8 +13,8 @@ cd "/Users/gs/projects/rforge/sintro/"
 
 cd /Users/gs/projects/rforge/sintro
 R CMD CHECK pkg
-R CMD check --as-cran pkg/sintro
 R CMD BUILD --compact-vignettes pkg/sintro
+R CMD check --as-cran pkg/sintro
 
 # install package
 R CMD INSTALL sintro
