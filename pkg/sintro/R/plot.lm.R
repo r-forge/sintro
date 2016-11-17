@@ -1,5 +1,6 @@
 #  File src/library/stats/R/plot.lm.R
 # based on 2.15.0 Under development (unstable)
+# gs 20161114 changed rank to random in plot 7
 # gs 20120121 added show(7L) ext. stud resid vs. fit
 #  Part of the R package, http://www.R-project.org
 #
@@ -151,7 +152,7 @@ function (x, which = c(1L:3L,5L), ## was which = 1L:4L,
 # 7L   
        if (show[7L]) {
     er <- rstudent(x)
-    yhr <- rank(yh,ties.method = "average")
+    yhr <- rank(yh,ties.method = "random") #rank(yh,ties.method = "average")
 	ylim <- range(er, na.rm=TRUE)
 	if(id.n > 0)
 	    ylim <- extendrange(r= ylim, f = 0.08)
